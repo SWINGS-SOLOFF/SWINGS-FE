@@ -5,6 +5,10 @@
 
 
 ### ⚙️ 실행방법 (npm)
+> ### npm 설치
+```shell
+npm install
+```
 > ### 서버 실행
 ```shell
 npm run dev
