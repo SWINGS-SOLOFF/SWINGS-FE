@@ -1,39 +1,30 @@
+import React, { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-export default function Home() {
+const Home = () => {
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
 
-  const handleLogin = () => {
-    navigate("/swings/login");
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/swings/home");
-  };
+  if (!user) {
+    navigate("/swings/startpage");
+    return null;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold">홈 화면</h1>
-      {token ? (
-        <>
-          <p className="text-gray-600">로그인 성공! 여기는 홈 화면입니다.</p>
-          <button
-            onClick={handleLogout}
-            className="mt-4 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
-          >
-            로그아웃
-          </button>
-        </>
-      ) : (
-        <button
-          onClick={handleLogin}
-          className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-        >
-          로그인
-        </button>
-      )}
+      <h1 className="text-3xl font-bold text-green-700 mb-4">
+        {user.username}님, 환영합니다!
+      </h1>
+      <p>골프 실력: {user.golfSkill}</p>
+      <button
+        onClick={logout}
+        className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+      >
+        로그아웃
+      </button>
     </div>
   );
-}
+};
+
+export default Home;
