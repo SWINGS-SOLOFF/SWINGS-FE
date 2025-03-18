@@ -1,23 +1,26 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import StartPage from "./pages/StartPage";
 import Home from "./pages/Home";
+import { AuthProvider } from "./context/AuthContext";
+import PrivateRoute from "./routes/PrivateRoute";
 
-function App() {
-  const isAuthenticated = localStorage.getItem("token"); // 로그인 여부 확인
-
+const App = () => {
   return (
-    <Routes>
-      <Route path="/swings/home" element={<Home />} />
-      <Route
-        path="/swings/login"
-        element={isAuthenticated ? <Navigate to="/swings/home" /> : <Login />}
-      />
-      <Route
-        path="/swings/auth/login"
-        element={<Navigate to="/swings/home" />}
-      />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/swings/startpage" element={<StartPage />} />
+        <Route
+          path="/swings/home"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
   );
-}
+};
 
 export default App;
