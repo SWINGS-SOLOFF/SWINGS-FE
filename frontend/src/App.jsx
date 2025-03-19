@@ -10,7 +10,7 @@ import Navigation from './components/Navigation';
 function App() {
     return (
         <Router>
-            <div className="min-h-screen bg-green-50">
+            <div className="min-h-screen bg-green-50" style={{ minHeight: 'calc(100vh - 64px)' }}>
                 <Navigation />
                 <div className="container mx-auto px-4 pb-8">
                     <Routes>
