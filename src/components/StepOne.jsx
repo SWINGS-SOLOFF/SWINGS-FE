@@ -13,7 +13,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
     setChecking(true);
     try {
       const response = await fetch(
-        `http://localhost:8090/users/check-username?username=${formData.username}`
+        `http://localhost:8090/swings/users/check-username?username=${formData.username}`
       );
       if (!response.ok) {
         throw new Error("서버 오류");

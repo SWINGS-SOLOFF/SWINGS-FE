@@ -1,16 +1,40 @@
-// src/pages/Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
+  /** 🔹 로그인 요청 */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("로그인 시도:", formData);
-    alert("로그인 기능은 아직 구현되지 않았습니다.");
-    navigate("/");
+    setErrorMessage(""); // 기존 에러 초기화
+
+    try {
+      const response = await fetch("http://localhost:8090/swings/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "로그인 실패. 다시 시도해주세요.");
+      }
+
+      // 서버에서 JWT 토큰 응답 받았다고 가정하고 로컬 스토리지에 저장
+      localStorage.setItem("token", data.token);
+
+      alert("로그인 성공!");
+      navigate("/"); // 홈으로 이동
+    } catch (error) {
+      console.error("로그인 실패:", error);
+      setErrorMessage(error.message);
+    }
   };
 
   return (
@@ -21,7 +45,8 @@ export default function Login() {
           아이디:
           <input
             type="text"
-            className="w-full border p-2 rounded"
+            placeholder="아이디를 입력하세요"
+            className="w-full border p-2 rounded text-black"
             value={formData.username}
             onChange={(e) =>
               setFormData({ ...formData, username: e.target.value })
@@ -33,13 +58,17 @@ export default function Login() {
           비밀번호:
           <input
             type="password"
-            className="w-full border p-2 rounded"
+            placeholder="비밀번호를 입력하세요"
+            className="w-full border p-2 rounded text-black"
             value={formData.password}
             onChange={(e) =>
               setFormData({ ...formData, password: e.target.value })
             }
           />
         </label>
+
+        {/* 로그인 실패 메시지 */}
+        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
         <button
           type="submit"
