@@ -10,7 +10,7 @@ import Navigation from './components/Navigation';
 function App() {
     return (
         <Router>
-            <div className="min-h-screen bg-green-50" style={{ minHeight: 'calc(100vh - 64px)' }}>
+            <div className="min-h-screen bg-green-50" >
                 <Navigation />
                 <div className="container mx-auto px-4 pb-8">
                     <Routes>
@@ -18,7 +18,7 @@ function App() {
                         <Route path="/user-management" element={<UserManagementPage />} />
                         <Route path="/match-management" element={<MatchManagementPage />} />
                         <Route path="/admin" element={<AdminPage />} />
-                        <Route path="/feed" element={<FeedPage />} />
+                        <Route path="/swings/feed" element={<FeedPage />} />
                     </Routes>
                 </div>
             </div>

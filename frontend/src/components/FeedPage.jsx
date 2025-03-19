@@ -1,56 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { FaHeart, FaComment, FaShare, FaBookmark, FaPlusCircle } from 'react-icons/fa';
+import { FaHeart, FaTrash, FaPlusCircle } from 'react-icons/fa';
+import axios from 'axios';
 
 const FeedPage = () => {
-    // State for posts and new post form
     const [posts, setPosts] = useState([]);
     const [newPostContent, setNewPostContent] = useState('');
     const [newPostImage, setNewPostImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [showNewPostForm, setShowNewPostForm] = useState(false);
+    const [newCommentContent, setNewCommentContent] = useState({});
+    const userId = 1;  // 임시로 userId 1 사용
 
-    // Mock data for initial posts
     useEffect(() => {
-        setPosts([
-            {
-                id: 1,
-                username: 'golfer123',
-                avatarUrl: 'https://placehold.co/40x40',
-                imageUrl: 'https://placehold.co/600x400',
-                caption: '오늘 멋진 골프 라운딩을 즐겼습니다! 좋은 사람들과 함께해서 더 좋았어요. 다음 매칭도 기대합니다.',
-                likes: 42,
-                comments: 8,
-                timestamp: '2시간 전'
-            },
-            {
-                id: 2,
-                username: 'golf_pro',
-                avatarUrl: 'https://placehold.co/40x40',
-                imageUrl: 'https://placehold.co/600x400',
-                caption: '골프 모임에서 새로운 친구들을 만났습니다. 다음 주 토요일에 또 만나기로 했어요!',
-                likes: 28,
-                comments: 5,
-                timestamp: '4시간 전'
-            },
-            {
-                id: 3,
-                username: 'tee_time',
-                avatarUrl: 'https://placehold.co/40x40',
-                imageUrl: 'https://placehold.co/600x400',
-                caption: '새 클럽으로 첫 라운딩. 스코어가 많이 좋아졌네요. 모임에서 만난 분의 조언이 큰 도움이 되었습니다.',
-                likes: 56,
-                comments: 12,
-                timestamp: '어제'
-            }
-        ]);
+        axios.get('http://localhost:8090/swings/feeds')
+            .then(response => {
+                const data = Array.isArray(response.data) ? response.data : [];
+                setPosts(data);
+            })
+            .catch(error => {
+                console.error('Error fetching feeds:', error);
+            });
     }, []);
 
-    // Handle image file selection
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setNewPostImage(file);
-            // Create preview URL
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result);
@@ -59,30 +34,112 @@ const FeedPage = () => {
         }
     };
 
-    // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Create new post
-        const newPost = {
-            id: posts.length + 1,
-            username: 'current_user', // This would come from auth in a real app
-            avatarUrl: 'https://placehold.co/40x40',
-            imageUrl: imagePreview || 'https://placehold.co/600x400',
-            caption: newPostContent,
-            likes: 0,
-            comments: 0,
-            timestamp: '방금 전'
-        };
+        const formData = new FormData();
+        formData.append('userId', userId);
+        formData.append('content', newPostContent);
+        if (newPostImage) {
+            formData.append('file', newPostImage);
+        }
 
-        // Update posts state
-        setPosts([newPost, ...posts]);
+        try {
+            const response = await axios.post('http://localhost:8090/swings/feeds/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            setPosts([ { ...response.data, liked: false }, ...posts ]);
+        } catch (error) {
+            console.error('There was an error uploading the feed!', error);
+        }
 
-        // Reset form
         setNewPostContent('');
         setNewPostImage(null);
         setImagePreview(null);
         setShowNewPostForm(false);
+    };
+
+    const handleDelete = async (feedId) => {
+        try {
+            await axios.delete(`http://localhost:8090/swings/feeds/${feedId}`);
+            setPosts(posts.filter(post => post.feedId !== feedId));
+        } catch (error) {
+            console.error('Error deleting post:', error);
+        }
+    };
+
+    const handleLike = async (feedId) => {
+        try {
+            const response = await axios.put(`http://localhost:8090/swings/feeds/${feedId}/like`, { userId });
+            setPosts(posts.map(post =>
+                post.feedId === feedId
+                    ? { ...post, likes: response.data.likes, liked: true }
+                    : post
+            ));
+        } catch (error) {
+            console.error('Error liking post:', error);
+        }
+    };
+
+    const handleUnlike = async (feedId) => {
+        try {
+            const response = await axios.put(`http://localhost:8090/swings/feeds/${feedId}/unlike`, { userId });
+            setPosts(posts.map(post =>
+                post.feedId === feedId
+                    ? { ...post, likes: response.data.likes, liked: false }
+                    : post
+            ));
+        } catch (error) {
+            console.error('Error unliking post:', error);
+        }
+    };
+
+    const handleCommentSubmit = async (feedId) => {
+        if (!newCommentContent[feedId]) return;
+
+        try {
+            const response = await axios.post(`http://localhost:8090/swings/feeds/${feedId}/comments`, null, {
+                params: {
+                    userId,  // 임시로 userId 1 사용
+                    content: newCommentContent[feedId]
+                }
+            });
+
+            setPosts(posts.map(post =>
+                post.feedId === feedId
+                    ? {
+                        ...post,
+                        comments: Array.isArray(post.comments) ? [...post.comments, response.data] : [response.data]
+                    }
+                    : post
+            ));
+
+            setNewCommentContent(prev => ({ ...prev, [feedId]: '' }));
+        } catch (error) {
+            console.error('Error adding comment:', error);
+        }
+    };
+
+    const handleCommentDelete = async (commentId, feedId) => {
+        try {
+            await axios.delete(`http://localhost:8090/swings/feeds/${feedId}/comments/${commentId}`);
+
+            setPosts(posts.map(post =>
+                post.feedId === feedId
+                    ? { ...post, comments: Array.isArray(post.comments) ? post.comments.filter(comment => comment.commentId !== commentId) : [] }
+                    : post
+            ));
+        } catch (error) {
+            console.error('Error deleting comment:', error);
+        }
+    };
+
+    const handleShowMoreComments = (feedId) => {
+        setPosts(posts.map(post =>
+            post.feedId === feedId
+                ? { ...post, showAllComments: true }
+                : post
+        ));
     };
 
     return (
@@ -144,10 +201,10 @@ const FeedPage = () => {
                 </div>
             )}
 
-            {/* Feed Posts */}
+            {/* Feed List */}
             <div className="space-y-6">
                 {posts.map(post => (
-                    <div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden border border-green-100">
+                    <div key={post.feedId} className="bg-white rounded-lg shadow-md overflow-hidden border border-green-100">
                         {/* Post Header */}
                         <div className="flex items-center p-4">
                             <img
@@ -162,23 +219,21 @@ const FeedPage = () => {
                         </div>
 
                         {/* Post Image */}
-                        <img src={post.imageUrl} alt="Post content" className="w-full object-cover max-h-96" />
+                        <img src={`http://localhost:8090/swings/uploads/${post.imageUrl}`} alt="Feed content" className="w-full object-cover max-h-96" />
 
                         {/* Post Actions */}
-                        <div className="flex justify-between p-4 border-b border-green-100">
-                            <div className="flex space-x-4">
-                                <button className="text-xl text-green-700 hover:text-green-900">
-                                    <FaHeart />
-                                </button>
-                                <button className="text-xl text-green-700 hover:text-green-900">
-                                    <FaComment />
-                                </button>
-                                <button className="text-xl text-green-700 hover:text-green-900">
-                                    <FaShare />
-                                </button>
-                            </div>
-                            <button className="text-xl text-green-700 hover:text-green-900">
-                                <FaBookmark />
+                        <div className="flex p-2 border-b border-green-100">
+                            <button
+                                onClick={() => post.liked ? handleUnlike(post.feedId) : handleLike(post.feedId)}
+                                className="flex-1 flex justify-center items-center text-3xl hover:text-green-900 transition duration-200 py-4 border-r border-green-300"
+                            >
+                                <FaHeart className={post.liked ? "text-red-600" : "text-green-700"} />
+                            </button>
+                            <button
+                                onClick={() => handleDelete(post.feedId)}
+                                className="flex-1 flex justify-center items-center text-3xl text-red-600 hover:text-red-800 transition duration-200 py-4 border-l border-green-300"
+                            >
+                                <FaTrash />
                             </button>
                         </div>
 
@@ -189,14 +244,54 @@ const FeedPage = () => {
                                 <span className="font-semibold text-green-800 mr-2">{post.username}</span>
                                 {post.caption}
                             </p>
-                            <p className="text-gray-500 text-sm mb-2">댓글 {post.comments}개 모두 보기</p>
+
+                            <p className="text-gray-500 text-sm mb-2">
+                                댓글 {post.comments ? (Array.isArray(post.comments) ? post.comments.length : 0) : 0}개
+                            </p>
+
+                            {post.comments && Array.isArray(post.comments) && (
+                                <div className="space-y-4">
+                                    {post.comments.slice(0, post.showAllComments ? post.comments.length : 1).map(comment => (
+                                        <div key={comment.commentId} className="flex items-center justify-between">
+                                            <div>
+                                                <p className="font-semibold text-green-800">{comment.user.username}</p>
+                                                <p className="text-sm">{comment.content}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleCommentDelete(comment.commentId, post.feedId)}
+                                                className="text-red-600 hover:text-red-800 transition"
+                                            >
+                                                삭제
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Show More Comments */}
+                            {post.comments && post.comments.length > 1 && !post.showAllComments && (
+                                <button
+                                    onClick={() => handleShowMoreComments(post.feedId)}
+                                    className="text-green-600 mt-2"
+                                >
+                                    더보기
+                                </button>
+                            )}
+
                             <div className="flex items-center mt-2">
                                 <input
                                     type="text"
                                     placeholder="댓글 추가..."
+                                    value={newCommentContent[post.feedId] || ''}
+                                    onChange={(e) => setNewCommentContent({ ...newCommentContent, [post.feedId]: e.target.value })}
                                     className="flex-grow text-sm p-1 focus:outline-none"
                                 />
-                                <button className="text-green-600 font-semibold text-sm ml-2">게시</button>
+                                <button
+                                    onClick={() => handleCommentSubmit(post.feedId)}
+                                    className="text-green-600 font-semibold text-sm ml-2"
+                                >
+                                    게시
+                                </button>
                             </div>
                         </div>
                     </div>

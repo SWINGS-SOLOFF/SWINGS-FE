@@ -10,7 +10,7 @@ const Navigation = () => {
         { path: '/', icon: <FaHome />, label: '홈' },
         { path: '/user-management', icon: <FaUsers />, label: '모임 관리' },
         { path: '/match-management', icon: <FaHandshake />, label: '매칭 관리' },
-        { path: '/feed', icon: <FaStream />, label: '피드' },
+        { path: '/swings/feed', icon: <FaStream />, label: '피드' },
         { path: '/admin', icon: <FaSignInAlt />, label: '회원' },
     ];
 
