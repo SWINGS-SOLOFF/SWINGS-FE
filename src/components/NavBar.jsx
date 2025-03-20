@@ -8,15 +8,16 @@ export default function NavBar() {
     <nav className="p-4 bg-gray-800 text-white flex justify-center items-center space-x-4 w-full">
       <Link to="/">SWINGS</Link>
       {token ? (
-        <button
+        <Link
+          to="/"
           onClick={() => {
             logout();
             window.location.reload(); // ✅ 로그아웃 후 새로고침하여 UI 반영
           }}
-          className="bg-red-500 text-white px-4 py-2 rounded"
+          className="text-red-500"
         >
           LOGOUT
-        </button>
+        </Link>
       ) : (
         <Link to="/login">LOGIN</Link>
       )}
