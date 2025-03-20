@@ -1,13 +1,17 @@
 import AppRoutes from "./routes/AppRoutes";
-import NavBar from "./components/NavBar"; // ✅ NavBar import
+import NavBar from "./components/NavBar";
+import { AuthProvider } from "./context/AuthContext"; // ✅ AuthProvider 가져오기
 
 function App() {
   return (
-    <div className="App">
-      <NavBar /> {/* ✅ NavBar 컴포넌트 사용 */}
-      {/* 라우트 설정 */}
-      <AppRoutes />
-    </div>
+    <AuthProvider>
+      {" "}
+      {/* ✅ 전체 앱을 AuthProvider로 감싸야 함 */}
+      <div className="App">
+        <NavBar />
+        <AppRoutes />
+      </div>
+    </AuthProvider>
   );
 }
 
