@@ -6,6 +6,8 @@ import MatchManagementPage from './components/MatchManagementPage';
 import AdminPage from './components/AdminPage';
 import FeedPage from './components/FeedPage';
 import Navigation from './components/Navigation';
+import SocialPage from './components/SocialPage';
+
 
 function App() {
     return (
@@ -19,6 +21,7 @@ function App() {
                         <Route path="/match-management" element={<MatchManagementPage />} />
                         <Route path="/admin" element={<AdminPage />} />
                         <Route path="/swings/feed" element={<FeedPage />} />
+                        <Route path="/swings/social" element={<SocialPage />} />
                     </Routes>
                 </div>
             </div>

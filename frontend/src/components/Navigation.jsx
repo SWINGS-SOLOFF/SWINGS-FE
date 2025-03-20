@@ -11,14 +11,21 @@ const Navigation = () => {
         { path: '/user-management', icon: <FaUsers />, label: '모임 관리' },
         { path: '/match-management', icon: <FaHandshake />, label: '매칭 관리' },
         { path: '/swings/feed', icon: <FaStream />, label: '피드' },
+        { path: '/swings/social', icon: <FaUsers />, label: '소셜' },
         { path: '/admin', icon: <FaSignInAlt />, label: '회원' },
+
     ];
 
     return (
         <nav className="bg-green-800 text-white py-4 mb-6 shadow-md">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold">골프 매칭</div>
+                    <div className="flex items-center space-x-2">
+                        <div className="text-2xl font-bold">골프 매칭</div>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
 
                     <div className="hidden md:flex space-x-6">
                         {navItems.map((item) => (
