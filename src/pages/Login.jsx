@@ -1,22 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // ✅ AuthContext 가져오기
 
 export default function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ login 함수 가져오기
 
   /** 🔹 로그인 요청 */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage(""); // 기존 에러 초기화
+    setErrorMessage("");
 
     try {
       const response = await fetch("http://localhost:8090/swings/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
@@ -26,11 +26,12 @@ export default function Login() {
         throw new Error(data.message || "로그인 실패. 다시 시도해주세요.");
       }
 
-      // 서버에서 JWT 토큰 응답 받았다고 가정하고 로컬 스토리지에 저장
-      localStorage.setItem("token", data.token);
+      // ✅ JWT 토큰 저장 및 로그인 상태 변경
+      login(data.token);
 
       alert("로그인 성공!");
-      navigate("/"); // 홈으로 이동
+      navigate("/");
+      window.location.reload(); // ✅ UI 반영을 위해 새로고침
     } catch (error) {
       console.error("로그인 실패:", error);
       setErrorMessage(error.message);
@@ -67,7 +68,6 @@ export default function Login() {
           />
         </label>
 
-        {/* 로그인 실패 메시지 */}
         {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
         <button
