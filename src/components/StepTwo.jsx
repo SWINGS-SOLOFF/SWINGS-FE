@@ -14,7 +14,7 @@ const StepTwo = ({ formData, setFormData, prevStep }) => {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setFormData({ ...formData, user_img: reader.result }); // Base64 데이터 저장
+      setFormData({ ...formData, userImg: reader.result }); // Base64 데이터 저장
       setImagePreview(reader.result); // 미리보기용 상태 업데이트
     };
     reader.readAsDataURL(file);
@@ -75,9 +75,9 @@ const StepTwo = ({ formData, setFormData, prevStep }) => {
         골프 실력:
         <select
           className="w-full border p-2 rounded text-black"
-          value={formData.golf_skill}
+          value={formData.golfSkill}
           onChange={(e) =>
-            setFormData({ ...formData, golf_skill: e.target.value })
+            setFormData({ ...formData, golfSkill: e.target.value })
           }
         >
           <option value="">골프 실력을 선택하세요</option>
