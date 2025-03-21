@@ -112,6 +112,25 @@ const StepTwo = ({ formData, setFormData, prevStep }) => {
           }
         />
       </label>
+      {/* 종교 선택 */}
+      <label className="block">
+        종교:
+        <select
+          className="w-full border p-2 rounded text-black"
+          value={formData.religion}
+          onChange={(e) =>
+            setFormData({ ...formData, religion: e.target.value })
+          }
+        >
+          <option value="">종교를 선택하세요</option>
+          <option value="none">무교</option>
+          <option value="christian">기독교</option>
+          <option value="catholic">천주교</option>
+          <option value="buddhist">불교</option>
+          <option value="etc">기타</option>
+        </select>
+      </label>
+
       {/* 흡연 여부 */}
       <label className="block">
         흡연 여부:
