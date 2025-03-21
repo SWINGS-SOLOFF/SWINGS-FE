@@ -112,7 +112,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
         전화번호:
         <input
           type="text"
-          placeholder="전화번호를 입력하세요 (예: 010-1234-5678)"
+          placeholder="전화번호를 입력하세요 (예: 01012345678)"
           className="w-full border p-2 rounded text-black"
           value={formData.phonenumber}
           onChange={(e) =>
