@@ -96,11 +96,22 @@ export default function MyPage() {
           {editMode ? (
             <form onSubmit={handleUpdate} className="space-y-4">
               <label className="block">
-                이름:
+                새 비밀번호:
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={formData.newPassword || ""}
+                  onChange={handleChange}
+                  className="w-full border p-2 rounded"
+                />
+              </label>
+
+              <label className="block">
+                전화번호:
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="phonenumber"
+                  value={formData.phonenumber || ""}
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
                 />
@@ -108,13 +119,15 @@ export default function MyPage() {
 
               <label className="block">
                 성별:
-                <input
-                  type="text"
+                <select
                   name="gender"
-                  value={formData.gender}
+                  value={formData.gender || ""}
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
-                />
+                >
+                  <option value="male">남성</option>
+                  <option value="female">여성</option>
+                </select>
               </label>
 
               <label className="block">
@@ -122,7 +135,7 @@ export default function MyPage() {
                 <input
                   type="text"
                   name="job"
-                  value={formData.job}
+                  value={formData.job || ""}
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
                 />
@@ -130,13 +143,16 @@ export default function MyPage() {
 
               <label className="block">
                 골프 실력:
-                <input
-                  type="text"
+                <select
                   name="golfSkill"
-                  value={formData.golfSkill}
+                  value={formData.golfSkill || ""}
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
-                />
+                >
+                  <option value="beginner">초급</option>
+                  <option value="intermediate">중급</option>
+                  <option value="advanced">고급</option>
+                </select>
               </label>
 
               <label className="block">
@@ -144,7 +160,7 @@ export default function MyPage() {
                 <input
                   type="text"
                   name="mbti"
-                  value={formData.mbti}
+                  value={formData.mbti || ""}
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
                 />
@@ -155,25 +171,66 @@ export default function MyPage() {
                 <input
                   type="text"
                   name="hobbies"
-                  value={formData.hobbies}
+                  value={formData.hobbies || ""}
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
                 />
+              </label>
+
+              <label className="block">
+                종교:
+                <select
+                  name="religion"
+                  value={formData.religion || ""}
+                  onChange={handleChange}
+                  className="w-full border p-2 rounded"
+                >
+                  <option value="none">무교</option>
+                  <option value="christian">기독교</option>
+                  <option value="catholic">천주교</option>
+                  <option value="buddhist">불교</option>
+                  <option value="etc">기타</option>
+                </select>
+              </label>
+
+              <label className="block">
+                흡연 여부:
+                <select
+                  name="smoking"
+                  value={formData.smoking || ""}
+                  onChange={handleChange}
+                  className="w-full border p-2 rounded"
+                >
+                  <option value="yes">흡연함</option>
+                  <option value="no">흡연하지 않음</option>
+                </select>
+              </label>
+
+              <label className="block">
+                음주 여부:
+                <select
+                  name="drinking"
+                  value={formData.drinking || ""}
+                  onChange={handleChange}
+                  className="w-full border p-2 rounded"
+                >
+                  <option value="yes">음주함</option>
+                  <option value="no">음주하지 않음</option>
+                </select>
               </label>
 
               <label className="block">
                 자기소개:
                 <textarea
                   name="introduce"
-                  value={formData.introduce}
+                  value={formData.introduce || ""}
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
                 />
               </label>
 
-              {/* 프로필 이미지 업로드 */}
               <label className="block">
-                프로필 이미지:
+                프로필 이미지 업로드:
                 <input
                   type="file"
                   accept="image/*"
@@ -181,66 +238,30 @@ export default function MyPage() {
                 />
               </label>
 
-              {/* 프로필 이미지 미리보기 */}
               {formData.userImg && (
                 <div className="mt-2">
                   <img
                     src={formData.userImg}
                     alt="프로필 이미지"
-                    className="w-32 h-32 object-cover rounded-full"
+                    className="w-32 h-32 object-cover rounded-lg"
                   />
                 </div>
               )}
 
               <button
                 type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded w-full"
+                className="bg-blue-500 text-white p-2 rounded w-full"
               >
                 수정 완료
               </button>
             </form>
           ) : (
-            <>
-              <p>
-                <strong>이름:</strong> {userData.name}
-              </p>
-              <p>
-                <strong>성별:</strong> {userData.gender}
-              </p>
-              <p>
-                <strong>직업:</strong> {userData.job}
-              </p>
-              <p>
-                <strong>골프 실력:</strong> {userData.golfSkill}
-              </p>
-              <p>
-                <strong>MBTI:</strong> {userData.mbti}
-              </p>
-              <p>
-                <strong>취미:</strong> {userData.hobbies}
-              </p>
-              <p>
-                <strong>자기소개:</strong> {userData.introduce}
-              </p>
-
-              {/* 프로필 이미지 표시 */}
-              {userData.userImg && (
-                <div className="mt-2">
-                  <img
-                    src={userData.userImg}
-                    alt="프로필 이미지"
-                    className="w-32 h-32 object-cover rounded-full"
-                  />
-                </div>
-              )}
-
-              <button
-                onClick={() => setEditMode(true)}
-                className="bg-green-500 text-white px-4 py-2 rounded w-full"
-              >
-                회원정보 수정
-              </button>
-            </>
+            <button
+              onClick={() => setEditMode(true)}
+              className="bg-green-500 text-white p-2 rounded w-full"
+            >
+              회원정보 수정
+            </button>
           )}
         </div>
       ) : (

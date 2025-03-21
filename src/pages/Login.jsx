@@ -25,9 +25,13 @@ export default function Login() {
       if (!response.ok) {
         throw new Error(data.message || "로그인 실패. 다시 시도해주세요.");
       }
+      if (!data.accessToken) {
+        throw new Error("토큰을 받지 못했습니다.");
+      }
 
       // ✅ JWT 토큰 저장 및 로그인 상태 변경
-      login(data.token);
+      login(data.accessToken);
+      localStorage.setItem("token", data.accessToken); // ✅ 수정된 부분
 
       alert("로그인 성공!");
       navigate("/");
