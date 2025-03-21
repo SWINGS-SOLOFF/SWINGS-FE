@@ -24,6 +24,8 @@ export default function NavBar() {
       <Link to="/signup" className="bg-pink-500 text-white px-4 py-2 rounded">
         SIGNUP
       </Link>
+
+      <Link to="/mypage">MyPage</Link>
     </nav>
   );
 }
