@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import HomePage from './components/HomePage';
-import UserManagementPage from './components/UserManagementPage';
-import MatchManagementPage from './components/MatchManagementPage';
-import AdminPage from './components/AdminPage';
-import FeedPage from './components/FeedPage';
+import HomePage from './pages/Homepage.jsx';
+import UserManagementPage from './pages/UserManagementPage.jsx';
+import MatchManagementPage from './pages/MatchManagementPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
+import FeedPage from './pages/FeedPage.jsx';
 import Navigation from './components/Navigation';
-import SocialPage from './components/SocialPage';
+import SocialPage from './pages/SocialPage.jsx';
 
 
 function App() {

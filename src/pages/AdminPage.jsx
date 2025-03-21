@@ -1,8 +1,8 @@
 // src/components/HomePage.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import LoginForm from './LoginForm';
-import RegisterForm from './RegisterForm';
+import LoginForm from '../components/LoginForm.jsx';
+import RegisterForm from '../components/RegisterForm.jsx';
 
 const HomePage = () => {
     // 상태 관리: 로그인 또는 회원가입 폼 표시 여부

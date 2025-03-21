@@ -5,12 +5,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2c5978f4-f779-45b4-b055-317e6af98015" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/FeedPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/FeedPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Homepage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Homepage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Navigation.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Navigation.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/eslint.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/postcss.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/images/default-profile.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/vite.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/assets/react.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/AdminPage.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/FeedPage.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Homepage.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/LoginForm.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/MatchManagementPage.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Navigation.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/RegisterForm.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/SocialPage.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/UserManagementPage.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/main.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tailwind.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/vite.config.js" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,18 +45,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "itroqkfwk"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;itroqkfwk&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/SWINGS-SOLOFF/SWINGS-FE.git",
-    "accountId": "248909c5-d04d-4143-a133-415c673d1e25"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/SWINGS-SOLOFF/SWINGS-FE.git&quot;,
+    &quot;accountId&quot;: &quot;248909c5-d04d-4143-a133-415c673d1e25&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -56,7 +74,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "test",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/SWINGS-FE/frontend/src/components",
+    "last_opened_file_path": "C:/SWINGS-FE",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -94,6 +112,8 @@
       <workItem from="1742109156784" duration="207000" />
       <workItem from="1742195385164" duration="643000" />
       <workItem from="1742282826991" duration="35153000" />
+      <workItem from="1742432881671" duration="20841000" />
+      <workItem from="1742515724532" duration="1093000" />
     </task>
     <servers />
   </component>
