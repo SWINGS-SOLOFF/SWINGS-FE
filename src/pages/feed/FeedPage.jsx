@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FaHeart, FaRegHeart, FaComment, FaTrash, FaGolfBall,
     FaMapMarkerAlt, FaTrophy, FaCalendarAlt, FaEdit } from 'react-icons/fa';
 
-const SocialPage = () => {
+const FeedPage = () => {
     // Core state management
     const [feeds, setFeeds] = useState([]);
     const [comments, setComments] = useState({});
@@ -498,4 +498,4 @@ const SocialPage = () => {
     );
 };
 
-export default SocialPage;
+export default FeedPage;
