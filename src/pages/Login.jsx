@@ -31,7 +31,7 @@ export default function Login() {
 
       // ✅ JWT 토큰 저장 및 로그인 상태 변경
       login(data.accessToken);
-      localStorage.setItem("token", data.accessToken); // ✅ 수정된 부분
+      sessionStorage.setItem("token", data.accessToken); // ✅ 수정된 부분
 
       alert("로그인 성공!");
       navigate("/");
