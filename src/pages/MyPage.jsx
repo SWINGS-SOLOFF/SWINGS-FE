@@ -8,6 +8,15 @@ export default function MyPage() {
   const [error, setError] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({});
+  const getUpdatedFields = () => {
+    const updated = {};
+    for (const key in formData) {
+      if (formData[key] !== userData[key]) {
+        updated[key] = formData[key];
+      }
+    }
+    return updated;
+  };
 
   // ✅ 마이페이지 정보 가져오기 (GET /me)
   useEffect(() => {
@@ -60,6 +69,13 @@ export default function MyPage() {
     e.preventDefault();
     console.log("username:", userData.username);
 
+    const updatedFields = getUpdatedFields();
+
+    // 아무것도 안 바꿨으면 return
+    if (Object.keys(updatedFields).length === 0) {
+      alert("변경된 내용이 없습니다.");
+      return;
+    }
     try {
       const response = await fetch(
         `http://localhost:8090/swings/users/${userData.username}`,
@@ -69,7 +85,7 @@ export default function MyPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(updatedFields), // ✅ 변경된 값만 보냄
         }
       );
 
@@ -78,8 +94,8 @@ export default function MyPage() {
       }
 
       alert("회원 정보가 성공적으로 수정되었습니다!");
-      setUserData(formData); // 변경된 데이터 UI 반영
-      setEditMode(false); // 수정 모드 해제
+      setUserData({ ...userData, ...updatedFields }); // 변경된 부분만 반영
+      setEditMode(false);
     } catch (error) {
       console.error("회원 정보 수정 실패:", error);
       setError(error.message);
