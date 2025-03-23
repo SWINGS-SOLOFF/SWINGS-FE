@@ -40,23 +40,25 @@ export default function MyPage() {
   // ✅ 입력 값 변경 핸들러
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    console.log("handleChange 실행됨", e.target.name, e.target.value);
   };
 
-  // ✅ 이미지 업로드 핸들러 (Base64 변환)
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData({ ...formData, userImg: reader.result });
-    };
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  };
+  // // ✅ 이미지 업로드 핸들러 (Base64 변환)
+  // const handleImageUpload = (e) => {
+  //   const file = e.target.files[0];
+  //   const reader = new FileReader();
+  //   reader.onloadend = () => {
+  //     setFormData({ ...formData, userImg: reader.result });
+  //   };
+  //   if (file) {
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
   // ✅ 회원 정보 수정 API 호출 (PATCH /{username})
   const handleUpdate = async (e) => {
     e.preventDefault();
+    console.log("username:", userData.username);
 
     try {
       const response = await fetch(
@@ -95,17 +97,6 @@ export default function MyPage() {
         <div className="space-y-4">
           {editMode ? (
             <form onSubmit={handleUpdate} className="space-y-4">
-              <label className="block">
-                새 비밀번호:
-                <input
-                  type="password"
-                  name="newPassword"
-                  value={formData.newPassword || ""}
-                  onChange={handleChange}
-                  className="w-full border p-2 rounded"
-                />
-              </label>
-
               <label className="block">
                 전화번호:
                 <input
@@ -229,7 +220,7 @@ export default function MyPage() {
                 />
               </label>
 
-              <label className="block">
+              {/* <label className="block">
                 프로필 이미지 업로드:
                 <input
                   type="file"
@@ -246,7 +237,7 @@ export default function MyPage() {
                     className="w-32 h-32 object-cover rounded-lg"
                   />
                 </div>
-              )}
+              )} */}
 
               <button
                 type="submit"
