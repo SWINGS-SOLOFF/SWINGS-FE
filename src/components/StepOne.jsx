@@ -3,7 +3,7 @@ import { useState } from "react";
 const StepOne = ({ formData, setFormData, nextStep }) => {
   const [usernameError, setUsernameError] = useState("");
   const [checking, setChecking] = useState(false);
-
+  
   const checkUsername = async () => {
     if (!formData.username) {
       setUsernameError("아이디를 입력하세요.");
