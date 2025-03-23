@@ -1,13 +1,8 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
+// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  css: {
-    postcss: "./postcss.config.js",
-  },
-  server: {
-    port: 5173, // 항상 5173번 포트 사용
-    strictPort: true, // 사용 중이면 실행 실패 (다른 포트로 변경 안 함)
-  },
-});
+  base: "/swings/",
+})
