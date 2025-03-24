@@ -10,12 +10,12 @@ const SocialPage = () => {
     const [newComments, setNewComments] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [userBio, setUserBio] = useState('');
+    const [userintroduce, setUserintroduce] = useState('');
     const [userStats, setUserStats] = useState({ posts: 0, followers: 0, following: 0 });
-    const [editingBio, setEditingBio] = useState(false);
-    const [bioInput, setBioInput] = useState('');
+    const [editingintroduce, setEditingintroduce] = useState(false);
+    const [introduceInput, setintroduceInput] = useState('');
 
-    // Current user information
+    // 임시로 사용하는 현재 사용자 정보rrr
     const currentUser = {
         userId: 1,
         username: '골프매니아',
@@ -47,16 +47,16 @@ const SocialPage = () => {
     const fetchUserData = async () => {
         try {
             // Using Promise.all for parallel API calls
-            const [bioResponse, followersResponse, followingsResponse, feedCountResponse] =
+            const [introduceResponse, followersResponse, followingsResponse, feedCountResponse] =
                 await Promise.all([
-                    axios.get(`http://localhost:8090/swings/social/bio/${currentUser.userId}`),
+                    axios.get(`http://localhost:8090/swings/social/introduce/${currentUser.userId}`),
                     axios.get(`http://localhost:8090/swings/social/followers/${currentUser.userId}`),
                     axios.get(`http://localhost:8090/swings/social/followings/${currentUser.userId}`),
                     axios.get(`http://localhost:8090/swings/social/feeds/count/${currentUser.userId}`)
                 ]);
 
-            setUserBio(bioResponse.data);
-            setBioInput(bioResponse.data);
+            setUserintroduce(introduceResponse.data);
+            setintroduceInput(introduceResponse.data);
 
             setUserStats({
                 posts: feedCountResponse.data,
@@ -182,15 +182,15 @@ const SocialPage = () => {
         }
     };
 
-    // Handle bio update
-    const handleBioUpdate = async () => {
-        if (bioInput === userBio) {
-            setEditingBio(false);
+    // Handle introduce update
+    const handleintroduceUpdate = async () => {
+        if (introduceInput === userintroduce) {
+            setEditingintroduce(false);
             return;
         }
 
         try {
-            await axios.post(`http://localhost:8090/social/update-bio`, bioInput, {
+            await axios.post(`http://localhost:8090/social/update-introduce`, introduceInput, {
                 params: {
                     userId: currentUser.userId
                 },
@@ -199,10 +199,10 @@ const SocialPage = () => {
                 }
             });
 
-            setUserBio(bioInput);
-            setEditingBio(false);
+            setUserintroduce(introduceInput);
+            setEditingintroduce(false);
         } catch (err) {
-            console.error('Error updating bio:', err);
+            console.error('Error updating introduce:', err);
         }
     };
 
@@ -297,14 +297,14 @@ const SocialPage = () => {
                             </div>
                         </div>
 
-                        {/* Bio Section */}
+                        {/* introduce Section */}
                         <div className="mt-8 border-t pt-4">
                             <div className="flex justify-between items-center mb-2">
                                 <h3 className="font-medium text-gray-700">소개</h3>
-                                {!editingBio ? (
+                                {!editingintroduce ? (
                                     <button
                                         className="text-green-600 hover:text-green-800 flex items-center"
-                                        onClick={() => setEditingBio(true)}
+                                        onClick={() => setEditingintroduce(true)}
                                     >
                                         <FaEdit className="mr-1" /> 수정
                                     </button>
@@ -313,15 +313,15 @@ const SocialPage = () => {
                                         <button
                                             className="text-gray-500 hover:text-gray-700"
                                             onClick={() => {
-                                                setEditingBio(false);
-                                                setBioInput(userBio);
+                                                setEditingintroduce(false);
+                                                setintroduceInput(userintroduce);
                                             }}
                                         >
                                             취소
                                         </button>
                                         <button
                                             className="text-green-600 hover:text-green-800"
-                                            onClick={handleBioUpdate}
+                                            onClick={handleintroduceUpdate}
                                         >
                                             저장
                                         </button>
@@ -329,16 +329,16 @@ const SocialPage = () => {
                                 )}
                             </div>
 
-                            {!editingBio ? (
+                            {!editingintroduce ? (
                                 <p className="text-gray-700 leading-relaxed">
-                                    {userBio || "자기소개가 없습니다. '수정' 버튼을 클릭하여 자기소개를 추가해보세요."}
+                                    {userintroduce || "자기소개가 없습니다. '수정' 버튼을 클릭하여 자기소개를 추가해보세요."}
                                 </p>
                             ) : (
                                 <textarea
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     rows="3"
-                                    value={bioInput}
-                                    onChange={(e) => setBioInput(e.target.value)}
+                                    value={introduceInput}
+                                    onChange={(e) => setintroduceInput(e.target.value)}
                                     placeholder="자기소개를 입력하세요"
                                 />
                             )}
@@ -401,7 +401,7 @@ const SocialPage = () => {
                                     <p className="text-gray-800 leading-relaxed mb-4">{feed.caption}</p>
                                     {feed.imageUrl && (
                                         <img
-                                            src={`/swings${feed.imageUrl}`}
+                                            src={feed.imageUrl}
                                             alt="Post"
                                             className="w-full rounded-lg"
                                         />

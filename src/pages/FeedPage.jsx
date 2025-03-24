@@ -18,15 +18,42 @@ const FeedPage = () => {
     };
 
     useEffect(() => {
-        axios.get('http://localhost:8090/swings/feeds')
-            .then(response => {
-                const data = Array.isArray(response.data) ? response.data : [];
-                setPosts(data);
-            })
-            .catch(error => {
-                console.error('Error fetching feeds:', error);
-            });
+        fetchPosts();
     }, []);
+
+    const fetchPosts = async () => {
+        try {
+            const response = await axios.get('http://localhost:8090/swings/feeds');
+            const data = Array.isArray(response.data) ? response.data : [];
+
+            // 각 포스트에 대해 댓글 정보 가져오기
+            const postsWithComments = await Promise.all(
+                data.map(async (post) => {
+                    try {
+                        const commentsResponse = await axios.get(`http://localhost:8090/swings/feeds/${post.feedId}/comments`);
+                        return {
+                            ...post,
+                            comments: Array.isArray(commentsResponse.data) ? commentsResponse.data : [],
+                            liked: false, // 초기 상태 설정
+                            showComments: false // 초기 상태 설정
+                        };
+                    } catch (error) {
+                        console.error(`Error fetching comments for post ${post.feedId}:`, error);
+                        return {
+                            ...post,
+                            comments: [],
+                            liked: false,
+                            showComments: false
+                        };
+                    }
+                })
+            );
+
+            setPosts(postsWithComments);
+        } catch (error) {
+            console.error('Error fetching feeds:', error);
+        }
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -54,15 +81,27 @@ const FeedPage = () => {
             const response = await axios.post('http://localhost:8090/swings/feeds/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            setPosts([ { ...response.data, liked: false }, ...posts ]);
+
+            // 새 게시물을 posts 배열의 시작에 추가
+            const newPost = {
+                ...response.data,
+                liked: false,
+                comments: [],
+                showComments: false,
+                // username이 응답에 없는 경우 기본값 설정
+                username: response.data.username || userProfile.username
+            };
+
+            setPosts([ newPost, ...posts ]);
+
+            // 폼 초기화
+            setNewPostContent('');
+            setNewPostImage(null);
+            setImagePreview(null);
+            setShowNewPostForm(false);
         } catch (error) {
             console.error('There was an error uploading the feed!', error);
         }
-
-        setNewPostContent('');
-        setNewPostImage(null);
-        setImagePreview(null);
-        setShowNewPostForm(false);
     };
 
     const handleDelete = async (feedId) => {
@@ -76,7 +115,7 @@ const FeedPage = () => {
 
     const handleLike = async (feedId) => {
         try {
-            const response = await axios.put(`http://localhost:8090/swings/feeds/${feedId}/like`, { userId });
+            const response = await axios.put(`http://localhost:8090/swings/feeds/${feedId}/like`);
             setPosts(posts.map(post =>
                 post.feedId === feedId
                     ? { ...post, likes: response.data.likes, liked: true }
@@ -89,7 +128,7 @@ const FeedPage = () => {
 
     const handleUnlike = async (feedId) => {
         try {
-            const response = await axios.put(`http://localhost:8090/swings/feeds/${feedId}/unlike`, { userId });
+            const response = await axios.put(`http://localhost:8090/swings/feeds/${feedId}/unlike`);
             setPosts(posts.map(post =>
                 post.feedId === feedId
                     ? { ...post, likes: response.data.likes, liked: false }
@@ -149,6 +188,24 @@ const FeedPage = () => {
                 ? { ...post, showComments: !post.showComments }
                 : post
         ));
+    };
+
+    // 이미지 URL 정상화 함수
+    const normalizeImageUrl = (url) => {
+        if (!url) return '';
+
+        // 이미 완전한 URL인 경우
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+
+        // Backend에서 받은 URL이 상대경로인 경우
+        if (url.startsWith('/')) {
+            return `http://localhost:8090${url}`;
+        }
+
+        // Backend에서 파일명만 받은 경우
+        return `http://localhost:8090/swings/uploads/${url}`;
     };
 
     return (
@@ -242,7 +299,7 @@ const FeedPage = () => {
                                 {post.avatarUrl ? (
                                     <img
                                         src={post.avatarUrl}
-                                        alt={post.username}
+                                        alt={post.username || "사용자"}
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
@@ -250,31 +307,43 @@ const FeedPage = () => {
                                 )}
                             </div>
                             <div>
-                                <p className="font-bold text-green-800 text-lg">{post.username}</p>
-                                <p className="text-xs text-gray-500">{post.timestamp}</p>
+                                <p className="font-bold text-green-800 text-lg">{post.username || "사용자"}</p>
+                                <p className="text-xs text-gray-500">
+                                    {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""}
+                                </p>
                             </div>
                         </div>
 
                         {/* Post Image */}
-                        <div className="w-full">
-                            <img
-                                src={`http://localhost:8090/swings/uploads/${post.imageUrl}`}
-                                alt="피드 내용"
-                                className="w-full object-cover max-h-96"
-                            />
-                        </div>
+                        {post.imageUrl && (
+                            <div className="w-full">
+                                <img
+                                    src={normalizeImageUrl(post.imageUrl)}
+                                    alt="피드 내용"
+                                    className="w-full object-cover max-h-96"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = "/placeholder-image.jpg";
+                                    }}
+                                />
+                            </div>
+                        )}
 
                         {/* Post Content - 이미지 바로 아래로 이동 */}
                         <div className="p-4 border-b border-green-100">
                             <div className="mb-3">
                                 <p className="mb-2">
-                                    <span className="font-semibold text-green-800 mr-2">{post.username}</span>
+                                    <span className="font-semibold text-green-800 mr-2">
+                                        {post.username || "사용자"}
+                                    </span>
                                     {post.caption}
                                 </p>
                             </div>
 
                             {/* 좋아요 정보 */}
-                            <p className="font-semibold text-green-800 mb-1">{post.likes}명이 좋아합니다</p>
+                            <p className="font-semibold text-green-800 mb-1">
+                                {post.likes || 0}명이 좋아합니다
+                            </p>
                         </div>
 
                         {/* Post Actions - 버튼 크기 조정 */}
@@ -313,7 +382,7 @@ const FeedPage = () => {
                                     {post.comments.map(comment => (
                                         <div key={comment.commentId} className="flex items-center justify-between p-3 bg-white border border-green-200 rounded-lg">
                                             <div>
-                                                <p className="font-semibold text-green-800">{comment.username ?? '사용자'}</p>
+                                                <p className="font-semibold text-green-800">{comment.username || '사용자'}</p>
                                                 <p className="text-sm text-gray-700">{comment.content}</p>
                                             </div>
                                             <button
