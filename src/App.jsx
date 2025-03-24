@@ -1,23 +1,33 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Navigation from "./components/Navigation";
-import MatchGroupList from "./4_matchgroup/pages/MatchGroupList";
-import CreateMatchGroup from "./4_matchgroup/pages/CreateMatchGroup";
-import MatchGroupDetail from "./4_matchgroup/pages/MatchGroupDetail";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import GroupPage from './pages/matchgroup/GroupPage.jsx';
+import MatchPage from './pages/match/MatchPage.jsx';
+import MatchDetailPage from './pages/match/MatchDetailPage.jsx';
+import FeedPage from './pages/feed/FeedPage.jsx';
+import LoginPage from './pages/user/LoginPage.jsx';
+import ProfilePage from './pages/user/ProfilePage.jsx';
+import RegisterPage from './pages/user/RegisterPage.jsx';
+import Navigation from './components/Navigation';
 
 function App() {
     return (
         <Router>
             <div className="min-h-screen bg-green-50">
                 <Navigation />
-                <main className="container mx-auto px-4 pb-8">
+                <div className="container mx-auto px-4 pb-8">
                     <Routes>
-                        <Route path="/" element={<MatchGroupList />} />
-                        <Route path="/matchgroup" element={<MatchGroupList />} />
-                        <Route path="/matchgroup/create" element={<CreateMatchGroup />} />
-                        <Route path="/matchgroup/:groupId" element={<MatchGroupDetail />} />
+                        {/* 기존 HomePage는 없으므로, LoginPage를 홈으로 설정 */}
+                        <Route path="/" element={<LoginPage />} />
+                        <Route path="/user-management" element={<GroupPage />} />
+                        <Route path="/match-management" element={<MatchPage />} />
+                        <Route path="/match-detail" element={<MatchDetailPage />} />
+                        <Route path="/swings/feed" element={<FeedPage />} />
+                        <Route path="/swings/social" element={<FeedPage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/register" element={<RegisterPage />} />
                     </Routes>
-                </main>
+                </div>
             </div>
         </Router>
     );
