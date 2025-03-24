@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 기존 스타일 유지 */
+body {
+    @apply bg-gray-100 text-gray-900;
+}
