@@ -1,6 +1,7 @@
 import AppRoutes from "./routes/AppRoutes";
 import NavBar from "./components/NavBar";
 import Footer from "./components/FooterBar";
+import BottomNavBar from "./components/BottomNavBar";
 import { AuthProvider } from "./context/AuthContext"; // ✅ AuthProvider 가져오기
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
       <div className="App">
         <NavBar />
         <AppRoutes />
+        <BottomNavBar />
         <Footer />
       </div>
     </AuthProvider>
