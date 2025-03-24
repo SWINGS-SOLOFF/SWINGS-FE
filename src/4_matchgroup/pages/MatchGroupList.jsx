@@ -22,6 +22,8 @@ const MatchGroupList = () => {
         <div className="max-w-3xl mx-auto p-6">
             <h1 className="text-2xl font-bold mb-4">매칭 그룹 목록</h1>
             {groups.length === 0 ? (
+                <p className="text-gray-500">현재 모집 중인 그룹이 없습니다.</p>
+            ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {groups.map((group) => (
                         <div
