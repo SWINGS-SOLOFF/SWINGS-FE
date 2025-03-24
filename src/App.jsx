@@ -1,36 +1,22 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import GroupPage from './pages/matchgroup/GroupPage.jsx';
-import MatchPage from './pages/match/MatchPage.jsx';
-import MatchDetailPage from './pages/match/MatchDetailPage.jsx';
-import FeedPage from './pages/feed/FeedPage.jsx';
-import LoginPage from './pages/user/LoginPage.jsx';
-import ProfilePage from './pages/user/ProfilePage.jsx';
-import RegisterPage from './pages/user/RegisterPage.jsx';
-import Navigation from './components/Navigation';
+// src/App.jsx
+import React from "react";
+import { Outlet } from "react-router-dom";
+import NavBar from "./components/NavBar.jsx";   // 혹은 NavBar.jsx
+import FooterBar from "./1_user/components/FooterBar"; // 경로는 상황에 맞게 조정
 
-function App() {
-    return (
-        <Router>
-            <div className="min-h-screen bg-green-50">
-                <Navigation />
-                <div className="container mx-auto px-4 pb-8">
-                    <Routes>
-                        {/* 기존 HomePage는 없으므로, LoginPage를 홈으로 설정 */}
-                        <Route path="/" element={<LoginPage />} />
-                        <Route path="/user-management" element={<GroupPage />} />
-                        <Route path="/match-management" element={<MatchPage />} />
-                        <Route path="/match-detail" element={<MatchDetailPage />} />
-                        <Route path="/swings/feed" element={<FeedPage />} />
-                        <Route path="/swings/social" element={<FeedPage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        <Route path="/register" element={<RegisterPage />} />
-                    </Routes>
-                </div>
-            </div>
-        </Router>
-    );
+export default function App() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* 상단 공통 네비게이션 */}
+      <NavBar />
+
+      {/* 라우터가 렌더링할 각 페이지 */}
+      <main className="flex-grow">
+        <Outlet />
+      </main>
+
+      {/* 하단 공통 푸터 */}
+      <FooterBar />
+    </div>
+  );
 }
-
-export default App;
