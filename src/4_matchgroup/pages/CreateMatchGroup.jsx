@@ -3,26 +3,29 @@ import {useState} from "react";
 import {createMatchGroup} from "../api/matchGroupApi.js";
 
 const CreateMatchGroup = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate();  // 페이지 이동을 위한 navigate 함수
     const [groupData, setGroupData] = useState({
-        name: "",
+        name: "",  // 그룹명
         description: "",  // 그룹 설명
         maxParticipants: 10,  // 최대 참가자 수
         currentParticipants: 0, // 현재 참가자 수
-        ageRange: "20-40",
-        genderRatio: "1:1",
+        ageRange: "20-40",  // 연령대
+        genderRatio: "1:1",  // 성별 비
         location: "",  // 골프장 위치
-        dateTime: "",
-        playStyle: "상관없음",
-        recruitmentDeadline: "",
-        status: "모집중",
+        dateTime: "",  // 경기 일정
+        playStyle: "상관없음",  // 플레이 스타일(캐쥬얼 | 경쟁적)
+        recruitmentDeadline: "",  // 모집 마감 일정
+        status: "모집중",  // 모집 상태
     });
 
+    
+    // 핸들러
+    // 압력값 변경
     const handleChange  = (e) => {
         const {name, value} = e.target;
         setGroupData({...groupData, [name]: value});
 
-        // 모집 상태 업테이트
+        // 모집 상태 업데이트
         if(name === "recruitmentDeadline"){
             const now = new Date();
             const deadline  = new Date(value);
@@ -31,12 +34,13 @@ const CreateMatchGroup = () => {
         }
     };
 
+    // 그룹 생성
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault();  // 기본 폼 제출 방지
         try {
-            await createMatchGroup(groupData);
-            alert("그룹이 생성되었습니다!");
-            navigate("/matchgroup");
+            await createMatchGroup(groupData);  // API를 통해 그룹 생성 요청
+            alert("그룹이 생성되었습니다!");  // 성공 알림
+            navigate("/matchgroup");  // 그룹 목록 페이지로 이동
         } catch (error) {
             console.error("그룹 생성 실패:", error);
             alert("그룹 생성 중 오류가 발생했습니다.");

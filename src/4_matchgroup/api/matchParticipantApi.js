@@ -19,7 +19,29 @@ export  const joinMatch = async (groupId, username) => {
         const response = await axios.post(`${BASE_URL}/${groupId}/join`, { username });
         return response.data;
     } catch (error) {
-        console.error("참가 신청 중 오류 발생:", error);ㅇ
+        console.error("참가 신청 중 오류 발생:", error);
+        throw error;
+    }
+};
+
+// 특정 그룹에서 참가 취소하기
+export const leaveMatch = async (groupId, username) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/${groupId}/leave`, { username });
+        return response.data;
+    } catch (error) {
+        console.error("참가 취소 중 오류 발생:", error);
+        throw error;
+    }
+};
+
+// 특정 그룹에서 참가자 강제퇴장
+export const removeParticipant = async (groupId, username) => {
+    try {
+        const response = await axios.delete(`${BASE_URL}/${groupId}/remove`, { data: { username } });
+        return response.data;
+    } catch (error) {
+        console.error("참가자 강제 제거 중 오류 발생:", error);
         throw error;
     }
 };
