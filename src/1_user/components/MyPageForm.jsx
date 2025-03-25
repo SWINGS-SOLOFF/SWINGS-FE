@@ -10,7 +10,7 @@ export default function MyPageForm({ formData, handleChange, handleUpdate }) {
           name="phonenumber"
           value={formData.phonenumber || ""}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded text-black"
         />
       </label>
 
@@ -20,7 +20,7 @@ export default function MyPageForm({ formData, handleChange, handleUpdate }) {
           name="gender"
           value={formData.gender || ""}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded text-black"
         >
           <option value="male">남성</option>
           <option value="female">여성</option>
@@ -34,7 +34,7 @@ export default function MyPageForm({ formData, handleChange, handleUpdate }) {
           name="job"
           value={formData.job || ""}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded text-black"
         />
       </label>
 
@@ -44,7 +44,7 @@ export default function MyPageForm({ formData, handleChange, handleUpdate }) {
           name="golfSkill"
           value={formData.golfSkill || ""}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded text-black"
         >
           <option value="beginner">초급</option>
           <option value="intermediate">중급</option>
@@ -59,7 +59,7 @@ export default function MyPageForm({ formData, handleChange, handleUpdate }) {
           name="mbti"
           value={formData.mbti || ""}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded text-black"
         />
       </label>
 
@@ -70,7 +70,7 @@ export default function MyPageForm({ formData, handleChange, handleUpdate }) {
           name="hobbies"
           value={formData.hobbies || ""}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded text-black"
         />
       </label>
 
@@ -80,7 +80,7 @@ export default function MyPageForm({ formData, handleChange, handleUpdate }) {
           name="religion"
           value={formData.religion || ""}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded text-black"
         >
           <option value="none">무교</option>
           <option value="christian">기독교</option>
@@ -96,7 +96,7 @@ export default function MyPageForm({ formData, handleChange, handleUpdate }) {
           name="smoking"
           value={formData.smoking || ""}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded text-black"
         >
           <option value="yes">흡연함</option>
           <option value="no">흡연하지 않음</option>
@@ -109,7 +109,7 @@ export default function MyPageForm({ formData, handleChange, handleUpdate }) {
           name="drinking"
           value={formData.drinking || ""}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded text-black"
         >
           <option value="yes">음주함</option>
           <option value="no">음주하지 않음</option>
@@ -122,7 +122,7 @@ export default function MyPageForm({ formData, handleChange, handleUpdate }) {
           name="introduce"
           value={formData.introduce || ""}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded text-black"
         />
       </label>
 

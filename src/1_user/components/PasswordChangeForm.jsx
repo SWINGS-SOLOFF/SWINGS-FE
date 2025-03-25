@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { changePassword } from "../api/userApi";
+import { validatePasswordMatch } from "../utils/userUtils";
 
 export default function PasswordChangeForm({ username }) {
   const { token } = useAuth();
@@ -9,29 +11,16 @@ export default function PasswordChangeForm({ username }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
 
-    if (newPassword !== confirmPassword) {
-      setMessage("비밀번호가 일치하지 않습니다.");
+    const error = validatePasswordMatch(newPassword, confirmPassword);
+    if (error) {
+      setMessage(error);
       return;
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:8090/swings/users/${username}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ password: newPassword }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("비밀번호 변경 실패");
-      }
-
+      await changePassword(username, newPassword);
       setMessage("비밀번호가 성공적으로 변경되었습니다.");
       setNewPassword("");
       setConfirmPassword("");
@@ -49,7 +38,7 @@ export default function PasswordChangeForm({ username }) {
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded  text-black"
           required
         />
       </label>
@@ -60,7 +49,7 @@ export default function PasswordChangeForm({ username }) {
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded  text-black"
           required
         />
       </label>
