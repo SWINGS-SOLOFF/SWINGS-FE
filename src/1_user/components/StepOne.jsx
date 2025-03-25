@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { checkUsername } from "../api/userApi";
 
 const StepOne = ({ formData, setFormData, nextStep }) => {
   const [usernameError, setUsernameError] = useState("");
   const [checking, setChecking] = useState(false);
-  
-  const checkUsername = async () => {
+
+  const handleUsernameCheck = async () => {
     if (!formData.username) {
       setUsernameError("아이디를 입력하세요.");
       return;
@@ -12,23 +13,15 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
 
     setChecking(true);
     try {
-      const response = await fetch(
-        `http://localhost:8090/swings/users/check-username?username=${formData.username}`
+      const exists = await checkUsername(formData.username);
+      setUsernameError(
+        exists ? "이미 존재하는 아이디입니다." : "사용 가능한 아이디입니다."
       );
-      if (!response.ok) {
-        throw new Error("서버 오류");
-      }
-      const data = await response.json();
-      if (data.exists) {
-        setUsernameError("이미 존재하는 아이디입니다.");
-      } else {
-        setUsernameError("사용 가능한 아이디입니다.");
-      }
-    } catch (error) {
-      console.error("아이디 확인 실패:", error);
+    } catch {
       setUsernameError("서버 오류 발생");
+    } finally {
+      setChecking(false);
     }
-    setChecking(false);
   };
 
   return (
@@ -40,7 +33,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
         <div className="flex items-center space-x-2">
           <input
             type="text"
-            placeholder="아이디를 입력하세요"
+            placeholder="아이디"
             className="w-full border p-2 rounded text-black"
             value={formData.username}
             onChange={(e) =>
@@ -48,7 +41,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
             }
           />
           <button
-            onClick={checkUsername}
+            onClick={handleUsernameCheck}
             className="bg-blue-500 text-white px-4 py-2 rounded"
             disabled={checking}
           >
@@ -58,9 +51,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
         {usernameError && (
           <p
             className={`text-sm ${
-              usernameError === "사용 가능한 아이디입니다."
-                ? "text-green-500"
-                : "text-red-500"
+              usernameError.includes("가능") ? "text-green-500" : "text-red-500"
             }`}
           >
             {usernameError}
@@ -72,7 +63,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
         비밀번호:
         <input
           type="password"
-          placeholder="비밀번호를 입력하세요"
+          placeholder="비밀번호"
           className="w-full border p-2 rounded text-black"
           value={formData.password}
           onChange={(e) =>
@@ -85,7 +76,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
         비밀번호 확인:
         <input
           type="password"
-          placeholder="비밀번호를 다시 입력하세요"
+          placeholder="비밀번호 확인"
           className="w-full border p-2 rounded text-black"
           value={formData.confirmPassword}
           onChange={(e) =>
@@ -93,7 +84,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
           }
         />
         {formData.password !== formData.confirmPassword && (
-          <p className="text-red-500">비밀번호가 일치하지 않습니다.</p>
+          <p className="text-red-500 text-sm">비밀번호가 일치하지 않습니다.</p>
         )}
       </label>
 
@@ -101,7 +92,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
         이름:
         <input
           type="text"
-          placeholder="이름을 입력하세요"
+          placeholder="이름"
           className="w-full border p-2 rounded text-black"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -112,7 +103,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
         전화번호:
         <input
           type="text"
-          placeholder="전화번호를 입력하세요 (예: 01012345678)"
+          placeholder="전화번호"
           className="w-full border p-2 rounded text-black"
           value={formData.phonenumber}
           onChange={(e) =>
@@ -128,7 +119,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
           value={formData.gender}
           onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
         >
-          <option value="">성별을 선택하세요</option>
+          <option value="">성별 선택</option>
           <option value="male">남성</option>
           <option value="female">여성</option>
         </select>
@@ -137,7 +128,7 @@ const StepOne = ({ formData, setFormData, nextStep }) => {
       <button
         onClick={nextStep}
         className="w-full bg-blue-500 text-white p-2 rounded mt-4"
-        disabled={checking} // 중복 확인 중일 때 버튼 비활성화
+        disabled={checking}
       >
         다음 단계
       </button>
