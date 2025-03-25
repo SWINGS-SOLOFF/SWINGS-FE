@@ -45,3 +45,47 @@ export const removeParticipant = async (groupId, username) => {
         throw error;
     }
 };
+
+// 참가자 승인(대기 목록 -> 승인)
+export const approveParticipant = async (groupId, username) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/${groupId}/approve`, { username });
+        return response.data;
+    } catch (error) {
+        console.error("참가자 승인 중 오류 발생:", error);
+        throw error;
+    }
+};
+
+// 참가자 거절(대기 목록 -> 거절)
+export const rejectParticipant = async (groupId, username) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/${groupId}/reject`, { username });
+        return response.data;
+    } catch (error) {
+        console.error("참가자 거절 중 오류 발생:", error);
+        throw error;
+    }
+};
+
+// 모집 종료
+export const closeMatchGroup = async (groupId) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/${groupId}/close`);
+        return response.data;
+    } catch (error) {
+        console.error("모집 종료 중 오류 발생:", error);
+        throw error;
+    }
+};
+
+// 그룹 삭제
+export const deleteMatchGroup = async (groupId) => {
+    try {
+        const response = await axios.delete(`${BASE_URL}/${groupId}`);
+        return response.data;
+    } catch (error) {
+        console.error("그룹 삭제 중 오류 발생:", error);
+        throw error;
+    }
+};

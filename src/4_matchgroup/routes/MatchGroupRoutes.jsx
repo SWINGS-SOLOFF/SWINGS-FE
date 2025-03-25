@@ -7,9 +7,9 @@ import MatchGroupDetail from "../pages/MatchGroupDetail.jsx";
 const MatchGroupRoutes = () => {
     return(
             <Routes>
-                <Route path="/matchgroup" element={<MatchGroupList />}/>
-                <Route path="/matchgroup/create" element={<CreateMatchGroup />}/>
-                <Route path="/matchgroup/:groupId" element={<MatchGroupDetail />} />
+                <Route path="/swings/matchgroup" element={<MatchGroupList />}/>
+                <Route path="/swings/matchgroup/create" element={<CreateMatchGroup />}/>
+                <Route path="/swings/matchgroup/:groupId" element={<MatchGroupDetail />} />
             </Routes>
     );
 };

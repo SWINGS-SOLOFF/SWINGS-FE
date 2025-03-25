@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
-import { getMatchGroupById, closeMatchGroup, deleteMatchGroup } from "../api/matchGroupApi.js";
-import { getParticipantsByGroupId, joinMatch, leaveMatch, removeParticipant } from "../api/matchParticipantApi.js";
-import { useParams, useNavigate } from "react-router-dom";
+import { getMatchGroupById } from "../api/matchGroupApi.js";
+import {
+    approveParticipant,
+    getParticipantsByGroupId,
+    joinMatch,
+    leaveMatch, rejectParticipant,
+    removeParticipant
+} from "../api/matchParticipantApi.js";
 import {getCurrentUser} from "../../1_user/api/userApi.js";
+import { useParams, useNavigate } from "react-router-dom";
 
 const MatchGroupDetail = () => {
     const { groupId } = useParams();  // URL에서 groupId 추출
@@ -11,6 +17,7 @@ const MatchGroupDetail = () => {
     // 상태 변수
     const [group, setGroup] = useState(null);  // 그룹 정보
     const [participants, setParticipants] = useState([]);  // 참가자 목록
+    const [pendingParticipants, setPendingParticipants] = useState([]);
     const [loading, setLoading] = useState(true);  // 로딩 상태
     const [currentUser, setCurrentUser] = useState(null);  // 현재 로그인한 유저
     const [isHost, setIsHost] = useState(false);  // 방장 여부
@@ -25,9 +32,11 @@ const MatchGroupDetail = () => {
 
                 const groupData = await getMatchGroupById(groupId);  // 그룹 정보
                 const participantData = await getParticipantsByGroupId(groupId);  // 참가자 목록
+
                 setGroup(groupData);
-                setParticipants(participantData);
-                
+                setParticipants(participantData.filter(p => p.status === "approved"));
+                setPendingParticipants(participantData.filter(p => p.status === "pending"));
+
                 // 방장 여부 판단(그룹을 만든 사람이 방장)
                 if (user && groupData.creator === user.username) {
                     setIsHost(true);
@@ -39,6 +48,10 @@ const MatchGroupDetail = () => {
             }
         };
         fetchData();
+        
+        // 실시간 업데이트
+        const interval = setInterval(fetchData, 5000);
+        return () => clearInterval(interval);
     }, [groupId]);
 
 
@@ -69,7 +82,31 @@ const MatchGroupDetail = () => {
         }
     };
 
-    // 3. 참가자 강퇴 처리(방장만 가능)
+    // 3. 참가 신청 승인
+    const handleApprove = async (username) => {
+        try {
+            await approveParticipant(group.id, username);
+            alert(`${username} 님을 승인하였습니다.`);
+            window.location.reload();  // 새로고침하여 데이터 갱신
+        } catch (error) {
+            console.error("참가 승인 실패:", error);
+            alert("참가 승인 중 오류가 발생했습니다.");
+        }
+    };
+
+    // 4. 참가 신청 거절
+    const handleReject = async (username) => {
+        try {
+            await rejectParticipant(group.id, username);
+            alert(`${username} 님을 거절하였습니다.`);
+            window.location.reload();
+        } catch (error) {
+            console.error("참가 거절 실패:", error);
+            alert("참가 거절 중 오류가 발생했습니다.");
+        }
+    };
+
+    // 5. 참가자 강퇴 처리(방장만 가능)
     const handleRemoveParticipant = async (participantUsername) => {
         if (!isHost) return alert("방장만 참가자를 강퇴할 수 있습니다.");
 
@@ -83,7 +120,7 @@ const MatchGroupDetail = () => {
         }
     };
 
-    // 4. 모집 종료 처리(방장만 가능)
+    // 6. 모집 종료 처리(방장만 가능)
     const handleCloseGroup = async () => {
         if (!isHost) return alert("방장만 모집을 종료할 수 있습니다.");
 
@@ -97,7 +134,7 @@ const MatchGroupDetail = () => {
         }
     };
 
-    // 5. 그룹 삭제(방장만 가능)
+    // 7. 그룹 삭제(방장만 가능)
     const handleDeleteGroup = async () => {
         if (!isHost) return alert("방장만 그룹을 삭제할 수 있습니다.");
         if (!window.confirm("정말로 그룹을 삭제하시겠습니까?")) return;
@@ -105,7 +142,7 @@ const MatchGroupDetail = () => {
         try {
             await deleteMatchGroup(group.id);
             alert("그룹이 삭제되었습니다.");
-            navigate("/matchgroups"); // 그룹 목록 페이지로 이동
+            navigate("/matchgroup"); // 그룹 목록 페이지로 이동
         } catch (error) {
             console.error("그룹 삭제 실패:", error);
             alert("그룹 삭제 중 오류가 발생했습니다.");

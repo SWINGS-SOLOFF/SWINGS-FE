@@ -13,7 +13,7 @@ const CreateMatchGroup = () => {
         genderRatio: "1:1",  // 성별 비
         location: "",  // 골프장 위치
         dateTime: "",  // 경기 일정
-        playStyle: "상관없음",  // 플레이 스타일(캐쥬얼 | 경쟁적)
+        playStyle: "casual",  // 플레이 스타일(캐쥬얼 | 경쟁적)
         recruitmentDeadline: "",  // 모집 마감 일정
         status: "모집중",  // 모집 상태
     });
@@ -21,17 +21,24 @@ const CreateMatchGroup = () => {
     
     // 핸들러
     // 압력값 변경
-    const handleChange  = (e) => {
-        const {name, value} = e.target;
-        setGroupData({...groupData, [name]: value});
+    const handleChange = (e) => {
+        const { name, value } = e.target;
 
-        // 모집 상태 업데이트
-        if(name === "recruitmentDeadline"){
-            const now = new Date();
-            const deadline  = new Date(value);
-            const newStatus = deadline < now ? "모집 완료" : "모집중";
-            setGroupData({...groupData, status: newStatus});
-        }
+        setGroupData((prevState) => {
+            let newStatus = prevState.status; // 기존 상태 유지
+
+            if (name === "recruitmentDeadline") {
+                const now = new Date();
+                const deadline = new Date(value);
+                newStatus = deadline < now ? "모집 완료" : "모집중";
+            }
+
+            return {
+                ...prevState,
+                [name]: value, // 입력 필드 업데이트
+                status: newStatus, // 모집 상태 업데이트
+            };
+        });
     };
 
     // 그룹 생성
@@ -48,105 +55,110 @@ const CreateMatchGroup = () => {
     };
 
     return(
-        <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
-            <h2 className="text-xl font-bold mb-4"> 그룹 생성 </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="그룹명"
-                    value={groupData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border rounded"
-                />
-                <textarea
-                    name="description"
-                    placeholder="설명"
-                    value={groupData.description}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border rounded"
-                />
-                <input
-                    type="number"
-                    name="maxParticipants"
-                    placeholder="최대 인원"
-                    value={groupData.maxParticipants}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border rounded"
-                />
-                <input
-                    type="number"
-                    name="currentParticipants"
-                    placeholder="현재 참가자 수"
-                    value={groupData.currentParticipants}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border rounded"
-                />
-                <input
-                    type="text"
-                    name="genderRatio"
-                    placeholder="남녀 성비 (예: 1:1, 2:1)"
-                    value={groupData.genderRatio}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border rounded"
-                />
-                <input
-                    type="text"
-                    name="ageRange"
-                    placeholder="연령대 (예: 20-30, 30-40)"
-                    value={groupData.ageRange}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border rounded"
-                />
-                <input
-                    type="text"
-                    name="location"
-                    placeholder="골프장 장소"
-                    value={groupData.location}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border rounded"
-                />
-                <input
-                    type="datetime-local"
-                    name="dateTime"
-                    placeholder="일시"
-                    value={groupData.dateTime}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border rounded"
-                />
-                <input
-                    type="datetime-local"
-                    name="recruitmentDeadline"
-                    placeholder="모집 마감 일정"
-                    value={groupData.recruitmentDeadline}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border rounded"
-                />
-                <select
-                    name="playStyle"
-                    value={groupData.playStyle}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                >
-                    <option value="casual">캐주얼</option>
-                    <option value="competitive">경쟁적</option>
-                </select>
-                <button
-                    type="submit"
-                    className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                    그룹 생성
-                </button>
-            </form>
+        <div className="flex items-center justify-center min-h-screen bg-pink-100">
+            <div className="w-full max-w-lg p-6 bg-white shadow-2xl rounded-2xl border border-pink-300">
+                <h2 className="text-2xl font-bold text-pink-600 mb-6 text-center"> 💕 그룹 생성 💕 </h2>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <label htmlFor="name" className="block text-pink-700 font-semibold mb-2">
+                        뭐 설명이나 쓰지뭐..
+                    </label>
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="그룹명"
+                        value={groupData.name}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    />
+                    <textarea
+                        name="description"
+                        placeholder="설명"
+                        value={groupData.description}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    />
+                    <input
+                        type="number"
+                        name="maxParticipants"
+                        placeholder="최대 인원"
+                        value={groupData.maxParticipants}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    />
+                    <input
+                        type="number"
+                        name="currentParticipants"
+                        placeholder="현재 참가자 수"
+                        value={groupData.currentParticipants}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    />
+                    <input
+                        type="text"
+                        name="genderRatio"
+                        placeholder="남녀 성비 (예: 1:1, 2:1)"
+                        value={groupData.genderRatio}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    />
+                    <input
+                        type="text"
+                        name="ageRange"
+                        placeholder="연령대 (예: 20-30, 30-40)"
+                        value={groupData.ageRange}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    />
+                    <input
+                        type="text"
+                        name="location"
+                        placeholder="골프장 장소"
+                        value={groupData.location}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    />
+                    <input
+                        type="datetime-local"
+                        name="dateTime"
+                        placeholder="일시"
+                        value={groupData.dateTime}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    />
+                    <input
+                        type="datetime-local"
+                        name="recruitmentDeadline"
+                        placeholder="모집 마감 일정"
+                        value={groupData.recruitmentDeadline || ""}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    />
+                    <select
+                        name="playStyle"
+                        value={groupData.playStyle}
+                        onChange={handleChange}
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    >
+                        <option value="casual">캐주얼</option>
+                        <option value="competitive">경쟁적</option>
+                    </select>
+                    <button
+                        type="submit"
+                        className="w-full p-3 bg-pink-500 text-white rounded-lg font-semibold hover:bg-pink-600 transition"
+                    >
+                        그룹 생성
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };
