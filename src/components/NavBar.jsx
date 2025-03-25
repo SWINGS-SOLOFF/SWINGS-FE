@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // ✅ AuthContext 가져오기
+import { useAuth } from "../1_user/context/AuthContext.jsx";
 
 export default function NavBar() {
   const { token, logout } = useAuth(); // ✅ 토큰 및 로그아웃 함수 가져오기

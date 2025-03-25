@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-h }
 
 export default function PasswordChangeForm({ username }) {
   const { token } = useAuth();
@@ -17,14 +16,17 @@ export default function PasswordChangeForm({ username }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:8090/swings/users/${username}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ password: newPassword }),
-      });
+      const response = await fetch(
+        `http://localhost:8090/swings/users/${username}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ password: newPassword }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("비밀번호 변경 실패");
@@ -65,7 +67,10 @@ export default function PasswordChangeForm({ username }) {
 
       {message && <p className="text-sm text-red-500">{message}</p>}
 
-      <button type="submit" className="bg-blue-600 text-white p-2 rounded w-full">
+      <button
+        type="submit"
+        className="bg-blue-600 text-white p-2 rounded w-full"
+      >
         비밀번호 변경
       </button>
     </form>
