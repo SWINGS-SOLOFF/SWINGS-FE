@@ -6,12 +6,14 @@ import UserRoutes from "./1_user/routes/UserRoutes";
 
 export default function App() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen w-full">
       <NavBar />
 
-      <Routes>
-        <Route path="/*" element={<UserRoutes />} />
-      </Routes>
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/*" element={<UserRoutes />} />
+        </Routes>
+      </main>
 
       <FooterBar />
     </div>

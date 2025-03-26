@@ -30,9 +30,23 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
+  align-items: stretch;
+  padding: 0;
+  background-color: #242424;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0rem;
+}
+
+main {
+  flex-grow: 1;
 }
 
 h1 {
@@ -73,12 +87,19 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-#root {
+.card {
+  padding: 2em;
   width: 100%;
-  max-width: 1280px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 1rem;
-  text-align: center;
+  background-color: white;
+  border-radius: 1rem;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 1.5em;
+  }
 }
 
 .logo {
@@ -109,25 +130,9 @@ button:focus-visible {
   }
 }
 
-.card {
-  padding: 2em;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
 .read-the-docs {
   color: #888;
   font-size: 0.875rem;
   margin-top: 1rem;
   text-align: center;
-}
-
-@media (max-width: 640px) {
-  .card {
-    padding: 1em;
-  }
-  .logo {
-    height: 3em;
-  }
 }

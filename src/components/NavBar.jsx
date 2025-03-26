@@ -10,28 +10,34 @@ export default function NavBar() {
   };
 
   return (
-    <nav className="p-4 bg-gray-800 text-white flex justify-center items-center space-x-4 w-full">
-      <Link to="/">SWINGS</Link>
-      {token ? (
-        <>
-          <Link to="/" onClick={handleLogout} className="text-red-500">
-            LOGOUT
-          </Link>
-          <Link to="/mypage" className="text-green-500">
-            MYPAGE
-          </Link>
-        </>
-      ) : (
-        <>
-          <Link to="/login">LOGIN</Link>
-          <Link
-            to="/signup"
-            className="bg-pink-500 text-white px-4 py-2 rounded"
-          >
-            SIGNUP
-          </Link>
-        </>
-      )}
+    <nav className="w-full bg-gray-800 text-white px-4 py-3">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <Link to="/" className="text-lg font-bold">
+          SWINGS
+        </Link>
+        <div className="space-x-4">
+          {token ? (
+            <>
+              <Link to="/" onClick={handleLogout} className="text-red-400">
+                LOGOUT
+              </Link>
+              <Link to="/mypage" className="text-green-400">
+                MYPAGE
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/login">LOGIN</Link>
+              <Link
+                to="/signup"
+                className="bg-pink-500 text-white px-4 py-1 rounded"
+              >
+                SIGNUP
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
     </nav>
   );
 }
