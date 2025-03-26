@@ -1,46 +1,18 @@
-import { useState } from "react";
-import StepOne from "../components/StepOne";
-import StepTwo from "../components/StepTwo";
-import { signupUser } from "../api/userApi";
+// src/1_user/pages/SignUp.jsx
+import AnimatedSignupForm from "../components/AnimatedSignupForm";
+import { signupUser } from "../api/userApi"; // ✅ 경로 수정!
+import { useNavigate } from "react-router-dom";
 
-const SignUp = () => {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    confirmPassword: "",
-    name: "",
-    phonenumber: "",
-    gender: "",
-    job: "",
-    golfSkill: "",
-    mbti: "",
-    hobbies: "",
-    religion: "",
-    smoking: "",
-    drinking: "",
-    introduce: "",
-    userImg: "",
-  });
+export default function SignUp() {
+  const navigate = useNavigate();
 
-  const submitForm = async () => {
+  const submitForm = async (formData) => {
     await signupUser(formData);
   };
 
-  return step === 1 ? (
-    <StepOne
-      formData={formData}
-      setFormData={setFormData}
-      nextStep={() => setStep(2)}
-    />
-  ) : (
-    <StepTwo
-      formData={formData}
-      setFormData={setFormData}
-      prevStep={() => setStep(1)}
-      submitForm={submitForm}
-    />
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <AnimatedSignupForm submitForm={submitForm} />
+    </div>
   );
-};
-
-export default SignUp;
+}
