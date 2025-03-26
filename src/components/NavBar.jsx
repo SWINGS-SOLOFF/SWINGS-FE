@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../1_user/context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function NavBar() {
   const { token, logout } = useAuth(); // ✅ 토큰 및 로그아웃 함수 가져오기
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    window.location.reload(); // 상태 반영을 위해 새로고침
+    navigate("/");
   };
 
   return (

@@ -3,11 +3,13 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
 import MyPage from "../pages/MyPage";
+import LoginCard from "../pages/LoginCard";
 
 export default function UserRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<LoginCard />} />
+      <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/mypage" element={<MyPage />} />

@@ -3,22 +3,75 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { checkUsername } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
+import { getEnumRegion, getAllRegionNames } from "../utils/userUtils";
 
 const questions = [
-  { key: "gender", question: "성별이 어떻게 되시나요?", type: "select", options: ["남성", "여성"] },
-  { key: "name", question: "이름을 입력해주세요.", type: "text" },
-  { key: "username", question: "사용하실 아이디를 입력해주세요.", type: "text" },
-  { key: "password", question: "비밀번호를 입력해주세요.", type: "password" },
-  { key: "confirmPassword", question: "비밀번호를 한 번 더 입력해주세요.", type: "password" },
-  { key: "phonenumber", question: "전화번호를 입력해주세요.", type: "text" },
-  { key: "job", question: "직업이 무엇인가요?", type: "text" },
-  { key: "golfSkill", question: "골프 실력은 어느 정도인가요?", type: "select", options: ["초급", "중급", "고급"] },
+  {
+    key: "gender",
+    question: "성별이 어떻게 되시나요?",
+    type: "select",
+    options: ["남성", "여성"],
+    helper: "하나를 선택해주세요.",
+  },
   { key: "mbti", question: "MBTI를 입력해주세요.", type: "text" },
+  {
+    key: "golfSkill",
+    question: "골프 실력은 어느 정도인가요?",
+    type: "select",
+    options: ["초급", "중급", "고급"],
+    helper: "하나를 선택해주세요.",
+  },
+  {
+    key: "activityRegion",
+    question: "어느 지역에서 활동하시나요?",
+    type: "select",
+    options: getAllRegionNames(), // 한글 목록
+    helper: "현재 거주하거나 자주 활동하는 지역을 선택해주세요.",
+  },
+
+  { key: "job", question: "직업이 무엇인가요?", type: "text" },
   { key: "hobbies", question: "취미가 무엇인가요?", type: "text" },
-  { key: "religion", question: "종교가 있으신가요?", type: "select", options: ["무교", "기독교", "천주교", "불교", "기타"] },
-  { key: "smoking", question: "흡연하시나요?", type: "select", options: ["흡연함", "흡연하지 않음"] },
-  { key: "drinking", question: "음주하시나요?", type: "select", options: ["음주함", "음주하지 않음"] },
-  { key: "introduce", question: "자기소개를 해주세요.", type: "textarea" }
+  {
+    key: "religion",
+    question: "종교가 있으신가요?",
+    type: "select",
+    options: ["무교", "기독교", "천주교", "불교", "기타"],
+    helper: "하나를 선택해주세요.",
+  },
+  {
+    key: "smoking",
+    question: "흡연하시나요?",
+    type: "select",
+    options: ["흡연함", "흡연하지 않음"],
+  },
+  {
+    key: "drinking",
+    question: "음주하시나요?",
+    type: "select",
+    options: ["음주함", "음주하지 않음"],
+  },
+  {
+    key: "username",
+    question: "사용하실 아이디를 입력해주세요.",
+    type: "text",
+    helper: "중복 확인이 자동으로 이뤄집니다.",
+  },
+  {
+    key: "password",
+    question: "비밀번호를 입력해주세요.",
+    type: "password",
+    helper: "6자 이상 영문/숫자 조합을 추천합니다.",
+  },
+  {
+    key: "confirmPassword",
+    question: "비밀번호를 한 번 더 입력해주세요.",
+    type: "password",
+  },
+  { key: "name", question: "이름을 입력해주세요.", type: "text" },
+
+  { key: "phonenumber", question: "전화번호를 입력해주세요.", type: "text" },
+
+  { key: "introduce", question: "자기소개를 해주세요.", type: "textarea" },
 ];
 
 export default function AnimatedSignupForm({ submitForm }) {
@@ -32,16 +85,18 @@ export default function AnimatedSignupForm({ submitForm }) {
 
   const handleNext = async (value) => {
     if (!value) return setError("입력해주세요.");
+    if (current.key === "activityRegion") {
+      value = getEnumRegion(value);
+    }
 
-    // 아이디 중복 확인
     if (current.key === "username") {
       const exists = await checkUsername(value);
       if (exists) return setError("이미 존재하는 아이디입니다.");
     }
 
-    // 비밀번호 확인
     if (current.key === "confirmPassword") {
-      if (formData.password !== value) return setError("비밀번호가 일치하지 않습니다.");
+      if (formData.password !== value)
+        return setError("비밀번호가 일치하지 않습니다.");
     }
 
     setFormData({ ...formData, [current.key]: value });
@@ -61,7 +116,7 @@ export default function AnimatedSignupForm({ submitForm }) {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md text-center space-y-4">
+    <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md text-center space-y-6">
       {step < questions.length ? (
         <motion.div
           key={step}
@@ -69,14 +124,19 @@ export default function AnimatedSignupForm({ submitForm }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <h2 className="text-lg font-bold mb-4">{current.question}</h2>
+          <h2 className="text-2xl font-extrabold text-gray-800 mb-2">
+            {current.question}
+          </h2>
+          {current.helper && (
+            <p className="text-sm text-gray-500 mb-4">{current.helper}</p>
+          )}
 
           {current.type === "select" ? (
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-col gap-3 items-center">
               {current.options.map((opt) => (
                 <button
                   key={opt}
-                  className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                  className="w-full px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
                   onClick={() => handleNext(opt)}
                 >
                   {opt}
