@@ -11,6 +11,7 @@ const BASE_URL = "http://localhost:8090/swings/matchgroup"
     // 모든 그룹 조회 API
     export const getAllMatchGroups = async () => {
         const response = await axios.get(`${BASE_URL}/list`);
+        console.log("API 응답:", response)
         return response.data;
     };
 
