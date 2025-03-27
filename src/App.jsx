@@ -6,7 +6,7 @@ import UserRoutes from "./1_user/routes/UserRoutes";
 
 export default function App() {
   const location = useLocation();
-  const hideLayoutPaths = ["/", "/login", "/signup"];
+  const hideLayoutPaths = ["/swings", "/swings/login", "/swings/signup"];
   const hideLayout = hideLayoutPaths.includes(location.pathname);
 
   return (

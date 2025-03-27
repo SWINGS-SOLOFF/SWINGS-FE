@@ -1,10 +1,10 @@
-// src/1_user/pages/Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { loginRequest } from "../api/userApi.js";
-import { saveToken } from "../utils/userUtils.js";
+import { loginRequest } from "../api/userApi";
+import { saveToken } from "../utils/userUtils";
 import { motion } from "framer-motion";
+import { LinkIcon } from "@heroicons/react/24/outline";
 
 export default function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -18,70 +18,94 @@ export default function Login() {
 
     try {
       const accessToken = await loginRequest(formData);
-
       login(accessToken);
       saveToken(accessToken);
-
       alert("로그인 성공!");
-      navigate("/home");
-      window.location.reload();
+      navigate("/swings/home");
     } catch (error) {
-      console.error("로그인 실패:", error);
       setErrorMessage(error.message);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 bg-opacity-90 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md relative"
+        className="w-full max-w-sm space-y-6 text-center"
       >
-        <button
-          onClick={() => navigate("/")}
-          className="absolute top-4 left-4 text-gray-500 hover:text-black"
-        >
-          ← 뒤로가기
-        </button>
-        <h2 className="text-xl font-bold text-center mb-4">로그인</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block">
-            아이디:
+        <h1 className="text-3xl font-bold text-gray-800">SWINGS</h1>
+        <p className="text-gray-500">골프 동반자를 찾아보세요</p>
+
+        <form onSubmit={handleSubmit} className="space-y-4 text-left">
+          <div>
+            <label className="block text-sm mb-1 text-gray-700">아이디</label>
             <input
               type="text"
-              placeholder="아이디를 입력하세요"
-              className="w-full border p-2 rounded text-black"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
+              placeholder="your_id"
               value={formData.username}
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
               }
             />
-          </label>
+          </div>
 
-          <label className="block">
-            비밀번호:
+          <div>
+            <label className="block text-sm mb-1 text-gray-700">비밀번호</label>
             <input
               type="password"
-              placeholder="비밀번호를 입력하세요"
-              className="w-full border p-2 rounded text-black"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
+              placeholder="••••••••"
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
             />
-          </label>
+            <div className="text-right text-sm mt-1">
+              <button
+                type="button"
+                className="text-blue-500 hover:underline"
+                onClick={() => alert("비밀번호 찾기 기능은 준비 중입니다.")}
+              >
+                비밀번호 찾기
+              </button>
+            </div>
+          </div>
 
-          {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+          {errorMessage && (
+            <p className="text-red-500 text-sm text-center">{errorMessage}</p>
+          )}
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded"
+            className="w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 rounded-lg"
           >
             로그인
           </button>
         </form>
+
+        <div className="flex items-center my-4">
+          <div className="flex-grow h-px bg-gray-300" />
+          <span className="px-3 text-gray-400 text-sm">또는</span>
+          <div className="flex-grow h-px bg-gray-300" />
+        </div>
+
+        <button
+          onClick={() => alert("구글 로그인은 준비 중입니다.")}
+          className="w-full flex justify-center items-center gap-2 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-100"
+        >
+          <LinkIcon className="w-5 h-5 text-gray-500" />
+          <span>Google로 로그인</span>
+        </button>
+
+        <button
+          onClick={() => navigate("/swings/signup")}
+          className="w-full flex justify-center items-center bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 rounded-lg"
+        >
+          회원가입
+        </button>
       </motion.div>
     </div>
   );

@@ -1,13 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { changePassword } from "../api/userApi";
+import { changePassword, fetchUserData } from "../api/userApi";
 import { validatePasswordMatch } from "../utils/userUtils";
 
-export default function PasswordChangeForm({ username }) {
+export default function PasswordChangeForm() {
   const { token } = useAuth();
+  const [username, setUsername] = useState(null);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const loadUsername = async () => {
+      try {
+        const user = await fetchUserData();
+        setUsername(user.username);
+      } catch (err) {
+        console.error("사용자 정보 조회 실패:", err);
+        setMessage("로그인이 필요합니다.");
+      }
+    };
+    loadUsername();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,24 +35,37 @@ export default function PasswordChangeForm({ username }) {
 
     try {
       await changePassword(username, newPassword);
-      setMessage("비밀번호가 성공적으로 변경되었습니다.");
+      setMessage("✅ 비밀번호가 성공적으로 변경되었습니다.");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
       console.error(err);
-      setMessage("오류가 발생했습니다.");
+      setMessage("❌ 비밀번호 변경 중 오류가 발생했습니다.");
     }
   };
 
+  if (!username) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        사용자 정보를 불러오는 중입니다...
+      </div>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 mt-6 max-w-md mx-auto p-4"
+    >
+      <h2 className="text-xl font-bold text-gray-800 mb-4">비밀번호 변경</h2>
+
       <label className="block">
         새 비밀번호:
         <input
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="w-full border p-2 rounded  text-black"
+          className="w-full border p-2 rounded text-black"
           required
         />
       </label>
@@ -49,16 +76,24 @@ export default function PasswordChangeForm({ username }) {
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full border p-2 rounded  text-black"
+          className="w-full border p-2 rounded text-black"
           required
         />
       </label>
 
-      {message && <p className="text-sm text-red-500">{message}</p>}
+      {message && (
+        <p
+          className={`text-sm text-center ${
+            message.includes("성공") ? "text-green-600" : "text-red-500"
+          }`}
+        >
+          {message}
+        </p>
+      )}
 
       <button
         type="submit"
-        className="bg-blue-600 text-white p-2 rounded w-full"
+        className="bg-blue-600 text-white p-2 rounded w-full hover:bg-blue-700"
       >
         비밀번호 변경
       </button>
