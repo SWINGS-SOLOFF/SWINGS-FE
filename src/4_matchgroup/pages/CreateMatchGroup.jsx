@@ -8,13 +8,14 @@ const CreateMatchGroup = () => {
         name: "",  // 그룹명
         description: "",  // 그룹 설명
         maxParticipants: 10,  // 최대 참가자 수
-        currentParticipants: 0, // 현재 참가자 수
+        currentParticipants: 1, // 현재 참가자 수
         ageRange: "20-40",  // 연령대
         genderRatio: "1:1",  // 성별 비
         location: "",  // 골프장 위치
-        dateTime: "",  // 경기 일정
+        schedule: "",  // 경기 일정
         playStyle: "casual",  // 플레이 스타일(캐쥬얼 | 경쟁적)
         recruitmentDeadline: "",  // 모집 마감 일정
+        skillLevel: "상관없음", // 실력 (초급 | 중급 | 고급 | 상관없음)
         status: "모집중",  // 모집 상태
     });
 
@@ -44,10 +45,11 @@ const CreateMatchGroup = () => {
     // 그룹 생성
     const handleSubmit = async (e) => {
         e.preventDefault();  // 기본 폼 제출 방지
+        console.log("보낼 데이터:", groupData);  // 확인용
         try {
             await createMatchGroup(groupData);  // API를 통해 그룹 생성 요청
             alert("그룹이 생성되었습니다!");  // 성공 알림
-            navigate("/matchgroup");  // 그룹 목록 페이지로 이동
+            navigate("/swings/matchgroup");  // 그룹 목록 페이지로 이동
         } catch (error) {
             console.error("그룹 생성 실패:", error);
             alert("그룹 생성 중 오류가 발생했습니다.");
@@ -126,9 +128,9 @@ const CreateMatchGroup = () => {
                     />
                     <input
                         type="datetime-local"
-                        name="dateTime"
+                        name="schedule"
                         placeholder="일시"
-                        value={groupData.dateTime}
+                        value={groupData.schedule}
                         onChange={handleChange}
                         required
                         className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
@@ -150,6 +152,17 @@ const CreateMatchGroup = () => {
                     >
                         <option value="casual">캐주얼</option>
                         <option value="competitive">경쟁적</option>
+                    </select>
+                    <select
+                        name="skillLevel"
+                        value={groupData.skillLevel}
+                        onChange={handleChange}
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    >
+                        <option value="초급">초급</option>
+                        <option value="중급">중급</option>
+                        <option value="고급">고급</option>
+                        <option value="상관없음">상관없음</option>
                     </select>
                     <button
                         type="submit"

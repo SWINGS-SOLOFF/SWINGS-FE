@@ -1,20 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MatchGroupList from "../4_matchgroup/pages/MatchGroupList.jsx";
-import CreateMatchGroup from "../4_matchgroup/pages/CreateMatchGroup.jsx";
-import MatchGroupDetail from "../4_matchgroup/pages/MatchGroupDetail.jsx";
-import LoginPage from "../1_user/pages/LoginPage.jsx";
-
-const UserRoutes = () => {
+const GroupButton = ({ onClick, children, disabled = false, className = "" }) => {
     return (
-        <Router>
-            <Routes>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/matchgroup" element={<MatchGroupList />} />
-                <Route path="/matchgroup/create" element={<CreateMatchGroup />} />
-                <Route path="/matchgroup/:id" element={<MatchGroupDetail />} />
-            </Routes>
-        </Router>
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            className={`px-6 py-3 rounded-xl text-white font-semibold transition shadow-md 
+                ${disabled ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"} 
+                ${className}`}
+        >
+            {children}
+        </button>
     );
 };
-
-export default UserRoutes;
+export default GroupButton;
