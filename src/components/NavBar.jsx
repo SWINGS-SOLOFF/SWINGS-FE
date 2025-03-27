@@ -1,14 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // ✅ useNavigate 추가
 import { useAuth } from "../1_user/context/AuthContext.jsx";
-import { nav } from "framer-motion/client";
 
 export default function NavBar() {
-  const { token, logout } = useAuth(); // ✅ 토큰 및 로그아웃 함수 가져오기
+  const { token, logout } = useAuth();
+  const navigate = useNavigate(); // ✅ navigate 정의
 
   const handleLogout = () => {
     logout();
-    navigate("/swings"); // ✅ 로그아웃 후 홈으로 이동
-
+    navigate("/swings"); // ✅ 로그아웃 후 /swings로 이동
   };
 
   return (
@@ -20,12 +19,9 @@ export default function NavBar() {
         <div className="space-x-4">
           {token ? (
             <>
-              <Link
-                onClick={handleLogout}
-                className="text-red-400"
-              >
+              <button onClick={handleLogout} className="text-red-400">
                 LOGOUT
-              </Link>
+              </button>
               <Link to="/swings/mypage" className="text-green-400">
                 MYPAGE
               </Link>
