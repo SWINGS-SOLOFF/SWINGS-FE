@@ -1,27 +1,32 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../1_user/context/AuthContext.jsx";
+import { nav } from "framer-motion/client";
 
 export default function NavBar() {
   const { token, logout } = useAuth(); // ✅ 토큰 및 로그아웃 함수 가져오기
 
   const handleLogout = () => {
     logout();
-    window.location.reload(); // 상태 반영을 위해 새로고침
+    navigate("/swings"); // ✅ 로그아웃 후 홈으로 이동
+
   };
 
   return (
     <nav className="w-full bg-gray-800 text-white px-4 py-3">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link to="/" className="text-lg font-bold">
+        <Link to="/swings/home" className="text-lg font-bold">
           SWINGS
         </Link>
         <div className="space-x-4">
           {token ? (
             <>
-              <Link to="/" onClick={handleLogout} className="text-red-400">
+              <Link
+                onClick={handleLogout}
+                className="text-red-400"
+              >
                 LOGOUT
               </Link>
-              <Link to="/mypage" className="text-green-400">
+              <Link to="/swings/mypage" className="text-green-400">
                 MYPAGE
               </Link>
             </>
