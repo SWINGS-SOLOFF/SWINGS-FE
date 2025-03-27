@@ -131,7 +131,7 @@ export default function AnimatedSignupForm({ submitForm }) {
     try {
       await submitForm(formData);
       alert("회원가입이 완료되었습니다!");
-      navigate("/login");
+      navigate("/swings");
     } catch (e) {
       setError("회원가입 중 오류가 발생했습니다.");
     }
