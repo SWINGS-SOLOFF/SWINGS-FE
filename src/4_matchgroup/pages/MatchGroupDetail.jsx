@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMatchGroupById } from "../api/matchGroupApi.js";
+import {getCurrentUser, getMatchGroupById} from "../api/matchGroupApi.js";
 import {
     approveParticipant,
     getParticipantsByGroupId,
@@ -7,7 +7,6 @@ import {
     leaveMatch, rejectParticipant,
     removeParticipant
 } from "../api/matchParticipantApi.js";
-import {getCurrentUser} from "../../1_user/api/userApi.js";
 import { useParams, useNavigate } from "react-router-dom";
 
 const MatchGroupDetail = () => {

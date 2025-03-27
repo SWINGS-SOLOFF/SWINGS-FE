@@ -1,9 +1,8 @@
-// src/App.jsx
-import { Routes, Route, useLocation } from "react-router-dom";/
-import NavBar from "./components/NavBar";
-import FooterBar from "./components/FooterBar";
+import { Routes, Route, useLocation } from "react-router-dom";
+import FooterBar from "./components/FooterBar.jsx";
 import UserRoutes from "./1_user/routes/UserRoutes";
 import MatchGroupRoutes from "./4_matchgroup/routes/MatchGroupRoutes.jsx";
+import NavBar from "./components/NavBar.jsx";
 
 export default function App() {
   const location = useLocation();
@@ -17,7 +16,7 @@ export default function App() {
       <main className="flex-grow">
         <Routes>
           <Route path="/*" element={<UserRoutes />} />
-          <Route path="/*" element={<MatchGroupRoutes />} />
+          <Route path="/swings/matchgroup/*" element={<MatchGroupRoutes />} />
         </Routes>
       </main>
 

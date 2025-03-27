@@ -20,7 +20,3 @@ const MatchGroupCard = ({ group }) => {
 };
 
 export default MatchGroupCard;
-
-
-
-
