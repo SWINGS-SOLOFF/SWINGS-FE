@@ -1,35 +1,65 @@
-import axios from "axios";
+// src/1_user/api/auth.js
+import axios from "./axiosInstance";
 
-const API_URL = "http://localhost:8090/swings/auth"; // 백엔드 API URL 확인 필요
+/**
+ * 로그인 API 요청 함수
+ * @param {{ username: string, password: string }} formData
+ * @returns {Promise<string>} accessToken
+ */
+export async function loginRequest(formData) {
+  try {
+    const response = await axios.post("/auth/login", formData);
+    const data = response.data;
 
-// 현재 로그인한 사용자 정보 가져오기
-export const getCurrentUser = async () => {
-    try {
-        const response = await axios.get(`${API_URL}/me`, { withCredentials: true });
-        return response.data;
-    } catch (error) {
-        console.error("사용자 정보를 가져오는 중 오류 발생:", error);
-        throw error;
+    if (!data.accessToken) {
+      throw new Error("토큰을 받지 못했습니다.");
     }
+
+    return data.accessToken;
+  } catch (error) {
+    const message =
+      error.response?.data?.message || error.message || "로그인 실패";
+    throw new Error(message);
+  }
+  
+}
+
+
+
+// 아이디 중복 확인
+export const checkUsername = async (username) => {
+  const response = await axios.get(`/users/check-username?username=${username}`);
+  return response.data.exists;
 };
 
-// 로그인 요청
-export const login = async (email, password) => {
-    try {
-        const response = await axios.post(`${API_URL}/login`, { email, password }, { withCredentials: true });
-        return response.data;
-    } catch (error) {
-        console.error("로그인 오류:", error);
-        throw error;
-    }
+// 회원가입 요청
+export const signupUser = async (formData) => {
+  const response = await axios.post("/users/signup", {
+    ...formData,
+    role: formData.role || "player",
+  });
+  return response.data;
 };
 
-// 로그아웃 요청
-export const logout = async () => {
-    try {
-        await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
-    } catch (error) {
-        console.error("로그아웃 오류:", error);
-        throw error;
-    }
+//마이페이지 정보 불러오기
+export const fetchUserData = async () => {
+  const response = await axios.get("/users/me");
+  return response.data;
+};
+
+//마이페이지 정보 수정하기
+export const updateUserInfo = async (username, updatedFields) => {
+  const response = await axios.patch(`/users/${username}`, updatedFields);
+  return response.data;
+};
+
+
+/**
+ * 비밀번호 변경 요청
+ * @param {string} username
+ * @param {string} newPassword
+ * @returns {Promise<void>}
+ */
+export const changePassword = async (username, newPassword) => {
+  await axios.patch(`/users/${username}`, { password: newPassword });
 };
