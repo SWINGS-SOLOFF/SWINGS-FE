@@ -8,11 +8,11 @@ import AuthScreen from "../pages/AuthScreen";
 export default function UserRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<AuthScreen />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/mypage" element={<MyPage />} />
+      <Route path="/swings" element={<AuthScreen />} />
+      <Route path="/swings/home" element={<Home />} />
+      <Route path="/swings/login" element={<Login />} />
+      <Route path="/swings/signup" element={<SignUp />} />
+      <Route path="/swings/mypage" element={<MyPage />} />
     </Routes>
   );
 }
