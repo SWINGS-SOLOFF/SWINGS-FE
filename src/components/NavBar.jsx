@@ -1,44 +1,28 @@
-import { Link, useNavigate } from "react-router-dom"; // ✅ useNavigate 추가
-import { useAuth } from "../1_user/context/AuthContext.jsx";
+// src/components/NavBar.jsx
+import { Link, useNavigate } from "react-router-dom";
+import { MessageCircle } from "lucide-react";
 
 export default function NavBar() {
-  const { token, logout } = useAuth();
-  const navigate = useNavigate(); // ✅ navigate 정의
-
-  const handleLogout = () => {
-    logout();
-    navigate("/swings"); // ✅ 로그아웃 후 /swings로 이동
-  };
+  const navigate = useNavigate();
 
   return (
-    <nav className="w-full bg-gray-800 text-white px-4 py-3">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link to="/swings/home" className="text-lg font-bold">
-          SWINGS
-        </Link>
-        <div className="space-x-4">
-          {token ? (
-            <>
-              <button onClick={handleLogout} className="text-red-400">
-                LOGOUT
-              </button>
-              <Link to="/swings/mypage" className="text-green-400">
-                MYPAGE
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link to="/login">LOGIN</Link>
-              <Link
-                to="/signup"
-                className="bg-pink-500 text-white px-4 py-1 rounded"
-              >
-                SIGNUP
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-    </nav>
+    <header className="w-full bg-white border-b border-gray-200 shadow-sm px-4 py-3 flex justify-between items-center fixed top-0 z-50">
+      {/* 로고 */}
+      <Link
+        to="/swings/home"
+        className="text-xl font-bold text-[#2E384D] hover:opacity-80"
+      >
+        SWINGS
+      </Link>
+
+      {/* 메시지 아이콘 */}
+      <button
+        onClick={() => navigate("/swings/messages")} // 나중에 메시지 페이지 생기면
+        className="text-[#2E384D] hover:opacity-80"
+        aria-label="메시지"
+      >
+        <MessageCircle size={24} />
+      </button>
+    </header>
   );
 }

@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchUserData } from "../api/userApi";
-import UpdateForm from "../components/UpdateForm";
+import { removeToken } from "../utils/userUtils"; // ✅ 로그아웃 유틸 불러오기
 
 export default function MyPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showUpdateForm, setShowUpdateForm] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -22,6 +21,12 @@ export default function MyPage() {
     };
     loadUser();
   }, []);
+
+  // ✅ 로그아웃 처리 함수
+  const handleLogout = () => {
+    removeToken();
+    navigate("/swings");
+  };
 
   if (loading) {
     return (
@@ -41,24 +46,34 @@ export default function MyPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center px-4 pt-8 space-y-6">
-      {!showUpdateForm ? (
-        <>
-          <button
-            onClick={() => navigate("/swings/update")}
-            className="w-full max-w-xs bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg"
-          >
-            회원정보 수정
-          </button>
-          <button
-            onClick={() => navigate("/swings/passwordchange")}
-            className="w-full max-w-xs bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg"
-          >
-            비밀번호 변경
-          </button>
-        </>
-      ) : (
-        <UpdateForm formData={formData} setFormData={setFormData} />
-      )}
+      <button
+        onClick={() => navigate("/swings/mypage/update")}
+        className="w-full max-w-xs bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg"
+      >
+        회원정보 수정
+      </button>
+
+      <button
+        onClick={() => navigate("/swings/mypage/passwordchange")}
+        className="w-full max-w-xs bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg"
+      >
+        비밀번호 변경
+      </button>
+
+      <button
+        onClick={() => navigate("/swings/mypage/userdelete")}
+        className="w-full max-w-xs bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"
+      >
+        회원 탈퇴
+      </button>
+
+      {/* ✅ 로그아웃 버튼 */}
+      <button
+        onClick={handleLogout}
+        className="w-full max-w-xs bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 rounded-lg mt-6"
+      >
+        로그아웃
+      </button>
     </div>
   );
 }
