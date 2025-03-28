@@ -21,14 +21,13 @@ export async function loginRequest(formData) {
       error.response?.data?.message || error.message || "로그인 실패";
     throw new Error(message);
   }
-  
 }
-
-
 
 // 아이디 중복 확인
 export const checkUsername = async (username) => {
-  const response = await axios.get(`/users/check-username?username=${username}`);
+  const response = await axios.get(
+    `/users/check-username?username=${username}`
+  );
   return response.data.exists;
 };
 
@@ -53,7 +52,6 @@ export const updateUserInfo = async (username, updatedFields) => {
   return response.data;
 };
 
-
 /**
  * 비밀번호 변경 요청
  * @param {string} username
@@ -62,4 +60,12 @@ export const updateUserInfo = async (username, updatedFields) => {
  */
 export const changePassword = async (username, newPassword) => {
   await axios.patch(`/users/${username}`, { password: newPassword });
+};
+
+//회원탈퇴 + 비번 확인 요청
+export const deleteUserWithPassword = async (password) => {
+  const response = await axios.post("/users/delete/me", {
+    password,
+  });
+  return response.data;
 };

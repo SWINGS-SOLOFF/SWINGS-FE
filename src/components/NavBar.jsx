@@ -1,13 +1,9 @@
-import { Link } from "react-router-dom";
-import { useAuth } from "../1_user/context/AuthContext.jsx";
+// src/components/NavBar.jsx
+import { Link, useNavigate } from "react-router-dom";
+import { MessageCircle } from "lucide-react";
 
 export default function NavBar() {
-  const { token, logout } = useAuth(); // ✅ 토큰 및 로그아웃 함수 가져오기
-
-  const handleLogout = () => {
-    logout();
-    window.location.reload(); // 상태 반영을 위해 새로고침
-  };
+  const navigate = useNavigate();
 
   return (
     <nav className="w-full bg-gray-800 text-white px-4 py-3">
