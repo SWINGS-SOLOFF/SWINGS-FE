@@ -5,6 +5,17 @@ import { useNavigate } from "react-router-dom";
 
 const questions = [
   {
+    key: "username",
+    question: "사용하실 아이디를 입력해주세요.",
+    type: "text",
+  },
+  {
+    key: "passwordDouble",
+    question: "비밀번호를 입력하고 확인해주세요.",
+    type: "passwordDouble",
+  },
+  { key: "name", question: "이름을 입력해주세요.", type: "text" },
+  {
     key: "gender",
     question: "성별이 어떻게 되시나요?",
     type: "select",
@@ -13,20 +24,7 @@ const questions = [
       { label: "여성", value: "female" },
     ],
   },
-  { key: "name", question: "이름을 입력해주세요.", type: "text" },
-  {
-    key: "username",
-    question: "사용하실 아이디를 입력해주세요.",
-    type: "text",
-  },
-  { key: "password", question: "비밀번호를 입력해주세요.", type: "password" },
-  {
-    key: "confirmPassword",
-    question: "비밀번호를 한 번 더 입력해주세요.",
-    type: "password",
-  },
 
-  // ✅ 지역 선택 - 한글 표시 / Enum 전송
   {
     key: "activityRegion",
     question: "어느 지역에 거주하시나요?",
@@ -103,26 +101,33 @@ export default function AnimatedSignupForm({ submitForm }) {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({});
   const [input, setInput] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const current = questions[step];
 
   const handleNext = async (value) => {
-    if (!value) return setError("입력해주세요.");
+    if (!value && current.type !== "passwordDouble") {
+      return setError("입력해주세요.");
+    }
 
     if (current.key === "username") {
       const exists = await checkUsername(value);
       if (exists) return setError("이미 존재하는 아이디입니다.");
     }
 
-    if (current.key === "confirmPassword") {
-      if (formData.password !== value)
+    if (current.type === "passwordDouble") {
+      if (!input || !passwordConfirm) return setError("모두 입력해주세요.");
+      if (input !== passwordConfirm)
         return setError("비밀번호가 일치하지 않습니다.");
+      setFormData({ ...formData, password: input });
+    } else {
+      setFormData({ ...formData, [current.key]: value });
     }
 
-    setFormData({ ...formData, [current.key]: value });
     setInput("");
+    setPasswordConfirm("");
     setError("");
     setStep(step + 1);
   };
@@ -165,20 +170,15 @@ export default function AnimatedSignupForm({ submitForm }) {
 
             {current.type === "select" ? (
               <div className="flex flex-wrap justify-center gap-2">
-                {current.options.map((opt) => {
-                  const label = typeof opt === "string" ? opt : opt.label;
-                  const value = typeof opt === "string" ? opt : opt.value;
-
-                  return (
-                    <button
-                      key={value}
-                      className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600"
-                      onClick={() => handleNext(value)}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
+                {current.options.map((opt) => (
+                  <button
+                    key={opt.value}
+                    className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600"
+                    onClick={() => handleNext(opt.value)}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
               </div>
             ) : current.type === "textarea" ? (
               <>
@@ -192,6 +192,29 @@ export default function AnimatedSignupForm({ submitForm }) {
                 <button
                   className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
                   onClick={() => handleNext(input)}
+                >
+                  다음
+                </button>
+              </>
+            ) : current.type === "passwordDouble" ? (
+              <>
+                <input
+                  type="password"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="w-full border p-2 rounded text-black mb-2"
+                  placeholder="비밀번호"
+                />
+                <input
+                  type="password"
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                  className="w-full border p-2 rounded text-black"
+                  placeholder="비밀번호 확인"
+                />
+                <button
+                  className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
+                  onClick={() => handleNext()}
                 >
                   다음
                 </button>
