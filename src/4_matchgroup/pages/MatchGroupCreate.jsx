@@ -2,10 +2,12 @@ import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {createMatchGroup} from "../api/matchGroupApi.js";
 
-const CreateMatchGroup = () => {
+const MatchGroupCreate = () => {
     const navigate = useNavigate();  // 페이지 이동을 위한 navigate 함수
+    const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
     const [groupData, setGroupData] = useState({
-        name: "",  // 그룹명
+        groupName: "",  // 그룹명
         description: "",  // 그룹 설명
         maxParticipants: 10,  // 최대 참가자 수
         currentParticipants: 1, // 현재 참가자 수
@@ -17,6 +19,7 @@ const CreateMatchGroup = () => {
         recruitmentDeadline: "",  // 모집 마감 일정
         skillLevel: "상관없음", // 실력 (초급 | 중급 | 고급 | 상관없음)
         status: "모집중",  // 모집 상태
+        matchType: "screen", // 추가된 필드 (스크린 / 필드 선택)
     });
 
     
@@ -28,7 +31,7 @@ const CreateMatchGroup = () => {
         setGroupData((prevState) => {
             let newStatus = prevState.status; // 기존 상태 유지
 
-            if (name === "recruitmentDeadline") {
+            if (name === "recruitmentDeadline" && value) {
                 const now = new Date();
                 const deadline = new Date(value);
                 newStatus = deadline < now ? "모집 완료" : "모집중";
@@ -46,13 +49,30 @@ const CreateMatchGroup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();  // 기본 폼 제출 방지
         console.log("보낼 데이터:", groupData);  // 확인용
+
+        if (!groupData.groupName.trim()) {
+            setError("방 이름을 입력하세요.");
+            return;
+        }
+        if (!groupData.description.trim()) {
+            setError("방 설명을 입력하세요.");
+            return;
+        }
+        if (!groupData.recruitmentDeadline) {
+            setError("모집 마감일을 선택하세요.");
+            return;
+        }
+
         try {
-            await createMatchGroup(groupData);  // API를 통해 그룹 생성 요청
-            alert("그룹이 생성되었습니다!");  // 성공 알림
-            navigate("/swings/matchgroup");  // 그룹 목록 페이지로 이동
+            await createMatchGroup({
+                ...groupData,
+                recruitmentDeadline: new Date(groupData.recruitmentDeadline).toISOString(), // 🔹 ISO 형식 변환
+            });
+            alert("그룹이 생성되었습니다!");
+            navigate("/swings/matchgroup");  // API 경로 지정
         } catch (error) {
             console.error("그룹 생성 실패:", error);
-            alert("그룹 생성 중 오류가 발생했습니다.");
+            setError("그룹 생성 중 오류가 발생했습니다.");
         }
     };
 
@@ -66,9 +86,9 @@ const CreateMatchGroup = () => {
                     </label>
                     <input
                         type="text"
-                        name="name"
+                        name="groupName"
                         placeholder="그룹명"
-                        value={groupData.name}
+                        value={groupData.groupName}
                         onChange={handleChange}
                         required
                         className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
@@ -81,6 +101,15 @@ const CreateMatchGroup = () => {
                         required
                         className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
                     />
+                    <select
+                        name="matchType"
+                        value={groupData.matchType}
+                        onChange={handleChange}
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-400 outline-none"
+                    >
+                        <option value="screen">스크린</option>
+                        <option value="field">필드</option>
+                    </select>
                     <input
                         type="number"
                         name="maxParticipants"
@@ -176,4 +205,4 @@ const CreateMatchGroup = () => {
     );
 };
 
-export default CreateMatchGroup;
+export default MatchGroupCreate;
