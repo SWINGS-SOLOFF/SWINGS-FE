@@ -1,4 +1,3 @@
-// src/1_user/components/UpdateForm.jsx
 import { useEffect, useState } from "react";
 import { fetchUserData, updateUserInfo } from "../api/userApi";
 
@@ -64,6 +63,7 @@ export default function UpdateForm() {
 
     if (Object.keys(updatedFields).length === 0) {
       setErrorMsg("변경된 항목이 없습니다.");
+      setSuccessMsg("");
       return;
     }
 
@@ -96,13 +96,12 @@ export default function UpdateForm() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center px-4 pt-8 space-y-4">
-      <h3 className="text-xl text-gray-700 font-semibold mb-6">
-        회원정보 수정
-      </h3>
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-10">
+      <div className="w-full max-w-sm space-y-6">
+        <h2 className="text-2xl font-bold text-[#2E384D] text-center">
+          회원정보 수정
+        </h2>
 
-      <div className="w-full max-w-sm space-y-4">
-        {/* 전화번호 */}
         <InputField
           label="전화번호"
           value={formData.phonenumber}
@@ -110,7 +109,6 @@ export default function UpdateForm() {
           placeholder="010xxxxxxxx"
         />
 
-        {/* 성별 */}
         <SelectField
           label="성별"
           value={formData.gender}
@@ -121,7 +119,6 @@ export default function UpdateForm() {
           ]}
         />
 
-        {/* 직업 */}
         <InputField
           label="직업"
           value={formData.job}
@@ -129,7 +126,6 @@ export default function UpdateForm() {
           placeholder="예: 개발자, 학생"
         />
 
-        {/* 골프 실력 */}
         <SelectField
           label="골프 실력"
           value={formData.golfSkill}
@@ -141,7 +137,6 @@ export default function UpdateForm() {
           ]}
         />
 
-        {/* MBTI */}
         <InputField
           label="MBTI"
           value={formData.mbti}
@@ -149,7 +144,6 @@ export default function UpdateForm() {
           placeholder="예: INFP"
         />
 
-        {/* 취미 */}
         <InputField
           label="취미"
           value={formData.hobbies}
@@ -157,7 +151,6 @@ export default function UpdateForm() {
           placeholder="예: 등산, 게임"
         />
 
-        {/* 활동 지역 */}
         <SelectField
           label="활동 지역"
           value={formData.region}
@@ -165,7 +158,6 @@ export default function UpdateForm() {
           options={regionOptions}
         />
 
-        {/* 종교 */}
         <SelectField
           label="종교"
           value={formData.religion}
@@ -179,7 +171,6 @@ export default function UpdateForm() {
           ]}
         />
 
-        {/* 흡연 */}
         <SelectField
           label="흡연 여부"
           value={formData.smoking}
@@ -190,15 +181,13 @@ export default function UpdateForm() {
           ]}
         />
 
-        {/* 버튼 */}
         <button
           onClick={handleUpdate}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg mt-4"
+          className="w-full bg-[#2E384D] hover:bg-[#1f2c3a] text-white font-semibold py-2 rounded-lg mt-2"
         >
           수정 완료
         </button>
 
-        {/* 메시지 */}
         {successMsg && (
           <p className="text-green-600 text-sm text-center">{successMsg}</p>
         )}
@@ -210,7 +199,7 @@ export default function UpdateForm() {
   );
 }
 
-// 🔹 하위 컴포넌트
+// 📦 인풋 필드
 function InputField({ label, value, onChange, placeholder }) {
   return (
     <div>
@@ -227,6 +216,7 @@ function InputField({ label, value, onChange, placeholder }) {
   );
 }
 
+// 📦 셀렉트 필드 (조건부 placeholder)
 function SelectField({ label, value, onChange, options }) {
   return (
     <div>
@@ -234,11 +224,15 @@ function SelectField({ label, value, onChange, options }) {
         {label}
       </label>
       <select
-        className="w-full border border-gray-300 rounded-lg px-4 py-2"
+        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
       >
-        <option value="">현재 선택: {value || "없음"}</option>
+        {!value && (
+          <option value="" disabled hidden>
+            -- 선택해주세요 --
+          </option>
+        )}
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
