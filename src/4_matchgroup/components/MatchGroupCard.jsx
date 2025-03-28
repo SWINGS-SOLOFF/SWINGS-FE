@@ -1,22 +1,65 @@
-import {useNavigate} from "react-router-dom";
-import Button from "../../components/Button.jsx";
+import { useNavigate } from "react-router-dom"
+import { CalendarIcon, MapPinIcon, UsersIcon } from "lucide-react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/Card.jsx"
+import {Badge} from "./ui/Badge.jsx";
+import Button from "./ui/Button.jsx";
 
-const MatchGroupCard = ({ group }) => {
-    const navigate = useNavigate();
-    const isFull = group.currentParticipants >= group.maxParticipants;
+export default function MatchGroupCard({ group }) {
+    const navigate = useNavigate()
+    const isFull = group.currentParticipants >= group.maxParticipants
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString)
+        return new Intl.DateTimeFormat("ko-KR", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        }).format(date)
+    }
 
     return (
-        <div className="p-6 bg-white shadow-xl rounded-2xl cursor-pointer transition hover:shadow-2xl border border-gray-200">
-            <h3 className="text-xl font-bold text-green-700">{group.name}</h3>
-            <p className="text-gray-600 mb-2">{group.description}</p>
-            <p className="text-sm text-gray-500">📍 장소: {group.location}</p>
-            <p className="text-sm text-gray-500">⏰ 일정: {new Date(group.dateTime).toLocaleDateString()}</p>
-            <p className="text-sm text-gray-500">👥 모집 현황: {group.currentParticipants}/{group.maxParticipants}명</p>
-            <Button onClick={() => navigate(`/matchgroup/${group.id}`)} disabled={isFull} className="mt-4 w-full">
-                {isFull ? "모집 완료" : "참여 신청하기"}
-            </Button>
-        </div>
-    );
-};
+        <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
+            <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                    <Badge variant={group.matchType === "screen" ? "info" : "success"} className="mb-2">
+                        {group.matchType === "screen" ? "스크린" : "필드"}
+                    </Badge>
+                    <Badge variant={isFull ? "warning" : "success"}>{isFull ? "모집 완료" : "모집 중"}</Badge>
+                </div>
+                <CardTitle className="text-xl font-bold">{group.name}</CardTitle>
+                <CardDescription className="line-clamp-2">{group.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="pb-2">
+                <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                        <MapPinIcon className="h-4 w-4 text-golf-green-600" />
+                        <span>{group.location}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                        <CalendarIcon className="h-4 w-4 text-golf-green-600" />
+                        <span>{formatDate(group.schedule)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                        <UsersIcon className="h-4 w-4 text-golf-green-600" />
+                        <span>
+              {group.currentParticipants}/{group.maxParticipants}명
+            </span>
+                    </div>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button
+                    onClick={() => navigate(`/matchgroup/${group.id}`)}
+                    disabled={isFull}
+                    variant={isFull ? "outline" : "default"}
+                    className="w-full"
+                >
+                    {isFull ? "모집 완료" : "참여 신청하기"}
+                </Button>
+            </CardFooter>
+        </Card>
+    )
+}
 
-export default MatchGroupCard;

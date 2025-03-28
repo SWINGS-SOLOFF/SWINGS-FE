@@ -1,15 +1,17 @@
 import {Route, Routes} from "react-router-dom";
 import MatchGroupList from "../pages/MatchGroupList.jsx";
-import CreateMatchGroup from "../pages/CreateMatchGroup.jsx";
+import MatchGroupCreate from "../pages/MatchGroupCreate.jsx";
 import MatchGroupDetail from "../pages/MatchGroupDetail.jsx";
+import MatchGroupMain from "../pages/MatchGroupMain.jsx";
 
 
 const MatchGroupRoutes = () => {
     return(
             <Routes>
-                <Route path="/" element={<MatchGroupList />}/>
-                <Route path="/create" element={<CreateMatchGroup />}/>
-                <Route path="/:groupId" element={<MatchGroupDetail />} />
+                <Route index element={<MatchGroupMain />} />
+                <Route path="/:category" element={<MatchGroupList />}/>
+                <Route path="create" element={<MatchGroupCreate />}/>
+                <Route path="/:category/:groupId" element={<MatchGroupDetail />} />
             </Routes>
     );
 };
