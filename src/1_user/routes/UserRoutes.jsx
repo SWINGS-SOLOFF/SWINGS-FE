@@ -7,6 +7,7 @@ import UpdateForm from "../components/UpdateForm";
 import PasswordChangeForm from "../components/PasswordChangeForm";
 import DeleteUser from "../components/DeleteUser";
 import PrivateRoute from "../components/PrivateRoute"; // ✅ 추가
+import AdminPage from "../pages/adminPage";
 
 export default function UserRoutes() {
   return (
@@ -53,6 +54,14 @@ export default function UserRoutes() {
         element={
           <PrivateRoute>
             <DeleteUser />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/swings/admin"
+        element={
+          <PrivateRoute>
+            <AdminPage />
           </PrivateRoute>
         }
       />
