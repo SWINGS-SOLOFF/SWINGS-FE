@@ -5,6 +5,7 @@ import { loginRequest } from "../api/userApi";
 import { saveToken } from "../utils/userUtils";
 import { motion } from "framer-motion";
 import { LinkIcon } from "@heroicons/react/24/outline";
+import { jwtDecode } from "jwt-decode";
 
 export default function StartLogin() {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -20,10 +21,21 @@ export default function StartLogin() {
       const accessToken = await loginRequest(formData);
       login(accessToken);
       saveToken(accessToken);
+
+      // ✅ 토큰에서 role 추출
+      const decoded = jwtDecode(accessToken);
+      const role = decoded.role;
+
       alert("로그인 성공!");
-      navigate("/swings/home");
+
+      // ✅ role에 따라 페이지 분기
+      if (role === "admin") {
+        navigate("/swings/admin");
+      } else {
+        navigate("/swings/home");
+      }
     } catch (error) {
-      setErrorMessage(error.message);
+      setErrorMessage(error.message || "로그인 중 오류 발생");
     }
   };
 
@@ -44,7 +56,7 @@ export default function StartLogin() {
             <input
               type="text"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
-              placeholder="SWGINS_ID"
+              placeholder="SWINGS_ID"
               value={formData.username}
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
