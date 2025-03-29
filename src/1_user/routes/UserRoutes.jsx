@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
-import Login from "../pages/Login";
+import StartLogin from "../pages/StartLogin";
 import SignUp from "../pages/SignUp";
 import MyPage from "../pages/MyPage";
 import UpdateForm from "../components/UpdateForm";
@@ -12,7 +12,7 @@ export default function UserRoutes() {
   return (
     <Routes>
       {/* ✅ 비로그인 상태에서도 접근 가능한 경로 */}
-      <Route path="/swings" element={<Login />} />
+      <Route path="/swings" element={<StartLogin />} />
       <Route path="/swings/signup" element={<SignUp />} />
 
       {/* ✅ 로그인 후 접근 가능한 경로들 (보호된 라우트) */}
