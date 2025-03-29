@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { fetchUserData, updateUserInfo } from "../api/userApi";
+import { checkUsername } from "../api/userApi";
+import { useNavigate } from "react-router-dom";
+import { removeToken } from "../utils/userUtils";
 
 const regionOptions = [
   { label: "서울", value: "SEOUL" },
@@ -27,6 +30,10 @@ export default function UpdateForm() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(true);
+  const [usernameChecked, setUsernameChecked] = useState(true);
+  const [usernameMsg, setUsernameMsg] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -44,19 +51,44 @@ export default function UpdateForm() {
     loadUser();
   }, []);
 
+  const handleUsernameCheck = async () => {
+    if (!formData?.username) return;
+
+    if (formData.username === originalData.username) {
+      setUsernameChecked(true);
+      setUsernameMsg("현재 사용 중인 아이디입니다.");
+      return;
+    }
+
+    try {
+      const exists = await checkUsername(formData.username);
+      if (exists) {
+        setUsernameChecked(false);
+        setUsernameMsg("이미 사용 중인 아이디입니다.");
+      } else {
+        setUsernameChecked(true);
+        setUsernameMsg("사용 가능한 아이디입니다.");
+      }
+    } catch {
+      setUsernameMsg("중복 확인 중 오류 발생");
+      setUsernameChecked(false);
+    }
+  };
+
   const handleUpdate = async () => {
     if (!formData || !formData.username) {
       setErrorMsg("사용자 정보가 없습니다.");
       return;
     }
 
+    if (formData.username !== originalData.username && !usernameChecked) {
+      setErrorMsg("아이디 중복 확인이 필요합니다.");
+      return;
+    }
+
     const updatedFields = {};
     for (const key in formData) {
-      if (
-        key !== "username" &&
-        formData[key] !== originalData[key] &&
-        formData[key] !== undefined
-      ) {
+      if (formData[key] !== originalData[key] && formData[key] !== undefined) {
         updatedFields[key] = formData[key];
       }
     }
@@ -68,10 +100,17 @@ export default function UpdateForm() {
     }
 
     try {
-      await updateUserInfo(formData.username, updatedFields);
-      setSuccessMsg("✅ 회원정보가 성공적으로 수정되었습니다!");
+      await updateUserInfo(originalData.username, updatedFields);
       setErrorMsg("");
-      setOriginalData({ ...formData });
+
+      if (updatedFields.username) {
+        alert("아이디가 변경되어 다시 로그인해야 합니다.");
+        removeToken();
+        navigate("/swings");
+      } else {
+        setSuccessMsg("✅ 회원정보가 성공적으로 수정되었습니다!");
+        setOriginalData({ ...formData });
+      }
     } catch (err) {
       console.error("회원정보 수정 실패:", err);
       setSuccessMsg("");
@@ -101,6 +140,39 @@ export default function UpdateForm() {
         <h2 className="text-2xl font-bold text-[#2E384D] text-center">
           회원정보 수정
         </h2>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            아이디
+          </label>
+          <div className="flex gap-2">
+            <input
+              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-black"
+              value={formData.username || ""}
+              onChange={(e) => {
+                setFormData({ ...formData, username: e.target.value });
+                setUsernameChecked(false);
+                setUsernameMsg("");
+              }}
+              placeholder="아이디 입력"
+            />
+            <button
+              onClick={handleUsernameCheck}
+              className="bg-blue-500 text-white px-3 rounded"
+            >
+              중복 확인
+            </button>
+          </div>
+          {usernameMsg && (
+            <p
+              className={`text-sm mt-1 ${
+                usernameChecked ? "text-green-600" : "text-red-500"
+              }`}
+            >
+              {usernameMsg}
+            </p>
+          )}
+        </div>
 
         <InputField
           label="전화번호"
@@ -153,8 +225,8 @@ export default function UpdateForm() {
 
         <SelectField
           label="활동 지역"
-          value={formData.region}
-          onChange={(v) => setFormData({ ...formData, region: v })}
+          value={formData.activityRegion}
+          onChange={(v) => setFormData({ ...formData, activityRegion: v })}
           options={regionOptions}
         />
 
@@ -181,6 +253,16 @@ export default function UpdateForm() {
           ]}
         />
 
+        <SelectField
+          label="음주 여부"
+          value={formData.drinking}
+          onChange={(v) => setFormData({ ...formData, drinking: v })}
+          options={[
+            { label: "음주함", value: "음주함" },
+            { label: "음주하지 않음", value: "음주하지 않음" },
+          ]}
+        />
+
         <button
           onClick={handleUpdate}
           className="w-full bg-[#2E384D] hover:bg-[#1f2c3a] text-white font-semibold py-2 rounded-lg mt-2"
@@ -199,7 +281,7 @@ export default function UpdateForm() {
   );
 }
 
-// 📦 인풋 필드
+// 🔹 공통 컴포넌트들
 function InputField({ label, value, onChange, placeholder }) {
   return (
     <div>
@@ -216,7 +298,6 @@ function InputField({ label, value, onChange, placeholder }) {
   );
 }
 
-// 📦 셀렉트 필드 (조건부 placeholder)
 function SelectField({ label, value, onChange, options }) {
   return (
     <div>

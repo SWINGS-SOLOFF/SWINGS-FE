@@ -6,7 +6,7 @@ import { saveToken } from "../utils/userUtils";
 import { motion } from "framer-motion";
 import { LinkIcon } from "@heroicons/react/24/outline";
 
-export default function Login() {
+export default function StartLogin() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ export default function Login() {
             <input
               type="text"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
-              placeholder="your_id"
+              placeholder="SWGINS_ID"
               value={formData.username}
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
@@ -57,7 +57,7 @@ export default function Login() {
             <input
               type="password"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
-              placeholder="••••••••"
+              placeholder="••••"
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
