@@ -7,7 +7,8 @@ import UpdateForm from "../components/UpdateForm";
 import PasswordChangeForm from "../components/PasswordChangeForm";
 import DeleteUser from "../components/DeleteUser";
 import PrivateRoute from "../components/PrivateRoute"; // ✅ 추가
-import AdminPage from "../pages/adminPage";
+import AdminDashboard from "../pages/AdminDashboard";
+import AdminUserList from "../pages/AdminUserList";
 
 export default function UserRoutes() {
   return (
@@ -57,11 +58,21 @@ export default function UserRoutes() {
           </PrivateRoute>
         }
       />
+
+      //관리자 페이지
       <Route
         path="/swings/admin"
         element={
           <PrivateRoute>
-            <AdminPage />
+            <AdminDashboard />
+          </PrivateRoute>
+        }
+      />
+            <Route
+        path="/swings/admin/users"
+        element={
+          <PrivateRoute>
+            <AdminUserList />
           </PrivateRoute>
         }
       />

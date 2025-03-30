@@ -48,7 +48,7 @@ export default function StartLogin() {
         className="w-full max-w-sm space-y-6 text-center"
       >
         <h1 className="text-3xl font-bold text-gray-800">SWINGS</h1>
-        <p className="text-gray-500">골프 동반자를 찾아보세요</p>
+        <p className="text-gray-500">나랑 골프치러 갈래?</p>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-left">
           <div>
