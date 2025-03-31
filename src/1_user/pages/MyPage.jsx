@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchUserData } from "../api/userApi";
+import { fetchUserData } from "../api/userapi";
 import { removeToken } from "../utils/userUtils";
+import { MessageCircle, LogOut } from "lucide-react";
 
 export default function MyPage() {
   const navigate = useNavigate();
@@ -76,8 +77,9 @@ export default function MyPage() {
 
         <button
           onClick={handleLogout}
-          className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 rounded-lg"
+          className="text-sm text-gray-600 hover:text-red-500 flex items-center gap-1"
         >
+          <LogOut size={16} />
           로그아웃
         </button>
       </div>
