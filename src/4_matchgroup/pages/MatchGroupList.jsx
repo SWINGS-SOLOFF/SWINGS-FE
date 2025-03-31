@@ -53,8 +53,8 @@ const MatchGroupList = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                    {/* 그룹 리스트 랜더링 */}
-                    {groups.map((group) => (
-                        <MatchGroupCard key={group.id} group={group} />
+                    {groups.map((group, index) => (
+                        <MatchGroupCard key={group.id || `group-${index}`} group={group} />
                     ))}
                 </div>
             )}
