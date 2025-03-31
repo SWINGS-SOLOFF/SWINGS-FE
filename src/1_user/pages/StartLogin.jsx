@@ -47,8 +47,10 @@ export default function StartLogin() {
         transition={{ duration: 0.4 }}
         className="w-full max-w-sm space-y-6 text-center"
       >
-        <h1 className="text-3xl font-bold text-gray-800">SWINGS</h1>
-        <p className="text-gray-500">나랑 골프치러 갈래?</p>
+        <h1 className="text-3xl font-bold text-gray-800">
+          SWINGS
+        </h1>
+        <p className="text-gray-500 animate-bounce">나랑 골프치러 갈래?</p>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-left">
           <div>
