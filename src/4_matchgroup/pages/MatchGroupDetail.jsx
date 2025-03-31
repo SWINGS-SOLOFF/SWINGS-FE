@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
-import {getCurrentUser, getMatchGroupById} from "../api/matchGroupApi.js";
+import { getCurrentUser, getMatchGroupById } from "../api/matchGroupApi.js";
 import {
     approveParticipant,
     getParticipantsByGroupId,
     joinMatch,
-    leaveMatch, rejectParticipant,
+    leaveMatch,
+    rejectParticipant,
     removeParticipant
 } from "../api/matchParticipantApi.js";
 import { useParams, useNavigate } from "react-router-dom";
+import PendingParticipantModal from "../components/PendingParticipantModal";
 
 const MatchGroupDetail = () => {
     const { groupId } = useParams();  // URL에서 groupId 추출
+    console.log("그룹아이디", groupId);
     const navigate = useNavigate();  // 페이지 이동을 위한 navigate 함수
-    
+
     // 상태 변수
     const [group, setGroup] = useState(null);  // 그룹 정보
     const [participants, setParticipants] = useState([]);  // 참가자 목록
@@ -20,6 +23,7 @@ const MatchGroupDetail = () => {
     const [loading, setLoading] = useState(true);  // 로딩 상태
     const [currentUser, setCurrentUser] = useState(null);  // 현재 로그인한 유저
     const [isHost, setIsHost] = useState(false);  // 방장 여부
+    const [showPendingModal, setShowPendingModal] = useState(false);  // 참가 신청 모달 표시
 
 
     // 페이지 로딩(초기 데이터 불러오기)
@@ -47,14 +51,13 @@ const MatchGroupDetail = () => {
             }
         };
         fetchData();
-        
+
         // 실시간 업데이트
         const interval = setInterval(fetchData, 5000);
         return () => clearInterval(interval);
     }, [groupId]);
 
 
-    // 핸들러
     // 1. 참가 신청
     const handleJoin = async () => {
         if (!group || group.currentParticipants >= group.maxParticipants) return;
@@ -68,7 +71,7 @@ const MatchGroupDetail = () => {
             alert("참가 신청 중 오류가 발생했습니다.");
         }
     };
-    
+
     // 2. 참가 취소
     const handleLeave = async () => {
         try {
@@ -205,6 +208,24 @@ const MatchGroupDetail = () => {
                 </div>
             )}
 
+            {isHost && pendingParticipants.length > 0 && (
+                <button
+                    onClick={() => setShowPendingModal(true)}
+                    className="w-full px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
+                >
+                    참가 신청 목록 보기
+                </button>
+            )}
+
+            {isHost && pendingParticipants.length > 0 && (
+                <button
+                    onClick={() => setShowPendingModal(true)}
+                    className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition"
+                >
+                    대기자 목록 보기
+                </button>
+            )}
+
             <div className="mt-6">
                 <h2 className="text-lg font-semibold">👥 참가자 목록</h2>
                 {participants.length === 0 ? (
@@ -227,6 +248,14 @@ const MatchGroupDetail = () => {
                     </ul>
                 )}
             </div>
+            {/* ✅ 모달 렌더링 */}
+            <PendingParticipantModal
+                isOpen={showPendingModal}
+                onClose={() => setShowPendingModal(false)}
+                pendingParticipants={pendingParticipants}
+                onApprove={handleApprove}
+                onReject={handleReject}
+            />
         </div>
     );
 };
