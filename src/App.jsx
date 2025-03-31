@@ -1,39 +1,28 @@
 // src/App.jsx
-import { Routes, Route, useLocation } from "react-router-dom";
-import NavBar from "./components/NavBar";
-import FooterBar from "./components/FooterBar";
-import BottomNavBar from "./components/BottomNavBar";
+import { Routes, Route } from "react-router-dom";
+import UserLayout from "./1_user/layouts/UserLayout";
+import AdminLayout from "./1_user/layouts/AdminLayout";
 import UserRoutes from "./1_user/routes/UserRoutes";
+import AdminRoutes from "./1_user/routes/AdminRoutes";
+import StartLogin from "./1_user/pages/StartLogin";
+import SignUp from "./1_user/pages/SignUp";
 
 export default function App() {
-  const location = useLocation();
-
-  // 경로별로 NavBar, FooterBar, BottomNavBar 숨김 조건 설정
-  const hideNavPaths = ["/swings", "/swings/signup"];
-  const showBottomBarPaths = [
-    "/swings/home",
-    "/swings/join",
-    "/swings/mate",
-    "/swings/feed",
-    "/swings/mypage",
-  ];
-
-  const hideNav = hideNavPaths.includes(location.pathname);
-  const showBottomBar = showBottomBarPaths.includes(location.pathname);
-
   return (
-    <div className="flex flex-col min-h-screen w-full">
-      {!hideNav && <NavBar />}
+    <Routes>
+      {/* ✅ 로그인/회원가입 (Nav 없이) */}
+      <Route path="/swings" element={<StartLogin />} />
+      <Route path="/swings/signup" element={<SignUp />} />
 
-      <main className="flex-grow pb-16">
-        {" "}
-        {/* 하단 여백 확보 */}
-        <Routes>
-          <Route path="/*" element={<UserRoutes />} />
-        </Routes>
-      </main>
+      {/* ✅ 관리자 페이지 (AdminNavBar 포함) */}
+      <Route path="/swings/admin/*" element={<AdminLayout />}>
+        <Route path="*" element={<AdminRoutes />} />
+      </Route>
 
-      {showBottomBar && <BottomNavBar />}
-    </div>
+      {/* ✅ 사용자 페이지 (NavBar + BottomNavBar 포함) */}
+      <Route path="/swings/*" element={<UserLayout />}>
+        <Route path="*" element={<UserRoutes />} />
+      </Route>
+    </Routes>
   );
 }

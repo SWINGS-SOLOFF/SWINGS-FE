@@ -21,7 +21,10 @@ export default function AdminUserList() {
   );
 
   return (
+
     <div className="p-8 bg-white min-h-screen">
+          <br/>
+          <br/>
       <h1 className="text-2xl font-bold mb-4 text-gray-800">전체 유저 목록</h1>
 
       <input
