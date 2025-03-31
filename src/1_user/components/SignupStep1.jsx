@@ -35,7 +35,6 @@ export default function SignupStep1({ formData, updateData }) {
       {usernameCheck && (
         <p className="text-sm text-gray-500 ml-1">{usernameCheck}</p>
       )}
-
       <input
         type="password"
         placeholder="비밀번호"
@@ -58,11 +57,12 @@ export default function SignupStep1({ formData, updateData }) {
         onChange={(e) => updateData({ name: e.target.value })}
       />
       <input
-        type="tel"
-        placeholder="전화번호"
-        className="w-full border p-2 rounded text-black"
-        value={formData.phonenumber || ""}
-        onChange={(e) => updateData({ phonenumber: e.target.value })}
+        type="email"
+        placeholder="이메일"
+        className="w-full border p-2 rounded
+        text-black"
+        value={formData.email || ""}
+        onChange={(e) => updateData({ email: e.target.value })}
       />
     </div>
   );
