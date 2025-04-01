@@ -69,30 +69,3 @@ export const deleteUserWithPassword = async (password) => {
   });
   return response.data;
 };
-
-//-관리자 페이지-
-// 전체 유저 목록 조회
-export const fetchAllUsers = async () => {
-  const response = await axios.get("/admin/users");
-  return response.data;
-};
-
-// 특정 유저 정보 조회 (관리자 또는 본인용)
-export const getUserByUsername = async (username) => {
-  const response = await axios.get(`/admin/users/${username}`);
-  return response.data;
-};
-
-// 유저 삭제
-export const deleteUserByAdmin = async (username) => {
-  const response = await axios.delete(`/admin/users/${username}/delete`);
-  return response.data;
-};
-
-// 역할 변경
-export const updateUserRole = async (username, newRole) => {
-  const response = await axios.patch(`/admin/users/${username}/role`, {
-    role: newRole,
-  });
-  return response.data;
-};
