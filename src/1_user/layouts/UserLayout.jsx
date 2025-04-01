@@ -9,6 +9,10 @@ const showBottomBarPaths = [
   "/swings/mate",
   "/swings/feed",
   "/swings/mypage",
+  "/swings/match",
+  "/swings/matchgroup",
+  "/swings/chat",
+  "/swings/settings",
 ];
 
 export default function UserLayout() {
