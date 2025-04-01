@@ -1,4 +1,3 @@
-
 // src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import UserLayout from "./1_user/layouts/UserLayout";
@@ -7,8 +6,7 @@ import UserRoutes from "./1_user/routes/UserRoutes";
 import AdminRoutes from "./1_user/routes/AdminRoutes";
 import StartLogin from "./1_user/pages/StartLogin";
 import SignUp from "./1_user/pages/SignUp";
-import FeedPage from './2_feed/pages/FeedPage';
-import SocialPage from './2_feed/pages/SocialPage';
+import FeedRoutes from "./2_feed/routes/FeedRoutes.jsx";
 import MatchRoutes from "./3_match/routes/MatchRoutes";
 import MatchGroupRoutes from "./4_matchgroup/routes/MatchGroupRoutes.jsx";
 
@@ -28,7 +26,7 @@ export default function App() {
         <Route path="match/*" element={<MatchRoutes />} />
         <Route path="matchgroup/*" element={<MatchGroupRoutes />} />
         <Route path="feed/*" element={<FeedRoutes />} />
-        <Route path="social" element={<SocialPage />} />
+        <Route path="social/*" element={<FeedRoutes />} />
         <Route path="*" element={<UserRoutes />} />
       </Route>
 
