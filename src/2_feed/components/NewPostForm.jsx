@@ -1,6 +1,5 @@
-// src/components/NewPostForm.js
 import React from 'react';
-import { FaUser, FaPlusCircle } from 'react-icons/fa';
+import { FaUser } from 'react-icons/fa';
 
 const NewPostForm = ({
                          newPostContent,
@@ -8,8 +7,7 @@ const NewPostForm = ({
                          handleImageChange,
                          imagePreview,
                          handleSubmit,
-                         setShowNewPostForm,
-                         showNewPostForm
+                         setShowNewPostForm
                      }) => {
     return (
         <div className="bg-white p-5 rounded-lg shadow-md mb-6 border border-green-200">

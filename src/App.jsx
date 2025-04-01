@@ -17,6 +17,7 @@ const AppRoutes = () => {
                         <Route path="/feed" element={<FeedPage />} />
                         <Route path="/swings/feed" element={<FeedPage />} />
                         <Route path="/swings/social" element={<SocialPage />} />
+                        <Route path="/profile/:userId" element={<SocialPage />} />
                     </Routes>
                 </div>
             </div>
