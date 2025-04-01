@@ -11,8 +11,8 @@ import ChatRoomPage from "../pages/ChatRoomPage";
  */
 const MatchRoutes = () => (
     <Routes>
-        <Route path="/swings/match" element={<SwipePage />} />
-        <Route path="/swings/chat/:roomId" element={<ChatRoomPage />} />
+        <Route path="" element={<SwipePage />} />                // → /swings/match
+        <Route path="../chat/:roomId" element={<ChatRoomPage />} /> // → /swings/chat/123
     </Routes>
 );
 
