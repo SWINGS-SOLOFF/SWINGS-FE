@@ -1,28 +1,38 @@
-// src/routes/AppRoutes.js
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navigation from "./components/Navigation";
+
+// src/App.jsx
+import { Routes, Route } from "react-router-dom";
+import UserLayout from "./1_user/layouts/UserLayout";
+import AdminLayout from "./1_user/layouts/AdminLayout";
+import UserRoutes from "./1_user/routes/UserRoutes";
+import AdminRoutes from "./1_user/routes/AdminRoutes";
+import StartLogin from "./1_user/pages/StartLogin";
+import SignUp from "./1_user/pages/SignUp";
 import FeedPage from './2_feed/pages/FeedPage';
 import SocialPage from './2_feed/pages/SocialPage';
-// 필요한 다른 페이지들 임포트
+import MatchRoutes from "./3_match/routes/MatchRoutes";
+import MatchGroupRoutes from "./4_matchgroup/routes/MatchGroupRoutes.jsx";
 
-const AppRoutes = () => {
-    return (
-        <Router>
-            <div className="min-h-screen bg-green-50">
-                {/* 네비게이션 컴포넌트 (필요하면 주석 해제) */}
-                 <Navigation />
-                <div className="container mx-auto px-4 pb-8">
-                    <Routes>
-                        <Route path="/feed" element={<FeedPage />} />
-                        <Route path="/swings/feed" element={<FeedPage />} />
-                        <Route path="/swings/social" element={<SocialPage />} />
-                        <Route path="/profile/:userId" element={<SocialPage />} />
-                    </Routes>
-                </div>
-            </div>
-        </Router>
-    );
-};
+export default function App() {
+  return (
+    <Routes>
+      {/* 로그인 / 회원가입 (Nav 없이) */}
+      <Route path="/swings" element={<StartLogin />} />
+      <Route path="/swings/signup" element={<SignUp />} />
 
-export default AppRoutes;
+      {/* 관리자 페이지 (AdminNavBar 포함) */}
+      <Route path="/swings/admin/*" element={<AdminLayout />}>
+        <Route path="*" element={<AdminRoutes />} />
+      </Route>
+
+      <Route path="/swings/*" element={<UserLayout />}>
+        <Route path="match/*" element={<MatchRoutes />} />
+        <Route path="matchgroup/*" element={<MatchGroupRoutes />} />
+        <Route path="feed/*" element={<FeedRoutes />} />
+        <Route path="social" element={<SocialPage />} />
+        <Route path="*" element={<UserRoutes />} />
+      </Route>
+
+      {/* 매치 그룹 페이지 */}
+    </Routes>
+  );
+}
