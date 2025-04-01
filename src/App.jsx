@@ -1,3 +1,4 @@
+
 // src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import UserLayout from "./1_user/layouts/UserLayout";
@@ -6,6 +7,7 @@ import UserRoutes from "./1_user/routes/UserRoutes";
 import AdminRoutes from "./1_user/routes/AdminRoutes";
 import StartLogin from "./1_user/pages/StartLogin";
 import SignUp from "./1_user/pages/SignUp";
+import MatchRoutes from "./3_match/routes/MatchRoutes";
 
 export default function App() {
   return (
@@ -17,6 +19,7 @@ export default function App() {
       {/* ✅ 관리자 페이지 (AdminNavBar 포함) */}
       <Route path="/swings/admin/*" element={<AdminLayout />}>
         <Route path="*" element={<AdminRoutes />} />
+         <Route path="/*" element={<MatchRoutes />} /> 
       </Route>
 
       {/* ✅ 사용자 페이지 (NavBar + BottomNavBar 포함) */}
