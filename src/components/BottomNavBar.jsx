@@ -1,17 +1,11 @@
 // src/components/BottomNavBar.jsx
 import { Link, useLocation } from "react-router-dom";
-import {
-  Home,
-  UserPlus,
-  Users,
-  Newspaper,
-  User,
-} from "lucide-react"; // lucide 아이콘
+import { Home, UserPlus, Users, Newspaper, User } from "lucide-react"; // lucide 아이콘
 
 const navItems = [
   { to: "/swings/home", label: "홈", icon: <Home size={20} /> },
-  { to: "/swings/join", label: "조인", icon: <UserPlus size={20} /> },
-  { to: "/swings/mate", label: "메이트", icon: <Users size={20} /> },
+  { to: "/swings/matchgroup", label: "조인", icon: <UserPlus size={20} /> },
+  { to: "/swings/match", label: "메이트", icon: <Users size={20} /> },
   { to: "/swings/feed", label: "피드", icon: <Newspaper size={20} /> },
   { to: "/swings/mypage", label: "마이페이지", icon: <User size={20} /> },
 ];
