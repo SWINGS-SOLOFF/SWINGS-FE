@@ -1,6 +1,7 @@
 import {
     FaMapMarkerAlt,
-    FaTransgender,
+    FaMale,
+    FaFemale,
     FaBriefcase,
     FaGolfBall,
     FaSmokingBan,
@@ -15,7 +16,7 @@ import { MdFavorite } from 'react-icons/md';
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// 팔로워/팔로잉 목록 모달 컴포넌트 (애니메이션 추가)
+// 팔로워/팔로잉 목록 모달 컴포넌트
 const FollowListModal = ({ users, onClose, title }) => {
     return (
         <motion.div
@@ -77,6 +78,7 @@ const FollowListModal = ({ users, onClose, title }) => {
     );
 };
 
+// 사용자 상세 정보 카드 컴포넌트
 const UserDetailCard = ({ user }) => {
     const userDetails = [
         {
@@ -103,7 +105,7 @@ const UserDetailCard = ({ user }) => {
             }[user.activityRegion]
         },
         {
-            icon: <FaTransgender className="text-blue-500" />,
+            icon: user.gender === 'male' ? <FaMale className="text-blue-500" /> : <FaFemale className="text-pink-500" />,
             label: '성별',
             value: user.gender === 'male' ? '남성' : '여성'
         },
@@ -166,35 +168,50 @@ const UserDetailCard = ({ user }) => {
     );
 };
 
-const SocialProfile = ({
-                           user,
-                           userStats,
-                           userIntroduce,
-                           editing,
-                           onEditToggle,
-                           onIntroduceChange,
-                           onIntroduceSave,
-                           followers = [],
-                           following = [],
-                           onFetchFollowers,
-                           onFetchFollowing
-                       }) => {
-    // 팔로워/팔로잉 모달 상태 관리
+// 메인 SocialProfile 컴포넌트
+const SocialProfile = ({ user, userStats, userIntroduce, onIntroduceChange, onIntroduceSave }) => {
+    // 상태 관리
+    const [editing, setEditing] = useState(false);
     const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
     const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
     const [followersData, setFollowersData] = useState([]);
     const [followingData, setFollowingData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [introduceText, setIntroduceText] = useState(userIntroduce || '');
 
     const postsRef = useRef(null);
+
+    // 자기소개 수정 토글 함수
+    const handleEditToggle = () => {
+        setEditing(!editing);
+    };
+
+    // 자기소개 저장 함수
+    const handleIntroduceSave = () => {
+        if (onIntroduceSave) {
+            onIntroduceSave(introduceText);
+        }
+        setEditing(false);
+    };
+
+    // 자기소개 변경 함수
+    const handleIntroduceChange = (e) => {
+        setIntroduceText(e.target.value);
+        if (onIntroduceChange) {
+            onIntroduceChange(e);
+        }
+    };
 
     // 팔로워 목록 가져오기
     const handleShowFollowers = async () => {
         setIsLoading(true);
         try {
-            // onFetchFollowers 함수가 전달되면 호출, 없으면 defaultProps가 실행됨
-            const data = await onFetchFollowers(user.userId || user.id);
-            setFollowersData(data || followers);
+            // 임시 데이터 사용
+            const dummyFollowers = [
+                { id: 1, name: '홍길동', userImg: '/default-profile.jpg', description: '골프 좋아하는 사람' },
+                { id: 2, name: '김철수', userImg: '/default-profile.jpg', description: '골프 초보자' }
+            ];
+            setFollowersData(dummyFollowers);
             setIsFollowersModalOpen(true);
         } catch (error) {
             console.error("팔로워 목록 로딩 오류:", error);
@@ -207,8 +224,12 @@ const SocialProfile = ({
     const handleShowFollowing = async () => {
         setIsLoading(true);
         try {
-            const data = await onFetchFollowing(user.userId || user.id);
-            setFollowingData(data || following);
+            // 임시 데이터 사용
+            const dummyFollowing = [
+                { id: 3, name: '이영희', userImg: '/default-profile.jpg', description: '골프 강사' },
+                { id: 4, name: '박지민', userImg: '/default-profile.jpg', description: '골프 매니아' }
+            ];
+            setFollowingData(dummyFollowing);
             setIsFollowingModalOpen(true);
         } catch (error) {
             console.error("팔로잉 목록 로딩 오류:", error);
@@ -233,9 +254,7 @@ const SocialProfile = ({
                             alt="프로필 사진"
                             className="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl"
                         />
-                        <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-md">
-                            프로
-                        </div>
+                        {/* 프로 배지 제거 */}
                     </div>
                     <h1 className="text-3xl font-bold text-green-800 mt-2">{user.name}</h1>
                     <p className="text-gray-600 mb-6">@{user.username}</p>
@@ -285,14 +304,14 @@ const SocialProfile = ({
                             <h2 className="text-2xl font-bold text-green-800">자기소개</h2>
                             {!editing ? (
                                 <button
-                                    onClick={onEditToggle}
+                                    onClick={handleEditToggle}
                                     className="text-green-600 hover:text-green-800 transition px-3 py-1 rounded-full hover:bg-green-50"
                                 >
                                     수정
                                 </button>
                             ) : (
                                 <button
-                                    onClick={onIntroduceSave}
+                                    onClick={handleIntroduceSave}
                                     className="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition shadow-md"
                                 >
                                     저장
@@ -302,13 +321,13 @@ const SocialProfile = ({
                         {editing ? (
                             <textarea
                                 className="w-full h-32 p-3 border-2 border-green-200 rounded-lg focus:border-green-500 transition"
-                                value={userIntroduce}
-                                onChange={onIntroduceChange}
+                                value={introduceText}
+                                onChange={handleIntroduceChange}
                                 placeholder="당신에 대해 알려주세요..."
                             />
                         ) : (
                             <p className="text-gray-700 leading-relaxed">
-                                {userIntroduce || '아직 자기소개가 없습니다.'}
+                                {introduceText || '아직 자기소개가 없습니다.'}
                             </p>
                         )}
                     </div>
@@ -340,11 +359,6 @@ const SocialProfile = ({
             </AnimatePresence>
         </div>
     );
-};
-
-SocialProfile.defaultProps = {
-    onFetchFollowers: () => Promise.resolve([]),
-    onFetchFollowing: () => Promise.resolve([]),
 };
 
 export default SocialProfile;
