@@ -1,16 +1,17 @@
-import { Link } from "react-router-dom"
-import { ClubIcon as GolfIcon, Users2Icon, CalendarIcon } from "lucide-react"
+import { Link } from "react-router-dom";
+import { ClubIcon as GolfIcon, Users2Icon, CalendarIcon } from "lucide-react";
 import Button from "../components/ui/Button.jsx";
 
 export default function MatchGroupMain() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-golf-green-50">
             <div className="container mx-auto px-4 py-16">
+                {/* 헤더 영역 */}
                 <div className="max-w-4xl mx-auto text-center mb-16">
                     <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-golf-green-600 to-golf-green-400">
-              그룹 매치 페이지
-            </span>
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-golf-green-600 to-golf-green-400">
+                            그룹 매치 페이지
+                        </span>
                     </h1>
                     <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
                         함께 골프를 즐길 파트너를 찾아보세요. 스크린 골프부터 필드까지 다양한 매칭이 가능합니다.
@@ -22,6 +23,7 @@ export default function MatchGroupMain() {
                     </div>
                 </div>
 
+                {/* 스크린 / 필드 선택 카드 */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                     <Link
                         to="/swings/matchgroup/screen"
@@ -68,6 +70,7 @@ export default function MatchGroupMain() {
                     </Link>
                 </div>
 
+                {/* 안내 영역 */}
                 <div className="mt-16 max-w-3xl mx-auto rounded-2xl shadow-lg p-8">
                     <h2 className="text-2xl font-bold text-center mb-6">골프 매칭 서비스 이용 안내</h2>
                     <div className="grid gap-6">
@@ -104,6 +107,5 @@ export default function MatchGroupMain() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
-
