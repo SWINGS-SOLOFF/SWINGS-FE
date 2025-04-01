@@ -19,8 +19,10 @@ export default function App() {
       {/* ✅ 관리자 페이지 (AdminNavBar 포함) */}
       <Route path="/swings/admin/*" element={<AdminLayout />}>
         <Route path="*" element={<AdminRoutes />} />
-         <Route path="/*" element={<MatchRoutes />} /> 
       </Route>
+
+        
+        <Route path="/swings/match/*" element={<MatchRoutes />} />
 
       {/* ✅ 사용자 페이지 (NavBar + BottomNavBar 포함) */}
       <Route path="/swings/*" element={<UserLayout />}>

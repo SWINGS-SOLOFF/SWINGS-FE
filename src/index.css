@@ -100,7 +100,7 @@ button:focus-visible {
   .card {
     padding: 1.5em;
   }
-
+}
 #root {
   max-width: 1280px;
   margin: 0 auto;
