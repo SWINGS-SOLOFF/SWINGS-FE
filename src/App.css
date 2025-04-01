@@ -15,6 +15,7 @@ body {
   min-height: 100vh; /* 최소 화면 높이 100vh로 설정 */
 }
 
+
 #root {
   width: 100%; /* max-width 제거 */
   height: 100%; /* 높이를 100%로 설정 */
