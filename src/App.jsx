@@ -1,5 +1,3 @@
-
-// src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import UserLayout from "./1_user/layouts/UserLayout";
 import AdminLayout from "./1_user/layouts/AdminLayout";
@@ -28,6 +26,5 @@ export default function App() {
       <Route path="/swings/*" element={<UserLayout />}>
         <Route path="*" element={<UserRoutes />} />
       </Route>
+
     </Routes>
-  );
-}
