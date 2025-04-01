@@ -1,119 +1,75 @@
-import Select from "react-select";
+import { motion } from "framer-motion";
 
-export default function SignupStep3({ formData, updateData }) {
-  const mbtiOptions = [
-    "ISTJ",
-    "ISFJ",
-    "INFJ",
-    "INTJ",
-    "ISTP",
-    "ISFP",
-    "INFP",
-    "INTP",
-    "ESTP",
-    "ESFP",
-    "ENFP",
-    "ENTP",
-    "ESTJ",
-    "ESFJ",
-    "ENFJ",
-    "ENTJ",
-  ].map((type) => ({ label: type, value: type }));
-
-  const regionOptions = [
-    { label: "서울", value: "SEOUL" },
-    { label: "부산", value: "BUSAN" },
-    { label: "대구", value: "DAEGU" },
-    { label: "인천", value: "INCHEON" },
-    { label: "광주", value: "GWANGJU" },
-    { label: "대전", value: "DAEJEON" },
-    { label: "울산", value: "ULSAN" },
-    { label: "세종", value: "SEJONG" },
-    { label: "경기", value: "GYEONGGI" },
-    { label: "강원", value: "GANGWON" },
-    { label: "충북", value: "CHUNGBUK" },
-    { label: "충남", value: "CHUNGNAM" },
-    { label: "전북", value: "JEONBUK" },
-    { label: "전남", value: "JEONNAM" },
-    { label: "경북", value: "GYEONGBUK" },
-    { label: "경남", value: "GYEONGNAM" },
-    { label: "제주", value: "JEJU" },
-  ];
-
-  const customSelectStyles = {
-    container: (base) => ({
-      ...base,
-      width: "100%",
-    }),
-    control: (base) => ({
-      ...base,
-      paddingTop: "2px",
-      paddingBottom: "2px",
-      paddingLeft: "12px",
-      paddingRight: "12px",
-      borderColor: "#D1D5DB", // Tailwind border-gray-300
-      borderRadius: "0.5rem",
-      minHeight: "42px",
-      boxShadow: "none",
-    }),
-    menu: (base) => ({
-      ...base,
-      maxHeight: "150px",
-      overflowY: "auto",
-      color: "#000",
-      zIndex: 9999,
-    }),
+export default function SignupStep3({ formData, onChange, onNext }) {
+  const handleSelect = (e) => {
+    const { name, value } = e.target;
+    onChange(name, value);
   };
 
   return (
-    <div className="w-full px-4">
-      <div className="w-full max-w-sm mx-auto space-y-5">
-        {/* MBTI */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            MBTI
-          </label>
-          <Select
-            options={mbtiOptions}
-            value={mbtiOptions.find((opt) => opt.value === formData.mbti)}
-            onChange={(selected) => updateData({ mbti: selected.value })}
-            placeholder="MBTI 선택"
-            styles={customSelectStyles}
-          />
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8 space-y-6"
+    >
+      <h2 className="text-2xl font-bold text-center text-gray-800">생활 습관</h2>
+      <p className="text-center text-sm text-gray-500 mb-6">
+        취미, 종교, 흡연 및 음주 여부를 입력해주세요
+      </p>
 
-        {/* 직업 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            직업
-          </label>
-          <input
-            type="text"
-            value={formData.job || ""}
-            onChange={(e) => updateData({ job: e.target.value })}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
-            placeholder="직업"
-          />
-        </div>
+      <div className="space-y-4">
+        <input
+          name="hobbies"
+          value={formData.hobbies}
+          onChange={(e) => onChange("hobbies", e.target.value)}
+          placeholder="취미"
+          className="w-full p-2 border rounded text-black"
+        />
 
-        {/* 활동 지역 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            활동 지역
-          </label>
-          <Select
-            options={regionOptions}
-            value={regionOptions.find(
-              (opt) => opt.value === formData.activityRegion
-            )}
-            onChange={(selected) =>
-              updateData({ activityRegion: selected.value })
-            }
-            placeholder="활동 지역 선택"
-            styles={customSelectStyles}
-          />
-        </div>
+        <select
+          name="religion"
+          value={formData.religion}
+          onChange={handleSelect}
+          className="w-full p-2 border rounded text-black"
+        >
+          <option value="">종교</option>
+          <option value="none">무교</option>
+          <option value="christian">기독교</option>
+          <option value="catholic">천주교</option>
+          <option value="buddhist">불교</option>
+          <option value="etc">기타</option>
+        </select>
+
+        <select
+          name="smoking"
+          value={formData.smoking}
+          onChange={handleSelect}
+          className="w-full p-2 border rounded text-black"
+        >
+          <option value="">흡연 여부</option>
+          <option value="yes">흡연함</option>
+          <option value="no">흡연하지 않음</option>
+        </select>
+
+        <select
+          name="drinking"
+          value={formData.drinking}
+          onChange={handleSelect}
+          className="w-full p-2 border rounded text-black"
+        >
+          <option value="">음주 여부</option>
+          <option value="yes">음주함</option>
+          <option value="no">음주하지 않음</option>
+        </select>
       </div>
-    </div>
+
+      <button
+        onClick={onNext}
+        className="w-full bg-gray-800 text-white py-2 rounded mt-6"
+      >
+        다음
+      </button>
+    </motion.div>
   );
 }
