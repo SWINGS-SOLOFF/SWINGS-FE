@@ -1,36 +1,30 @@
-import { Routes, Route, useLocation } from "react-router-dom";
-import NavBar from "./components/NavBar";
-import BottomNavBar from "./components/BottomNavBar";
+import { Routes, Route } from "react-router-dom";
+import UserLayout from "./1_user/layouts/UserLayout";
+import AdminLayout from "./1_user/layouts/AdminLayout";
 import UserRoutes from "./1_user/routes/UserRoutes";
-import MatchGroupRoutes from "./4_matchgroup/routes/MatchGroupRoutes.jsx";
+import AdminRoutes from "./1_user/routes/AdminRoutes";
+import StartLogin from "./1_user/pages/StartLogin";
+import SignUp from "./1_user/pages/SignUp";
+import MatchRoutes from "./3_match/routes/MatchRoutes";
 
 export default function App() {
-  const location = useLocation();
-
-  const hideNavPaths = ["/swings", "/swings/signup"];
-  const showBottomBarPaths = [
-    "/swings/home",
-    "/swings/join",
-    "/swings/mate",
-    "/swings/feed",
-    "/swings/mypage",
-  ];
-
-  const hideNav = hideNavPaths.includes(location.pathname);
-  const showBottomBar = showBottomBarPaths.includes(location.pathname);
-
   return (
-      <div className="flex flex-col min-h-screen w-full">
-        {!hideNav && <NavBar />}
+    <Routes>
+      {/* ✅ 로그인/회원가입 (Nav 없이) */}
+      <Route path="/swings" element={<StartLogin />} />
+      <Route path="/swings/signup" element={<SignUp />} />
 
-        <main className="flex-grow pb-16">
-          <Routes>
-            <Route path="/*" element={<UserRoutes />} />
-            <Route path="/swings/matchgroup/*" element={<MatchGroupRoutes />} />
-          </Routes>
-        </main>
+      {/* ✅ 관리자 페이지 (AdminNavBar 포함) */}
+      <Route path="/swings/admin/*" element={<AdminLayout />}>
+        <Route path="*" element={<AdminRoutes />} />
+      </Route>
 
-        {showBottomBar && <BottomNavBar />}
-      </div>
-  );
-}
+        
+        <Route path="/swings/match/*" element={<MatchRoutes />} />
+
+      {/* ✅ 사용자 페이지 (NavBar + BottomNavBar 포함) */}
+      <Route path="/swings/*" element={<UserLayout />}>
+        <Route path="*" element={<UserRoutes />} />
+      </Route>
+
+    </Routes>

@@ -1,23 +1,17 @@
+// src/1_user/routes/UserRoutes.jsx
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
-import Login from "../pages/Login";
-import SignUp from "../pages/SignUp";
 import MyPage from "../pages/MyPage";
 import UpdateForm from "../components/UpdateForm";
 import PasswordChangeForm from "../components/PasswordChangeForm";
 import DeleteUser from "../components/DeleteUser";
-import PrivateRoute from "../components/PrivateRoute"; // ✅ 추가
+import PrivateRoute from "../components/PrivateRoute";
 
 export default function UserRoutes() {
   return (
     <Routes>
-      {/* ✅ 비로그인 상태에서도 접근 가능한 경로 */}
-      <Route path="/swings" element={<Login />} />
-      <Route path="/swings/signup" element={<SignUp />} />
-
-      {/* ✅ 로그인 후 접근 가능한 경로들 (보호된 라우트) */}
       <Route
-        path="/swings/home"
+        path="home"
         element={
           <PrivateRoute>
             <Home />
@@ -25,7 +19,7 @@ export default function UserRoutes() {
         }
       />
       <Route
-        path="/swings/mypage"
+        path="mypage"
         element={
           <PrivateRoute>
             <MyPage />
@@ -33,7 +27,7 @@ export default function UserRoutes() {
         }
       />
       <Route
-        path="/swings/mypage/update"
+        path="mypage/update"
         element={
           <PrivateRoute>
             <UpdateForm />
@@ -41,7 +35,7 @@ export default function UserRoutes() {
         }
       />
       <Route
-        path="/swings/mypage/passwordchange"
+        path="mypage/passwordchange"
         element={
           <PrivateRoute>
             <PasswordChangeForm />
@@ -49,7 +43,7 @@ export default function UserRoutes() {
         }
       />
       <Route
-        path="/swings/mypage/userdelete"
+        path="mypage/userdelete"
         element={
           <PrivateRoute>
             <DeleteUser />
