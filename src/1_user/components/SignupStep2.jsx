@@ -1,92 +1,74 @@
-import { motion } from "framer-motion";
+import Select from "react-select";
 
-export default function SignupStep2({ formData, onChange, onNext }) {
-  const handleSelect = (e) => {
-    const { name, value } = e.target;
-    onChange(name, value);
+export default function SignupStep2({ formData, updateData }) {
+  const genderOptions = [
+    { value: "male", label: "남성" },
+    { value: "female", label: "여성" },
+  ];
+
+  const customSelectStyles = {
+    container: (base) => ({
+      ...base,
+      width: "100%",
+    }),
+    menu: (base) => ({
+      ...base,
+      maxHeight: "150px",
+      overflowY: "auto",
+      color: "#000",
+    }),
+    control: (base) => ({
+      ...base,
+      padding: "2px",
+      borderColor: "#D1D5DB",
+      borderRadius: "0.5rem",
+    }),
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8 space-y-6"
-    >
-      <h2 className="text-2xl font-bold text-center text-gray-800">
-        추가 정보
-      </h2>
-      <p className="text-center text-sm text-gray-500 mb-6">
-        성별, MBTI, 직업, 지역을 알려주세요
-      </p>
+    <div className="w-full px-4">
+      <div className="w-full max-w-md mx-auto space-y-5">
+        {/* 성별 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            성별
+          </label>
+          <Select
+            options={genderOptions}
+            value={genderOptions.find((opt) => opt.value === formData.gender)}
+            onChange={(selected) => updateData({ gender: selected.value })}
+            placeholder="성별 선택"
+            styles={customSelectStyles}
+          />
+        </div>
 
-      <div className="space-y-4">
-        <select
-          name="gender"
-          value={formData.gender}
-          onChange={handleSelect}
-          className="w-full p-2 border rounded text-black"
-        >
-          <option value="">성별</option>
-          <option value="male">남성</option>
-          <option value="female">여성</option>
-        </select>
+        {/* 생년월일 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            생년월일
+          </label>
+          <input
+            type="date"
+            value={formData.birthDate || ""}
+            onChange={(e) => updateData({ birthDate: e.target.value })}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
+          />
+        </div>
 
-        <input
-          name="mbti"
-          value={formData.mbti}
-          onChange={(e) => onChange("mbti", e.target.value)}
-          placeholder="MBTI"
-          className="w-full p-2 border rounded text-black"
-        />
-
-        <input
-          name="job"
-          value={formData.job}
-          onChange={(e) => onChange("job", e.target.value)}
-          placeholder="직업"
-          className="w-full p-2 border rounded text-black"
-        />
-
-        <select
-          name="activityRegion"
-          value={formData.activityRegion}
-          onChange={handleSelect}
-          className="w-full p-2 border rounded text-black"
-        >
-          <option value="">지역 선택</option>
-          {[
-            "SEOUL",
-            "BUSAN",
-            "DAEGU",
-            "INCHEON",
-            "GWANGJU",
-            "DAEJEON",
-            "ULSAN",
-            "SEJONG",
-            "GYEONGGI",
-            "GANGWON",
-            "CHUNGBUK",
-            "CHUNGNAM",
-            "JEONBUK",
-            "JEONNAM",
-            "GYEONGBUK",
-            "GYEONGNAM",
-            "JEJU",
-          ].map((region) => (
-            <option key={region} value={region}>
-              {region}
-            </option>
-          ))}
-        </select>
+        {/* 전화번호 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            전화번호
+          </label>
+          <input
+            type="text"
+            value={formData.phonenumber || ""}
+            onChange={(e) => updateData({ phonenumber: e.target.value })}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
+            placeholder="010xxxxxxxx"
+          />
+        </div>
       </div>
-
-      <button
-        onClick={onNext}
-        className="w-full bg-gray-800 text-white py-2 rounded mt-6"
-      >
-        다음
-      </button>
-    </motion.div>
+    </div>
   );
 }

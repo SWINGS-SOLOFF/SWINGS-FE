@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchUserData } from "../api/userApi";
-import { removeToken } from "../utils/userUtils"; // ✅ 로그아웃 유틸 불러오기
+import { fetchUserData } from "../api/userapi";
+import { removeToken } from "../utils/userUtils";
+import { MessageCircle, LogOut } from "lucide-react";
 
 export default function MyPage() {
   const navigate = useNavigate();
@@ -22,7 +23,6 @@ export default function MyPage() {
     loadUser();
   }, []);
 
-  // ✅ 로그아웃 처리 함수
   const handleLogout = () => {
     removeToken();
     navigate("/swings");
@@ -45,35 +45,44 @@ export default function MyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center px-4 pt-8 space-y-6">
-      <button
-        onClick={() => navigate("/swings/mypage/update")}
-        className="w-full max-w-xs bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg"
-      >
-        회원정보 수정
-      </button>
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-12">
+      <div className="w-full max-w-sm space-y-4 text-center">
+        <h2 className="text-2xl font-bold text-[#2E384D]">마이페이지</h2>
+        <p className="text-gray-500 text-sm">
+          계정 관련 기능을 이용할 수 있어요.
+        </p>
 
-      <button
-        onClick={() => navigate("/swings/mypage/passwordchange")}
-        className="w-full max-w-xs bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg"
-      >
-        비밀번호 변경
-      </button>
+        <button
+          onClick={() => navigate("/swings/mypage/update")}
+          className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg"
+        >
+          회원정보 수정
+        </button>
 
-      <button
-        onClick={() => navigate("/swings/mypage/userdelete")}
-        className="w-full max-w-xs bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"
-      >
-        회원 탈퇴
-      </button>
+        <button
+          onClick={() => navigate("/swings/mypage/passwordchange")}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg"
+        >
+          비밀번호 변경
+        </button>
 
-      {/* ✅ 로그아웃 버튼 */}
-      <button
-        onClick={handleLogout}
-        className="w-full max-w-xs bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 rounded-lg mt-6"
-      >
-        로그아웃
-      </button>
+        <button
+          onClick={() => navigate("/swings/mypage/userdelete")}
+          className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"
+        >
+          회원 탈퇴
+        </button>
+
+        <div className="border-t border-gray-200 my-4" />
+
+        <button
+          onClick={handleLogout}
+          className="text-sm text-gray-600 hover:text-red-500 flex items-center gap-1"
+        >
+          <LogOut size={16} />
+          로그아웃
+        </button>
+      </div>
     </div>
   );
 }
