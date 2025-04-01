@@ -10,27 +10,25 @@ import MatchRoutes from "./3_match/routes/MatchRoutes";
 import MatchGroupRoutes from "./4_matchgroup/routes/MatchGroupRoutes.jsx";
 
 export default function App() {
-    return (
-        <Routes>
-            {/* 로그인 / 회원가입 (Nav 없이) */}
-            <Route path="/swings" element={<StartLogin />} />
-            <Route path="/swings/signup" element={<SignUp />} />
+  return (
+    <Routes>
+      {/* 로그인 / 회원가입 (Nav 없이) */}
+      <Route path="/swings" element={<StartLogin />} />
+      <Route path="/swings/signup" element={<SignUp />} />
 
-            {/* 관리자 페이지 (AdminNavBar 포함) */}
-            <Route path="/swings/admin/*" element={<AdminLayout />}>
-                <Route path="*" element={<AdminRoutes />} />
-            </Route>
+      {/* 관리자 페이지 (AdminNavBar 포함) */}
+      <Route path="/swings/admin/*" element={<AdminLayout />}>
+        <Route path="*" element={<AdminRoutes />} />
+      </Route>
 
-            {/* 매치 페이지 */}
-            <Route path="/swings/match/*" element={<MatchRoutes />} />
+      <Route path="/swings/*" element={<UserLayout />}>
+        <Route path="match/*" element={<MatchRoutes />} />
+        <Route path="matchgroup/*" element={<MatchGroupRoutes />} />
+        <Route path="feed/*" element={<FeedRoutes />} />
+        <Route path="*" element={<UserRoutes />} />
+      </Route>
 
-            {/* 사용자 페이지 (NavBar + BottomNavBar 포함) */}
-            <Route path="/swings/*" element={<UserLayout />}>
-                <Route path="*" element={<UserRoutes />} />
-            </Route>
-
-            {/* 매치 그룹 페이지 */}
-            <Route path="/swings/matchgroup/*" element={<MatchGroupRoutes />} />
-        </Routes>
-    );
+      {/* 매치 그룹 페이지 */}
+    </Routes>
+  );
 }
