@@ -1,4 +1,4 @@
-import {Routes, Route, useLocation} from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import UserLayout from "./1_user/layouts/UserLayout";
 import AdminLayout from "./1_user/layouts/AdminLayout";
 import UserRoutes from "./1_user/routes/UserRoutes";
@@ -15,12 +15,6 @@ export default function App() {
             {/* 로그인 / 회원가입 (Nav 없이) */}
             <Route path="/swings" element={<StartLogin />} />
             <Route path="/swings/signup" element={<SignUp />} />
-
-            {/* 관리자 페이지 (AdminNavBar 포함) */}
-            <Route path="/swings/admin/*" element={<AdminLayout />}>
-                <Route path="*" element={<AdminRoutes />} />
-            </Route>
-
             <Route path="/swings/*" element={<UserLayout />}>
                 <Route path="match/*" element={<MatchRoutes />} />
                 <Route path="matchgroup/*" element={<MatchGroupRoutes />} />
