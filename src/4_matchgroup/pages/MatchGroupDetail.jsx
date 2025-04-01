@@ -1,180 +1,102 @@
+// React Hook 및 라우터 관련 기능 임포트
 import { useEffect, useState } from "react";
-import { getCurrentUser, getMatchGroupById } from "../api/matchGroupApi.js";
-import {
-    approveParticipant,
-    getParticipantsByGroupId,
-    joinMatch,
-    leaveMatch,
-    rejectParticipant,
-    removeParticipant
-} from "../api/matchParticipantApi.js";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
+// API 함수 및 커스텀 훅
+import { getCurrentUser, getMatchGroupById } from "../api/matchGroupApi";
+import { getParticipantsByGroupId } from "../api/matchParticipantApi";
+
+// 컴포넌트 & 커스텀 훅
 import PendingParticipantModal from "../components/PendingParticipantModal";
+import useMatchGroupActions from "../hooks/useMatchGroupActions";
+import useMatchStatus from "../hooks/useMatchStatus";
+
 
 const MatchGroupDetail = () => {
-    const { groupId } = useParams();  // URL에서 groupId 추출
-    console.log("그룹아이디", groupId);
-    const navigate = useNavigate();  // 페이지 이동을 위한 navigate 함수
+    const { groupId: matchGroupId } = useParams(); // URL에서 그룹 ID 추출
 
     // 상태 변수
-    const [group, setGroup] = useState(null);  // 그룹 정보
-    const [participants, setParticipants] = useState([]);  // 참가자 목록
-    const [pendingParticipants, setPendingParticipants] = useState([]);
-    const [loading, setLoading] = useState(true);  // 로딩 상태
-    const [currentUser, setCurrentUser] = useState(null);  // 현재 로그인한 유저
-    const [isHost, setIsHost] = useState(false);  // 방장 여부
-    const [showPendingModal, setShowPendingModal] = useState(false);  // 참가 신청 모달 표시
+    const [group, setGroup] = useState(null); // 매치 그룹 정보
+    const [participants, setParticipants] = useState([]); // 승인된 참가자 목록
+    const [pendingParticipants, setPendingParticipants] = useState([]); // 대기 중인 참가자 목록
+    const [currentUser, setCurrentUser] = useState(null); // 현재 로그인한 유저 정보
+    const [loading, setLoading] = useState(true); // 로딩 상태
+    const [showPendingModal, setShowPendingModal] = useState(false); // 대기자 모달 표시 여부
+    const [showJoinModal, setShowJoinModal] = useState(false); // 참가 신청 모달 상태 추가
 
+    // 현재 사용자 기준 상태 판단 (방장/참가자/대기자/모집마감 여부 등)
+    const { isHost, isParticipant, isFull } = useMatchStatus(
+        group,
+        currentUser,
+        participants,
+        pendingParticipants
+    );
 
-    // 페이지 로딩(초기 데이터 불러오기)
+    // 서버에서 그룹 및 참가자 데이터 불러오는 함수
+    const fetchGroupData = async () => {
+        try {
+            const user = await getCurrentUser(); // 현재 로그인한 사용자
+            const groupData = await getMatchGroupById(matchGroupId); // 그룹 정보
+            const allParticipants = await getParticipantsByGroupId(matchGroupId); // 전체 참가자 목록
+
+            setCurrentUser(user);
+            setGroup(groupData);
+            setParticipants(allParticipants.filter((p) => p.status === "approved"));
+            setPendingParticipants(allParticipants.filter((p) => p.status === "pending"));
+        } catch (error) {
+            console.error("데이터 로딩 오류:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 초기 로딩 및 5초마다 데이터 자동 갱신
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const user = await getCurrentUser();  // 로그인 유저 정보
-                setCurrentUser(user);
-
-                const groupData = await getMatchGroupById(groupId);  // 그룹 정보
-                const participantData = await getParticipantsByGroupId(groupId);  // 참가자 목록
-
-                setGroup(groupData);
-                setParticipants(participantData.filter(p => p.status === "approved"));
-                setPendingParticipants(participantData.filter(p => p.status === "pending"));
-
-                // 방장 여부 판단(그룹을 만든 사람이 방장)
-                if (user && groupData.creator === user.username) {
-                    setIsHost(true);
-                }
-            } catch (error) {
-                console.error("데이터 불러오기 오류:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-
-        // 실시간 업데이트
-        const interval = setInterval(fetchData, 5000);
-        return () => clearInterval(interval);
+        fetchGroupData(); // 최초 데이터 호출
+        const interval = setInterval(fetchGroupData, 5000); // 실시간 업데이트
+        return () => clearInterval(interval); // 언마운트 시 인터벌 제거
     }, [groupId]);
 
+    // 참가 관련 핸들러 함수 모음
+    const {
+        handleJoin,
+        handleLeave,
+        handleApprove,
+        handleReject,
+        handleRemoveParticipant,
+        handleCloseGroup,
+        handleDeleteGroup,
+    } = useMatchGroupActions(group, currentUser, fetchGroupData, participants, setParticipants);
 
-    // 1. 참가 신청
-    const handleJoin = async () => {
-        if (!group || group.currentParticipants >= group.maxParticipants) return;
-
-        try {
-            await joinMatch(group.id, currentUser.username);
-            alert("참가 신청이 완료되었습니다!");
-            window.location.reload();  // 새로고침하여 데이터 갱신
-        } catch (error) {
-            console.error("참가 신청 실패:", error);
-            alert("참가 신청 중 오류가 발생했습니다.");
-        }
+    // 모달 내 실제 참가 신청 처리
+    const handleConfirmJoin = async () => {
+        await handleJoin();
+        setShowJoinModal(false);
     };
 
-    // 2. 참가 취소
-    const handleLeave = async () => {
-        try {
-            await leaveMatch(group.id, currentUser.username);
-            alert("참가를 취소하였습니다.");
-            window.location.reload();
-        } catch (error) {
-            console.error("참가 취소 실패:", error);
-            alert("참가 취소 중 오류가 발생했습니다.");
-        }
-    };
-
-    // 3. 참가 신청 승인
-    const handleApprove = async (username) => {
-        try {
-            await approveParticipant(group.id, username);
-            alert(`${username} 님을 승인하였습니다.`);
-            window.location.reload();  // 새로고침하여 데이터 갱신
-        } catch (error) {
-            console.error("참가 승인 실패:", error);
-            alert("참가 승인 중 오류가 발생했습니다.");
-        }
-    };
-
-    // 4. 참가 신청 거절
-    const handleReject = async (username) => {
-        try {
-            await rejectParticipant(group.id, username);
-            alert(`${username} 님을 거절하였습니다.`);
-            window.location.reload();
-        } catch (error) {
-            console.error("참가 거절 실패:", error);
-            alert("참가 거절 중 오류가 발생했습니다.");
-        }
-    };
-
-    // 5. 참가자 강퇴 처리(방장만 가능)
-    const handleRemoveParticipant = async (participantUsername) => {
-        if (!isHost) return alert("방장만 참가자를 강퇴할 수 있습니다.");
-
-        try {
-            await removeParticipant(group.id, participantUsername);
-            alert(`${participantUsername} 님을 강퇴했습니다.`);
-            setParticipants(participants.filter(p => p.username !== participantUsername));
-        } catch (error) {
-            console.error("강퇴 실패:", error);
-            alert("강퇴 중 오류가 발생했습니다.");
-        }
-    };
-
-    // 6. 모집 종료 처리(방장만 가능)
-    const handleCloseGroup = async () => {
-        if (!isHost) return alert("방장만 모집을 종료할 수 있습니다.");
-
-        try {
-            await closeMatchGroup(group.id);
-            alert("모집이 종료되었습니다.");
-            window.location.reload();
-        } catch (error) {
-            console.error("모집 종료 실패:", error);
-            alert("모집 종료 중 오류가 발생했습니다.");
-        }
-    };
-
-    // 7. 그룹 삭제(방장만 가능)
-    const handleDeleteGroup = async () => {
-        if (!isHost) return alert("방장만 그룹을 삭제할 수 있습니다.");
-        if (!window.confirm("정말로 그룹을 삭제하시겠습니까?")) return;
-
-        try {
-            await deleteMatchGroup(group.id);
-            alert("그룹이 삭제되었습니다.");
-            navigate("/matchgroup"); // 그룹 목록 페이지로 이동
-        } catch (error) {
-            console.error("그룹 삭제 실패:", error);
-            alert("그룹 삭제 중 오류가 발생했습니다.");
-        }
-    };
-
-
-    // 로딩 or 에러 상태 처리
+    // 로딩/에러 상태 처리
     if (loading) return <p className="text-center">⏳ 로딩 중...</p>;
-    if (!group) return <p className="text-center text-red-500">❌ 그룹 정보를 찾을 수 없습니다.</p>;
+    if (!group) return <p className="text-center text-red-500">❌ 그룹 정보를 불러올 수 없습니다.</p>;
 
-
-    // 랜더링
-    const isFull = group.currentParticipants >= group.maxParticipants;
-    const isParticipant = participants.some((p) => p.username === currentUser?.username);
-
+    // 메인 화면 랜더링
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+            {/* 🧾 그룹 정보 출력 */}
             <h1 className="text-2xl font-bold mb-4">{group.name}</h1>
             <p className="text-gray-600 mb-2">{group.description}</p>
             <p className="text-gray-500">📍 장소: {group.location}</p>
             <p className="text-gray-500">
                 ⏰ 일정: {new Date(group.dateTime).toLocaleDateString()} {new Date(group.dateTime).toLocaleTimeString()}
             </p>
-            <p className="text-gray-500">👥 모집 현황: {group.currentParticipants}/{group.maxParticipants}명</p>
+            <p className="text-gray-500">
+                👥 모집 현황: {group.currentParticipants}/{group.maxParticipants}명
+            </p>
             <p className="text-sm font-bold text-blue-500">⭐ 방장: {group.creator}</p>
 
+            {/* 참가자 상태에 따른 버튼 표시 */}
             {!isParticipant ? (
                 <button
-                    onClick={handleJoin}
+                    onClick={() => setShowJoinModal(true)} // 모달 띄우기
                     className={`mt-4 w-full px-4 py-2 text-white rounded-lg shadow-md transition ${
                         isFull ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
                     }`}
@@ -191,6 +113,7 @@ const MatchGroupDetail = () => {
                 </button>
             )}
 
+            {/* 방장 전용 기능 버튼 (모집 종료/삭제/대기자 모달) */}
             {isHost && (
                 <div className="mt-6 space-y-2">
                     <button
@@ -205,27 +128,18 @@ const MatchGroupDetail = () => {
                     >
                         그룹 삭제
                     </button>
+                    {pendingParticipants.length > 0 && (
+                        <button
+                            onClick={() => setShowPendingModal(true)}
+                            className="w-full px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
+                        >
+                            대기자 목록 보기
+                        </button>
+                    )}
                 </div>
             )}
 
-            {isHost && pendingParticipants.length > 0 && (
-                <button
-                    onClick={() => setShowPendingModal(true)}
-                    className="w-full px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
-                >
-                    참가 신청 목록 보기
-                </button>
-            )}
-
-            {isHost && pendingParticipants.length > 0 && (
-                <button
-                    onClick={() => setShowPendingModal(true)}
-                    className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition"
-                >
-                    대기자 목록 보기
-                </button>
-            )}
-
+            {/* 승인된 참가자 목록 */}
             <div className="mt-6">
                 <h2 className="text-lg font-semibold">👥 참가자 목록</h2>
                 {participants.length === 0 ? (
@@ -233,7 +147,10 @@ const MatchGroupDetail = () => {
                 ) : (
                     <ul className="mt-2 space-y-2">
                         {participants.map((participant) => (
-                            <li key={participant.username} className="flex justify-between items-center bg-gray-100 p-2 rounded">
+                            <li
+                                key={participant.username}
+                                className="flex justify-between items-center bg-gray-100 p-2 rounded"
+                            >
                                 <span>{participant.username}</span>
                                 {isHost && participant.username !== currentUser?.username && (
                                     <button
@@ -248,7 +165,8 @@ const MatchGroupDetail = () => {
                     </ul>
                 )}
             </div>
-            {/* ✅ 모달 렌더링 */}
+
+            {/* 참가 신청 대기자 모달 */}
             <PendingParticipantModal
                 isOpen={showPendingModal}
                 onClose={() => setShowPendingModal(false)}
@@ -256,6 +174,38 @@ const MatchGroupDetail = () => {
                 onApprove={handleApprove}
                 onReject={handleReject}
             />
+
+            {/* 참가 신청 모달 */}
+            {showJoinModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                        <h2 className="text-xl font-bold mb-4 text-center">참가 신청 확인</h2>
+                        <p className="text-center text-gray-600 mb-4">{group.groupName}에 참가 신청하시겠습니까?</p>
+                        <div className="mb-4">
+                            <p className="font-semibold text-gray-700 mb-2">현재 참가자:</p>
+                            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                                {participants.map((p) => (
+                                    <li key={p.username}>{p.username}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setShowJoinModal(false)}
+                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                            >
+                                취소
+                            </button>
+                            <button
+                                onClick={handleConfirmJoin}
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            >
+                                참여하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

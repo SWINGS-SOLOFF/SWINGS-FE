@@ -30,6 +30,9 @@ export default function NavBar() {
                   <Link to="/swings/mypage" className="text-green-400">
                     My Page
                   </Link>
+                  <Link to="/swings/matchgroup" className="bg-pink-500 text-white px-4 py-1 rounded">
+                    matchgroup
+                  </Link>
                 </>
             ) : (
                 <>
