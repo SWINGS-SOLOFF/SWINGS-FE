@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import FeedPage from "../pages/FeedPage";
 import SocialPage from "../pages/SocialPage";
 import SocialProfile from "../components/SocialProfile";
@@ -9,7 +9,7 @@ export default function FeedRoutes() {
   return (
     <Routes>
       <Route
-        path="feed"
+        path="/"
         element={
           <PrivateRoute>
             <FeedPage />
