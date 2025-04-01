@@ -1,36 +1,28 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import GroupPage from './pages/matchgroup/GroupPage.jsx';
-import MatchPage from './pages/match/MatchPage.jsx';
-import MatchDetailPage from './pages/match/MatchDetailPage.jsx';
-import FeedPage from './pages/feed/FeedPage.jsx';
-import LoginPage from './pages/user/LoginPage.jsx';
-import ProfilePage from './pages/user/ProfilePage.jsx';
-import RegisterPage from './pages/user/RegisterPage.jsx';
-import Navigation from './components/Navigation';
+// src/App.jsx
+import { Routes, Route } from "react-router-dom";
+import UserLayout from "./1_user/layouts/UserLayout";
+import AdminLayout from "./1_user/layouts/AdminLayout";
+import UserRoutes from "./1_user/routes/UserRoutes";
+import AdminRoutes from "./1_user/routes/AdminRoutes";
+import StartLogin from "./1_user/pages/StartLogin";
+import SignUp from "./1_user/pages/SignUp";
 
-function App() {
-    return (
-        <Router>
-            <div className="min-h-screen bg-green-50">
-                <Navigation />
-                <div className="container mx-auto px-4 pb-8">
-                    <Routes>
-                        {/* 기존 HomePage는 없으므로, LoginPage를 홈으로 설정 */}
-                        <Route path="/" element={<LoginPage />} />
-                        <Route path="/user-management" element={<GroupPage />} />
-                        <Route path="/match-management" element={<MatchPage />} />
-                        <Route path="/match-detail" element={<MatchDetailPage />} />
-                        <Route path="/swings/feed" element={<FeedPage />} />
-                        <Route path="/swings/social" element={<FeedPage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        <Route path="/register" element={<RegisterPage />} />
-                    </Routes>
-                </div>
-            </div>
-        </Router>
-    );
+export default function App() {
+  return (
+    <Routes>
+      {/* ✅ 로그인/회원가입 (Nav 없이) */}
+      <Route path="/swings" element={<StartLogin />} />
+      <Route path="/swings/signup" element={<SignUp />} />
+
+      {/* ✅ 관리자 페이지 (AdminNavBar 포함) */}
+      <Route path="/swings/admin/*" element={<AdminLayout />}>
+        <Route path="*" element={<AdminRoutes />} />
+      </Route>
+
+      {/* ✅ 사용자 페이지 (NavBar + BottomNavBar 포함) */}
+      <Route path="/swings/*" element={<UserLayout />}>
+        <Route path="*" element={<UserRoutes />} />
+      </Route>
+    </Routes>
+  );
 }
-
-export default App;
