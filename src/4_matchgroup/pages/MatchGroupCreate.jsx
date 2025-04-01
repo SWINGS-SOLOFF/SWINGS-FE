@@ -57,7 +57,7 @@ const MatchGroupCreate = () => {
                 ...groupData,
             });
             alert("그룹이 생성되었습니다!");
-            navigate("/matchgroup");
+            navigate("/swings/matchgroup");
         } catch (error) {
             console.error("그룹 생성 실패:", error);
             setError("그룹 생성 중 오류가 발생했습니다.");

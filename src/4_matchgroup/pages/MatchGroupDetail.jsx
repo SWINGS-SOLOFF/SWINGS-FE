@@ -10,6 +10,7 @@ import { getParticipantsByGroupId } from "../api/matchParticipantApi";
 import PendingParticipantModal from "../components/PendingParticipantModal";
 import useMatchGroupActions from "../hooks/useMatchGroupActions";
 import useMatchStatus from "../hooks/useMatchStatus";
+import JoinConfirmModal from "../components/JoinConfirmModal.jsx";
 
 
 const MatchGroupDetail = () => {
@@ -175,37 +176,14 @@ const MatchGroupDetail = () => {
                 onReject={handleReject}
             />
 
-            {/* 참가 신청 모달 */}
-            {showJoinModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-                        <h2 className="text-xl font-bold mb-4 text-center">참가 신청 확인</h2>
-                        <p className="text-center text-gray-600 mb-4">{group.groupName}에 참가 신청하시겠습니까?</p>
-                        <div className="mb-4">
-                            <p className="font-semibold text-gray-700 mb-2">현재 참가자:</p>
-                            <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
-                                {participants.map((p) => (
-                                    <li key={p.username}>{p.username}</li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-6">
-                            <button
-                                onClick={() => setShowJoinModal(false)}
-                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-                            >
-                                취소
-                            </button>
-                            <button
-                                onClick={handleConfirmJoin}
-                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            >
-                                참여하기
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* 참가 신청 확인 모달 */}
+            <JoinConfirmModal
+                isOpen={showJoinModal}
+                onClose={() => setShowJoinModal(false)}
+                group={group}
+                participants={participants}
+                onConfirm={handleConfirmJoin}
+            />
         </div>
     );
 };

@@ -10,7 +10,7 @@ import {
 
 const navItems = [
   { to: "/swings/home", label: "홈", icon: <Home size={20} /> },
-  { to: "/swings/join", label: "조인", icon: <UserPlus size={20} /> },
+  { to: "/swings/matchgroup", label: "조인", icon: <UserPlus size={20} /> },
   { to: "/swings/mate", label: "메이트", icon: <Users size={20} /> },
   { to: "/swings/feed", label: "피드", icon: <Newspaper size={20} /> },
   { to: "/swings/mypage", label: "마이페이지", icon: <User size={20} /> },

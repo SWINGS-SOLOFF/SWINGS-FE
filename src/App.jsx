@@ -1,5 +1,4 @@
-// src/App.jsx
-import { Routes, Route } from "react-router-dom";
+import {Routes, Route, useLocation} from "react-router-dom";
 import UserLayout from "./1_user/layouts/UserLayout";
 import AdminLayout from "./1_user/layouts/AdminLayout";
 import UserRoutes from "./1_user/routes/UserRoutes";
@@ -10,6 +9,7 @@ import MatchRoutes from "./3_match/routes/MatchRoutes";
 import MatchGroupRoutes from "./4_matchgroup/routes/MatchGroupRoutes.jsx";
 
 export default function App() {
+
     return (
         <Routes>
             {/* 로그인 / 회원가입 (Nav 없이) */}
@@ -21,16 +21,11 @@ export default function App() {
                 <Route path="*" element={<AdminRoutes />} />
             </Route>
 
-            {/* 매치 페이지 */}
-            <Route path="/swings/match/*" element={<MatchRoutes />} />
-
-            {/* 사용자 페이지 (NavBar + BottomNavBar 포함) */}
             <Route path="/swings/*" element={<UserLayout />}>
+                <Route path="match/*" element={<MatchRoutes />} />
+                <Route path="matchgroup/*" element={<MatchGroupRoutes />} />
                 <Route path="*" element={<UserRoutes />} />
             </Route>
-
-            {/* 매치 그룹 페이지 */}
-            <Route path="/swings/matchgroup/*" element={<MatchGroupRoutes />} />
         </Routes>
     );
 }
