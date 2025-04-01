@@ -1,46 +1,49 @@
-export default function SignupStep4({ formData, updateData }) {
+import { motion } from "framer-motion";
+
+export default function SignupStep4({ formData, onChange, onSubmit }) {
   return (
-    <div className="space-y-4">
-      <input
-        type="text"
-        value={formData.hobbies || ""}
-        onChange={(e) => updateData({ hobbies: e.target.value })}
-        className="w-full border p-2 rounded text-black"
-        placeholder="취미"
-      />
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8 space-y-6"
+    >
+      <h2 className="text-2xl font-bold text-center text-gray-800">
+        마지막 단계
+      </h2>
+      <p className="text-center text-sm text-gray-500 mb-6">
+        골프 실력과 자기소개를 입력해주세요
+      </p>
 
-      <select
-        value={formData.religion || ""}
-        onChange={(e) => updateData({ religion: e.target.value })}
-        className="w-full border p-2 rounded text-black"
-      >
-        <option value="">종교 선택</option>
-        <option value="none">무교</option>
-        <option value="christian">기독교</option>
-        <option value="catholic">천주교</option>
-        <option value="buddhist">불교</option>
-        <option value="etc">기타</option>
-      </select>
+      <div className="space-y-4">
+        <select
+          name="golfSkill"
+          value={formData.golfSkill}
+          onChange={(e) => onChange("golfSkill", e.target.value)}
+          className="w-full p-2 border rounded text-black"
+        >
+          <option value="">골프 실력</option>
+          <option value="beginner">초급</option>
+          <option value="intermediate">중급</option>
+          <option value="advanced">고급</option>
+        </select>
 
-      <select
-        value={formData.smoking || ""}
-        onChange={(e) => updateData({ smoking: e.target.value })}
-        className="w-full border p-2 rounded text-black"
-      >
-        <option value="">흡연 여부</option>
-        <option value="yes">흡연함</option>
-        <option value="no">흡연하지 않음</option>
-      </select>
+        <textarea
+          name="introduce"
+          value={formData.introduce}
+          onChange={(e) => onChange("introduce", e.target.value)}
+          placeholder="자기소개"
+          className="w-full p-2 border rounded text-black"
+          rows="4"
+        />
+      </div>
 
-      <select
-        value={formData.drinking || ""}
-        onChange={(e) => updateData({ drinking: e.target.value })}
-        className="w-full border p-2 rounded text-black"
+      <button
+        onClick={onSubmit}
+        className="w-full bg-purple-600 text-white py-2 rounded mt-6"
       >
-        <option value="">음주 여부</option>
-        <option value="yes">음주함</option>
-        <option value="no">음주하지 않음</option>
-      </select>
-    </div>
+        회원가입 완료
+      </button>
+    </motion.div>
   );
 }

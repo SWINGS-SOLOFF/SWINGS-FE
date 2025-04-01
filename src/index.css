@@ -26,6 +26,8 @@ a:hover {
 
 body {
   margin: 0;
+  display: flex;
+  place-items: center;
   min-width: 320px;
   min-height: 100vh;
   display: flex;
@@ -100,13 +102,6 @@ button:focus-visible {
   .card {
     padding: 1.5em;
   }
-}
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0rem;
-  text-align: center;
-
 }
 
 .logo {
