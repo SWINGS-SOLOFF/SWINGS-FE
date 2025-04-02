@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchUserData } from "../api/userapi";
+import { fetchUserData, getPointBalance } from "../api/userapi"; // ✅ 추가
 import { removeToken } from "../utils/userUtils";
 import { MessageCircle, LogOut } from "lucide-react";
 
 export default function MyPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(null);
+  const [point, setPoint] = useState(null); // ✅ 포인트 상태
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,8 +15,11 @@ export default function MyPage() {
       try {
         const data = await fetchUserData();
         setFormData(data);
+
+        const balance = await getPointBalance(); // ✅ 포인트 잔액 조회
+        setPoint(balance);
       } catch (err) {
-        console.error("유저 정보 불러오기 실패:", err);
+        console.error("유저 정보 또는 포인트 불러오기 실패:", err);
       } finally {
         setLoading(false);
       }
@@ -51,6 +55,11 @@ export default function MyPage() {
         <p className="text-gray-500 text-sm">
           계정 관련 기능을 이용할 수 있어요.
         </p>
+
+        {/* ✅ 포인트 잔액 표시 */}
+        <div className="text-lg font-semibold text-green-600">
+          보유 포인트: {point?.toLocaleString() ?? 0} P
+        </div>
 
         <button
           onClick={() => navigate("/swings/mypage/update")}

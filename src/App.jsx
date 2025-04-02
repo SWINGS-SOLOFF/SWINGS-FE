@@ -9,6 +9,7 @@ import SignUp from "./1_user/pages/SignUp";
 import MatchRoutes from "./3_match/routes/MatchRoutes";
 import ChatRoutes from "./3_match/routes/ChatRoutes";
 import FeedRoutes from "./2_feed/routes/FeedRoutes";
+import MatchGroupRoutes from "./4_matchgroup/routes/MatchGroupRoutes";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
       {/* ✅ 사용자 페이지 (NavBar + BottomNavBar 포함) */}
       <Route path="/swings/*" element={<UserLayout />}>
         <Route path="match/*" element={<MatchRoutes />} />
+        <Route path="matchgroup/*" element={<MatchGroupRoutes />} />
         <Route path="chat/*" element={<ChatRoutes />} />
         <Route path="feed/*" element={<FeedRoutes />} />
         <Route path="social/*" element={<FeedRoutes />} />
