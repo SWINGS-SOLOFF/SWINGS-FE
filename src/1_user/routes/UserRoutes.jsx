@@ -6,6 +6,10 @@ import UpdateForm from "../components/UpdateForm";
 import PasswordChangeForm from "../components/PasswordChangeForm";
 import DeleteUser from "../components/DeleteUser";
 import PrivateRoute from "../components/PrivateRoute";
+import MyPointPage from "../pages/MyPointPage";
+import TossCheckout from "../pages/TossCheckout";
+import TossSuccess from "../pages/TossSuccess";
+import TossFail from "../pages/TossFail";
 
 export default function UserRoutes() {
   return (
@@ -18,11 +22,20 @@ export default function UserRoutes() {
           </PrivateRoute>
         }
       />
+
       <Route
         path="mypage"
         element={
           <PrivateRoute>
             <MyPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="mypage/points"
+        element={
+          <PrivateRoute>
+            <MyPointPage />
           </PrivateRoute>
         }
       />
@@ -47,6 +60,32 @@ export default function UserRoutes() {
         element={
           <PrivateRoute>
             <DeleteUser />
+          </PrivateRoute>
+        }
+      />
+
+      {/*  토스 결제 관련 라우터 추가 */}
+      <Route
+        path="mypage/points/checkout"
+        element={
+          <PrivateRoute>
+            <TossCheckout />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="mypage/points/success"
+        element={
+          <PrivateRoute>
+            <TossSuccess />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="mypage/points/fail"
+        element={
+          <PrivateRoute>
+            <TossFail />
           </PrivateRoute>
         }
       />
