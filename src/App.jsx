@@ -1,4 +1,3 @@
-
 // src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import UserLayout from "./1_user/layouts/UserLayout";
@@ -9,6 +8,7 @@ import StartLogin from "./1_user/pages/StartLogin";
 import SignUp from "./1_user/pages/SignUp";
 import MatchRoutes from "./3_match/routes/MatchRoutes";
 import ChatRoutes from "./3_match/routes/ChatRoutes";
+import FeedRoutes from "./2_feed/routes/FeedRoutes";
 
 export default function App() {
   return (
@@ -22,14 +22,12 @@ export default function App() {
         <Route path="*" element={<AdminRoutes />} />
       </Route>
 
-        
-        <Route path="/swings/match/*" element={<MatchRoutes />} />
-        <Route path="/swings/chat/*" element={<ChatRoutes />} />
-
       {/* ✅ 사용자 페이지 (NavBar + BottomNavBar 포함) */}
       <Route path="/swings/*" element={<UserLayout />}>
-      <Route path="feed/*" element={<FeedRoutes />} />
-      <Route path="social/*" element={<FeedRoutes />} />
+        <Route path="match/*" element={<MatchRoutes />} />
+        <Route path="chat/*" element={<ChatRoutes />} />
+        <Route path="feed/*" element={<FeedRoutes />} />
+        <Route path="social/*" element={<FeedRoutes />} />
         <Route path="*" element={<UserRoutes />} />
       </Route>
     </Routes>
