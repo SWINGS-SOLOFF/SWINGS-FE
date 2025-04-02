@@ -28,6 +28,8 @@ export default function App() {
 
       {/* ✅ 사용자 페이지 (NavBar + BottomNavBar 포함) */}
       <Route path="/swings/*" element={<UserLayout />}>
+      <Route path="feed/*" element={<FeedRoutes />} />
+      <Route path="social/*" element={<FeedRoutes />} />
         <Route path="*" element={<UserRoutes />} />
       </Route>
     </Routes>
