@@ -8,6 +8,7 @@ import AdminRoutes from "./1_user/routes/AdminRoutes";
 import StartLogin from "./1_user/pages/StartLogin";
 import SignUp from "./1_user/pages/SignUp";
 import MatchRoutes from "./3_match/routes/MatchRoutes";
+import ChatRoutes from "./3_match/routes/ChatRoutes";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
 
         
         <Route path="/swings/match/*" element={<MatchRoutes />} />
+        <Route path="/swings/chat/*" element={<ChatRoutes />} />
 
       {/* ✅ 사용자 페이지 (NavBar + BottomNavBar 포함) */}
       <Route path="/swings/*" element={<UserLayout />}>

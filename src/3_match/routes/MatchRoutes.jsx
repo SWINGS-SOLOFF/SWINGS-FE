@@ -3,8 +3,6 @@
 import React from "react";
 import { Route ,Routes} from "react-router-dom";
 import SwipePage from "../pages/SwipePage";
-import ChatRoomPage from "../pages/ChatRoomPage";
-import ChatListPage from "../pages/ChatListPage"
 /**
  * MatchRoutes
  * App.jsx의 <Routes> 안에서 사용할 <Route> 요소만 리턴합니다.
@@ -12,7 +10,7 @@ import ChatListPage from "../pages/ChatListPage"
 const MatchRoutes = () => (
     <Routes>
         <Route path="" element={<SwipePage />} />                // → /swings/match
-      
+
     </Routes>
 );
 
