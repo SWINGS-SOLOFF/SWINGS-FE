@@ -19,57 +19,48 @@
     "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-separator": "^1.1.2",
     "@radix-ui/react-tabs": "^1.1.3",
+    "@react-spring/web": "9.7.5",
     "@stomp/stompjs": "^7.1.0",
-    "sockjs-client": "^1.6.1",
     "axios": "^1.8.3",
-
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.10",
-    "jwt-decode": "^4.0.0",
-
     "framer-motion": "^12.6.2",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.484.0",
-    "react-icons": "^5.5.0",
-    "react-toastify": "^9.1.3",
-    "react-intersection-observer": "^9.16.0",
-
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.5.2",
+    "react-icons": "^5.5.0",
+    "react-intersection-observer": "^9.16.0",
     "react-router-dom": "^7.3.0",
-
     "react-select": "^5.10.1",
     "react-tinder-card": "^1.6.4",
-    "@react-spring/web": "9.7.5",
-
+    "react-toastify": "^9.1.3",
+    "sockjs-client": "^1.6.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7"
   },
   "__devDependencies_comment": "개발 도구 및 타입, 빌드 도구 등",
   "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@eslint/js": "^9.21.0",
+    "@tailwindcss/forms": "0.5.10",
+    "@tailwindcss/line-clamp": "^0.4.0",
+    "@tailwindcss/typography": "^0.5.0",
     "@types/react": "^18.2.40",
     "@types/react-dom": "^18.2.17",
-
     "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^6.2.0",
-
-    "@eslint/js": "^9.21.0",
+    "autoprefixer": "^10.4.21",
+    "buffer": "^6.0.3",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
-
     "postcss": "^8.5.3",
-    "autoprefixer": "^10.4.21",
-
-    "tailwindcss": "^3.4.17",
-    "@tailwindcss/forms": "0.5.10",
-    "@tailwindcss/line-clamp": "^0.4.0",
-    "@tailwindcss/typography": "^0.5.0",
-
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "process": "^0.11.10",
     "rollup-plugin-node-polyfills": "^0.2.1",
-    "buffer": "^6.0.3",
-    "process": "^0.11.10"
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.2.0"
   }
 }
