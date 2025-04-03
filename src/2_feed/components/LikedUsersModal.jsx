@@ -1,62 +1,73 @@
 import React from 'react';
-import { FaHeart, FaTimes } from 'react-icons/fa';
+import { FaHeart, FaTimes, FaUser } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-// 좋아요한 유저 목록 모달 컴포넌트
-const LikedUsersModal = ({ users, onClose }) => (
-    <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60"
-    >
-        <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.9 }}
-            className="bg-white w-11/12 md:w-96 max-h-[70vh] rounded-2xl shadow-2xl overflow-hidden"
-        >
-            <div className="bg-black text-white p-4 flex items-center justify-between">
-                <h3 className="text-xl font-bold flex items-center">
-                    <FaHeart className="mr-2 text-gray-300" />
-                    좋아요 ({users.length})
-                </h3>
-                <button
-                    onClick={onClose}
-                    className="hover:bg-gray-800 p-2 rounded-full transition"
-                >
-                    <FaTimes className="text-white" />
-                </button>
-            </div>
-            <div className="p-4 overflow-y-auto max-h-[50vh]">
-                {users.length === 0 ? (
-                    <div className="text-center text-gray-500 py-8">
-                        <FaRegHeart className="mx-auto text-4xl mb-4 text-gray-300" />
-                        <p>아직 좋아요를 누른 사용자가 없습니다.</p>
-                    </div>
-                ) : (
-                    <ul className="space-y-3">
-                        {users.map((user) => (
-                            <li
-                                key={user.userId}
-                                className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg transition"
-                            >
-                                <img
-                                    src={user.avatarUrl || '/default-profile.jpg'}
-                                    alt="프로필"
-                                    className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
-                                />
-                                <div>
-                                    <p className="font-semibold text-gray-800">{user.username}</p>
-                                    <p className="text-xs text-gray-500">{user.description || '골퍼'}</p>
-                                </div>
-                                <FaHeart className="ml-auto text-gray-500" />
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
-        </motion.div>
-    </motion.div>
-);
+const LikedUsersModal = ({ users, onClose }) => {
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+                className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden"
+            >
+                {/* 헤더 */}
+                <div className="flex items-center justify-between border-b border-gray-200 p-4">
+                    <h2 className="text-xl font-bold flex items-center">
+                        <FaHeart className="text-red-500 mr-2" />
+                        좋아요 ({users.length})
+                    </h2>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-500 hover:text-gray-800 p-2 rounded-full hover:bg-gray-100 transition"
+                    >
+                        <FaTimes />
+                    </button>
+                </div>
+
+                {/* 유저 목록 */}
+                <div className="overflow-y-auto max-h-[calc(80vh-70px)] p-2">
+                    {users.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-10 text-center">
+                            <FaHeart className="text-gray-300 text-5xl mb-4" />
+                            <p className="text-gray-500 font-medium">
+                                아직 좋아요를 누른 사용자가 없습니다.
+                            </p>
+                        </div>
+                    ) : (
+                        <ul className="divide-y divide-gray-100">
+                            {users.map((user) => (
+                                <li key={user.userId} className="py-3 hover:bg-gray-50 transition rounded-lg">
+                                    <div className="flex items-center p-2">
+                                        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                                            {user.avatarUrl ? (
+                                                <img
+                                                    src={user.avatarUrl}
+                                                    alt={user.username}
+                                                    className="w-full h-full object-cover rounded-full"
+                                                />
+                                            ) : (
+                                                <FaUser className="text-gray-700" />
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h3 className="font-semibold text-gray-900">
+                                                {user.username}
+                                            </h3>
+                                            <p className="text-sm text-gray-500">
+                                                {user.description || '골퍼'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </motion.div>
+        </div>
+    );
+};
+
 export default LikedUsersModal;
