@@ -1,78 +1,108 @@
-// src/api/socialApi.js
-import axios from 'axios';
+import axios from '../../1_user/api/axiosInstance';
 
-const BASE_URL = 'http://localhost:8090/swings/social';
+const BASE_URL = '';
 
-// 자기소개 불러오기
-export const getIntroduce = async (userId) => {
-    const response = await axios.get(`${BASE_URL}/introduce/${userId}`);
-    return response.data;
-};
+const socialApi = {
+    request: async (method, url, data = null, params = null, contentType = 'application/json') => {
+        return axios({
+            method,
+            url: `${BASE_URL}${url}`,
+            data,
+            params,
+            headers: { 'Content-Type': contentType }
+        });
+    },
 
-// 자기소개 수정하기
-export const updateIntroduce = async (userId, introduce) => {
-    const response = await axios.post(`${BASE_URL}/update-introduce?userId=${userId}`, introduce, {
-        headers: { 'Content-Type': 'text/plain' }
-    });
-    return response.data;
-};
+    getIntroduce: async (userId) => {
+        const res = await socialApi.request('get', `/social/introduce/${userId}`);
+        return res.data;
+    },
 
-// 팔로워 불러오기
-export const getFollowers = async (userId) => {
-    const response = await axios.get(`${BASE_URL}/followers/${userId}`);
-    return response.data;
-};
+    updateIntroduce: async (userId, introduce) => {
+        const res = await socialApi.request(
+            'post',
+            `/social/update-introduce?userId=${userId}`,
+            introduce,
+            null,
+            'text/plain'
+        );
+        return res.data;
+    },
 
-// 팔로잉 불러오기
-export const getFollowings = async (userId) => {
-    const response = await axios.get(`${BASE_URL}/followings/${userId}`);
-    return response.data;
-};
+    getFollowers: async (userId) => {
+        const res = await socialApi.request('get', `/social/followers/${userId}`);
+        return res.data;
+    },
 
-// 피드 개수 불러오기
-export const getFeedCount = async (userId) => {
-    const response = await axios.get(`${BASE_URL}/feeds/count/${userId}`);
-    return response.data;
-};
+    getFollowings: async (userId) => {
+        const res = await socialApi.request('get', `/social/followings/${userId}`);
+        return res.data;
+    },
 
-// 팔로우, 언팔로우 불러오기
-export const isFollowing = async (followerId, followeeId) => {
-    const response = await axios.get(`${BASE_URL}/isFollowing`, {
-        params: { followerId, followeeId }
-    });
-    return response.data;
-};
+    getFeedCount: async (userId) => {
+        const res = await socialApi.request('get', `/social/feeds/count/${userId}`);
+        return res.data;
+    },
 
-// 팔로우하기
-export const followUser = async (followerId, followeeId) => {
-    const response = await axios.post(`${BASE_URL}/follow`, {
-        followerId,
-        followeeId
-    });
-    return response.data;
-};
+    isFollowing: async (followerId, followeeId) => {
+        const res = await socialApi.request('get', `/social/isFollowing`, null, { followerId, followeeId });
+        return res.data;
+    },
 
-// 언팔로우 하기
-export const unfollowUser = async (followerId, followeeId) => {
-    const response = await axios.post(`${BASE_URL}/unfollow`, {
-        followerId,
-        followeeId
-    });
-    return response.data;
-};
+    followUser: async (followerId, followeeId) => {
+        const res = await socialApi.request('post', `/social/follow`, { followerId, followeeId });
+        return res.data;
+    },
 
-// 프로필 데이터 가져오기
-export const getProfile = async (userId) => {
-    if (!userId) {
-        throw new Error('유효한 사용자 ID가 필요합니다.');
+    unfollowUser: async (followerId, followeeId) => {
+        const res = await socialApi.request('post', `/social/unfollow`, { followerId, followeeId });
+        return res.data;
+    },
+
+    getProfile: async (userId) => {
+        const res = await socialApi.request('get', `/social/user/${userId}`);
+        return res.data;
+    },
+
+    getCurrentUser: async () => {
+        const res = await socialApi.request('get', `/users/me`);
+        return res.data;
+    },
+
+    getUserFeeds: async (userId) => {
+        const res = await socialApi.request('get', `/feeds/user/${userId}`);
+        return res.data;
+    },
+
+    likeFeed: async (feedId, userId) => {
+        const res = await socialApi.request('put', `/feeds/${feedId}/like`, null, { userId });
+        return res.data;
+    },
+
+    unlikeFeed: async (feedId, userId) => {
+        const res = await socialApi.request('put', `/feeds/${feedId}/unlike`, null, { userId });
+        return res.data;
+    },
+
+    deleteFeed: async (feedId) => {
+        const res = await socialApi.request('delete', `/feeds/${feedId}`);
+        return res.data;
+    },
+
+    getCommentsByFeedId: async (feedId) => {
+        const res = await socialApi.request('get', `/feeds/${feedId}/comments`);
+        return res.data;
+    },
+
+    addComment: async (feedId, userId, content) => {
+        const res = await socialApi.request('post', `/feeds/${feedId}/comments`, null, { userId, content });
+        return res.data;
+    },
+
+    deleteComment: async (feedId, commentId) => {
+        const res = await socialApi.request('delete', `/feeds/${feedId}/comments/${commentId}`);
+        return res.data;
     }
-
-    try {
-        const response = await axios.get(`http://localhost:8090/swings/social/user/${userId}`);
-        return response.data;
-    } catch (error) {
-        console.error('프로필 데이터 로딩 오류:', error);
-        throw error;
-    }
 };
 
+export default socialApi;

@@ -10,6 +10,9 @@ import ChatRoutes from "./3_match/routes/ChatRoutes";
 import FeedRoutes from "./2_feed/routes/FeedRoutes";
 import MatchGroupRoutes from "./4_matchgroup/routes/MatchGroupRoutes.jsx";
 import NotificationRoutes from "./5_notification/routes/NotificationRoutes.jsx";
+import SocialRoutes from "./2_feed/routes/SocialRoutes";
+import SocialPage from './2_feed/pages/SocialPage'; // 정확한 경로 확인 필수
+
 
 export default function App() {
   return (
@@ -29,7 +32,8 @@ export default function App() {
         <Route path="matchgroup/*" element={<MatchGroupRoutes />} />
         <Route path="chat/*" element={<ChatRoutes />} />
         <Route path="feed/*" element={<FeedRoutes />} />
-        <Route path="social/*" element={<FeedRoutes />} />
+        <Route path="social/*" element={<SocialRoutes />} />
+        <Route path="/profile/:userId" element={<SocialPage />} />
         <Route path="*" element={<UserRoutes />} />
         <Route path="notification/*" element={<NotificationRoutes />} />
       </Route>
