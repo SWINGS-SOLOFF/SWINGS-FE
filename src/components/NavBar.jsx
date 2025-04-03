@@ -17,7 +17,7 @@ export default function NavBar() {
 
       {/* 메시지 아이콘 */}
       <button
-        onClick={() => navigate("/swings/messages")} // 나중에 메시지 페이지 생기면
+        onClick={() => navigate("/swings/chat")} // 나중에 메시지 페이지 생기면
         className="text-[#2E384D] hover:opacity-80"
         aria-label="메시지"
       >

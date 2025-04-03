@@ -2,7 +2,10 @@
 
 import axios from "axios";
 
-const BASE_URL = "/api/chatroom"; // 백엔드 채팅방 관련 Prefix
+const BASE_URL = "http://localhost:8090/swings/api/chat"; // 백엔드 채팅방 관련 Prefix
+
+const MESSAGE_URL = "http://localhost:8090/swings/api/messages"; // 메세지 전용
+
 
 /**
  * 특정 유저 쌍에 대한 채팅방 조회 또는 생성
@@ -29,5 +32,5 @@ export const fetchChatRoomDetail = (roomId) => {
  * @returns Promise<ChatMessage[]>
  */
 export const fetchChatMessages = (roomId) => {
-    return axios.get(`${BASE_URL}/${roomId}/messages`);
+    return axios.get(`${BASE_URL}/messages/${roomId}`);
 };
