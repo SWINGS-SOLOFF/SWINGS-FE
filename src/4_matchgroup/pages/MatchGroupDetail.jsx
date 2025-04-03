@@ -92,7 +92,7 @@ const MatchGroupDetail = () => {
             <p className="text-gray-500">
                 👥 모집 현황: {group.currentParticipants}/{group.maxParticipants}명
             </p>
-            <p className="text-sm font-bold text-blue-500">⭐ 방장: {group.creator}</p>
+            <p className="text-sm font-bold text-blue-500">⭐ 방장: {group.hostUsername}</p>
 
             {/* 참가자 상태에 따른 버튼 표시 */}
             {!isParticipant ? (

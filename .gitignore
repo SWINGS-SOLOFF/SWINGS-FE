@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 환경변수 파일 토스 및 결제 관련 보안
+.env.local
+.env.*.local

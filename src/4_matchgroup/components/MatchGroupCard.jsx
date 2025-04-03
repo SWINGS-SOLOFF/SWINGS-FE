@@ -75,6 +75,10 @@ export default function MatchGroupCard({ group }) {
                             <UsersIcon className="h-4 w-4 text-golf-green-600" />
                             <span>{group.currentParticipants}/{group.maxParticipants}명</span>
                         </div>
+                        <div className="flex items-center gap-2">
+                            <span className="font-semibold text-golf-green-700">방장:</span>
+                            <span>{group.hostUsername}</span>
+                        </div>
                     </div>
                 </CardContent>
 
