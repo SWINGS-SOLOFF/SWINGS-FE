@@ -9,6 +9,8 @@ import SignUp from "./1_user/pages/SignUp";
 import MatchRoutes from "./3_match/routes/MatchRoutes";
 import ChatRoutes from "./3_match/routes/ChatRoutes";
 import FeedRoutes from "./2_feed/routes/FeedRoutes";
+import SocialRoutes from "./2_feed/routes/SocialRoutes";
+
 
 export default function App() {
   return (
@@ -27,7 +29,7 @@ export default function App() {
         <Route path="match/*" element={<MatchRoutes />} />
         <Route path="chat/*" element={<ChatRoutes />} />
         <Route path="feed/*" element={<FeedRoutes />} />
-        <Route path="social/*" element={<FeedRoutes />} />
+        <Route path="social/*" element={<SocialRoutes />} />
         <Route path="*" element={<UserRoutes />} />
       </Route>
     </Routes>
