@@ -85,7 +85,7 @@ export default function MyPage() {
           <ActionButton
             icon={<Settings size={18} />}
             text="회원정보 수정"
-            color="indigo"
+            color="green"
             onClick={() => navigate("/swings/mypage/update")}
           />
           <ActionButton
