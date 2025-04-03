@@ -44,7 +44,7 @@ export default function TossCheckout() {
       orderName: "포인트 1000P 충전",
       successUrl: `${window.location.origin}/swings/mypage/points/success`,
       failUrl: `${window.location.origin}/swings/mypage/points/fail`,
-      customerName: user.name || user.username || "홍길동", // ✅ 사용자 정보
+      customerName: user.userId || user.username,
     });
   };
 
