@@ -1,3 +1,4 @@
+import React, { useState, useRef } from 'react';
 import {
     FaMapMarkerAlt,
     FaMale,
@@ -10,35 +11,36 @@ import {
     FaTimes,
     FaUserFriends,
     FaUserPlus,
-    FaPhotoVideo
+    FaPhotoVideo,
+    FaEdit,
+    FaSave
 } from 'react-icons/fa';
 import { MdFavorite } from 'react-icons/md';
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 // 팔로워/팔로잉 목록 모달 컴포넌트
-const FollowListModal = ({ users, onClose, title }) => {
+export const FollowListModal = ({ users, onClose, title }) => {
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm"
         >
             <motion.div
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.9 }}
-                className="bg-white w-96 max-h-[500px] rounded-2xl shadow-2xl overflow-hidden"
+                className="bg-white w-96 max-h-[500px] rounded-xl shadow-2xl overflow-hidden"
             >
-                <div className="bg-green-600 text-white p-4 flex items-center justify-between">
+                <div className="bg-black text-white p-4 flex items-center justify-between">
                     <h3 className="text-xl font-bold flex items-center">
                         <FaUserFriends className="mr-2" />
                         {title} ({users.length})
                     </h3>
                     <button
                         onClick={onClose}
-                        className="hover:bg-green-700 p-2 rounded-full transition"
+                        className="hover:bg-gray-800 p-2 rounded-full transition"
                     >
                         <FaTimes className="text-white" />
                     </button>
@@ -59,13 +61,13 @@ const FollowListModal = ({ users, onClose, title }) => {
                                     <img
                                         src={user.avatarUrl || user.userImg || '/default-profile.jpg'}
                                         alt="프로필"
-                                        className="w-10 h-10 rounded-full object-cover border-2 border-green-500"
+                                        className="w-10 h-10 rounded-full object-cover border-2 border-black"
                                     />
                                     <div>
                                         <p className="font-semibold text-gray-800">{user.username || user.name}</p>
                                         <p className="text-xs text-gray-500">{user.description || '골퍼'}</p>
                                     </div>
-                                    <button className="ml-auto px-3 py-1 text-sm bg-green-600 text-white rounded-full hover:bg-green-700 transition">
+                                    <button className="ml-auto px-3 py-1 text-sm bg-black text-white rounded-full hover:bg-gray-800 transition">
                                         {title === '팔로워' ? '팔로우' : '언팔로우'}
                                     </button>
                                 </li>
@@ -82,7 +84,7 @@ const FollowListModal = ({ users, onClose, title }) => {
 const UserDetailCard = ({ user }) => {
     const userDetails = [
         {
-            icon: <FaMapMarkerAlt className="text-green-600" />,
+            icon: <FaMapMarkerAlt className="text-gray-700" />,
             label: '활동 지역',
             value: {
                 'SEOUL': '서울',
@@ -105,7 +107,7 @@ const UserDetailCard = ({ user }) => {
             }[user.activityRegion]
         },
         {
-            icon: user.gender === 'male' ? <FaMale className="text-blue-500" /> : <FaFemale className="text-pink-500" />,
+            icon: user.gender === 'male' ? <FaMale className="text-gray-700" /> : <FaFemale className="text-gray-700" />,
             label: '성별',
             value: user.gender === 'male' ? '남성' : '여성'
         },
@@ -115,7 +117,7 @@ const UserDetailCard = ({ user }) => {
             value: user.job
         },
         {
-            icon: <FaGolfBall className="text-green-700" />,
+            icon: <FaGolfBall className="text-gray-700" />,
             label: '골프 실력',
             value: {
                 'beginner': '초보자',
@@ -124,37 +126,37 @@ const UserDetailCard = ({ user }) => {
             }[user.golfSkill]
         },
         {
-            icon: <MdFavorite className="text-purple-600" />,
+            icon: <MdFavorite className="text-gray-700" />,
             label: 'MBTI',
             value: user.mbti
         },
         {
-            icon: <FaHeart className="text-red-500" />,
+            icon: <FaHeart className="text-gray-700" />,
             label: '취미',
             value: user.hobbies
         },
         {
-            icon: <FaSmokingBan className="text-gray-500" />,
+            icon: <FaSmokingBan className="text-gray-700" />,
             label: '흡연 여부',
             value: user.smoking === 'yes' ? '흡연' : '비흡연'
         },
         {
-            icon: <FaWineGlass className="text-pink-600" />,
+            icon: <FaWineGlass className="text-gray-700" />,
             label: '음주 여부',
             value: user.drinking === 'yes' ? '음주' : '비음주'
         }
     ];
 
     return (
-        <div className="bg-white shadow-2xl rounded-2xl p-6 border-2 border-green-50 transform transition-all hover:shadow-3xl">
-            <h2 className="text-2xl font-bold text-green-800 mb-6 border-b-2 border-green-100 pb-3">
+        <div className="bg-white shadow-xl rounded-xl p-6 border border-gray-200 transition-all hover:shadow-2xl">
+            <h2 className="text-2xl font-bold text-black mb-6 border-b border-gray-200 pb-3">
                 프로필 상세 정보
             </h2>
             <div className="grid grid-cols-2 gap-4">
                 {userDetails.map((detail, index) => (
                     <div
                         key={index}
-                        className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition"
+                        className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
                     >
                         <div className="text-2xl">{detail.icon}</div>
                         <div>
@@ -169,72 +171,35 @@ const UserDetailCard = ({ user }) => {
 };
 
 // 메인 SocialProfile 컴포넌트
-const SocialProfile = ({ user, userStats, userIntroduce, onIntroduceChange, onIntroduceSave }) => {
-    // 상태 관리
+const SocialProfile = ({ 
+    user, 
+    userStats, 
+    userIntroduce, 
+    onIntroduceChange, 
+    onEditingToggle,
+    onIntroduceSave, 
+    isCurrentUser = false,
+    isFollowing = false,
+    onFollowToggle,
+    onShowFollowers,
+    onShowFollowing
+}) => {
     const [editing, setEditing] = useState(false);
-    const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
-    const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
-    const [followersData, setFollowersData] = useState([]);
-    const [followingData, setFollowingData] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [introduceText, setIntroduceText] = useState(userIntroduce || '');
-
     const postsRef = useRef(null);
 
-    // 자기소개 수정 토글 함수
+    // 편집 모드 토글
     const handleEditToggle = () => {
         setEditing(!editing);
+        if (onEditingToggle) {
+            onEditingToggle();
+        }
     };
 
-    // 자기소개 저장 함수
-    const handleIntroduceSave = () => {
-        if (onIntroduceSave) {
-            onIntroduceSave(introduceText);
-        }
+    // 저장 처리
+    const handleSave = () => {
         setEditing(false);
-    };
-
-    // 자기소개 변경 함수
-    const handleIntroduceChange = (e) => {
-        setIntroduceText(e.target.value);
-        if (onIntroduceChange) {
-            onIntroduceChange(e);
-        }
-    };
-
-    // 팔로워 목록 가져오기
-    const handleShowFollowers = async () => {
-        setIsLoading(true);
-        try {
-            // 임시 데이터 사용
-            const dummyFollowers = [
-                { id: 1, name: '홍길동', userImg: '/default-profile.jpg', description: '골프 좋아하는 사람' },
-                { id: 2, name: '김철수', userImg: '/default-profile.jpg', description: '골프 초보자' }
-            ];
-            setFollowersData(dummyFollowers);
-            setIsFollowersModalOpen(true);
-        } catch (error) {
-            console.error("팔로워 목록 로딩 오류:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // 팔로잉 목록 가져오기
-    const handleShowFollowing = async () => {
-        setIsLoading(true);
-        try {
-            // 임시 데이터 사용
-            const dummyFollowing = [
-                { id: 3, name: '이영희', userImg: '/default-profile.jpg', description: '골프 강사' },
-                { id: 4, name: '박지민', userImg: '/default-profile.jpg', description: '골프 매니아' }
-            ];
-            setFollowingData(dummyFollowing);
-            setIsFollowingModalOpen(true);
-        } catch (error) {
-            console.error("팔로잉 목록 로딩 오류:", error);
-        } finally {
-            setIsLoading(false);
+        if (onIntroduceSave) {
+            onIntroduceSave();
         }
     };
 
@@ -248,50 +213,63 @@ const SocialProfile = ({ user, userStats, userIntroduce, onIntroduceChange, onIn
         <div className="max-w-4xl mx-auto px-4 py-8">
             <div className="grid md:grid-cols-3 gap-6">
                 <div className="md:col-span-1 flex flex-col items-center">
-                    <div className="relative mb-8">
+                    <div className="relative mb-6">
                         <img
-                            src={user.userImg || '/swings/images/default-profile.jpg'}
+                            src={user?.userImg || '/default-profile.jpg'}
                             alt="프로필 사진"
                             className="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl"
                         />
-                        {/* 프로 배지 제거 */}
                     </div>
-                    <h1 className="text-3xl font-bold text-green-800 mt-2">{user.name}</h1>
-                    <p className="text-gray-600 mb-6">@{user.username}</p>
+                    <h1 className="text-3xl font-bold text-black mt-2">{user?.name}</h1>
+                    <p className="text-gray-600 mb-6">@{user?.username}</p>
+                    
+                    {/* 팔로우 버튼 */}
+                    {!isCurrentUser && (
+                        <button
+                            onClick={onFollowToggle}
+                            className={`mb-6 px-6 py-2 rounded-full text-sm font-bold transition-colors ${
+                                isFollowing 
+                                    ? 'bg-gray-200 text-black border border-gray-400 hover:bg-gray-300' 
+                                    : 'bg-black text-white hover:bg-gray-800'
+                            }`}
+                        >
+                            {isFollowing ? '팔로잉' : '팔로우'}
+                        </button>
+                    )}
+                    
+                    {/* 통계 정보 */}
                     <div className="w-full flex justify-center mb-6">
-                        <div className="grid grid-cols-3 gap-1 bg-white rounded-xl shadow-lg p-1 w-full max-w-xs border border-green-100">
+                        <div className="grid grid-cols-3 gap-1 bg-white rounded-xl shadow-lg p-1 w-full max-w-xs border border-gray-200">
                             <motion.button
                                 whileTap={{ scale: 0.95 }}
                                 onClick={scrollToPosts}
-                                className="text-center py-3 px-2 rounded-lg hover:bg-green-50 transition-all cursor-pointer focus:outline-none"
+                                className="text-center py-3 px-2 rounded-lg hover:bg-gray-50 transition-all cursor-pointer focus:outline-none"
                             >
                                 <div className="flex flex-col items-center">
-                                    <FaPhotoVideo className="text-green-600 mb-1" />
-                                    <p className="text-xl font-bold text-gray-800">{userStats.posts}</p>
+                                    <FaPhotoVideo className="text-gray-700 mb-1" />
+                                    <p className="text-xl font-bold text-gray-800">{userStats?.posts || 0}</p>
                                     <p className="text-xs text-gray-500">게시물</p>
                                 </div>
                             </motion.button>
                             <motion.button
                                 whileTap={{ scale: 0.95 }}
-                                onClick={handleShowFollowers}
-                                disabled={isLoading}
-                                className="text-center py-3 px-2 rounded-lg hover:bg-green-50 transition-all cursor-pointer focus:outline-none"
+                                onClick={onShowFollowers}
+                                className="text-center py-3 px-2 rounded-lg hover:bg-gray-50 transition-all cursor-pointer focus:outline-none"
                             >
                                 <div className="flex flex-col items-center">
-                                    <FaUserFriends className="text-green-600 mb-1" />
-                                    <p className="text-xl font-bold text-gray-800">{userStats.followers}</p>
+                                    <FaUserFriends className="text-gray-700 mb-1" />
+                                    <p className="text-xl font-bold text-gray-800">{userStats?.followers || 0}</p>
                                     <p className="text-xs text-gray-500">팔로워</p>
                                 </div>
                             </motion.button>
                             <motion.button
                                 whileTap={{ scale: 0.95 }}
-                                onClick={handleShowFollowing}
-                                disabled={isLoading}
-                                className="text-center py-3 px-2 rounded-lg hover:bg-green-50 transition-all cursor-pointer focus:outline-none"
+                                onClick={onShowFollowing}
+                                className="text-center py-3 px-2 rounded-lg hover:bg-gray-50 transition-all cursor-pointer focus:outline-none"
                             >
                                 <div className="flex flex-col items-center">
-                                    <FaUserPlus className="text-green-600 mb-1" />
-                                    <p className="text-xl font-bold text-gray-800">{userStats.following}</p>
+                                    <FaUserPlus className="text-gray-700 mb-1" />
+                                    <p className="text-xl font-bold text-gray-800">{userStats?.following || 0}</p>
                                     <p className="text-xs text-gray-500">팔로잉</p>
                                 </div>
                             </motion.button>
@@ -299,64 +277,48 @@ const SocialProfile = ({ user, userStats, userIntroduce, onIntroduceChange, onIn
                     </div>
                 </div>
                 <div className="md:col-span-2 space-y-6">
-                    <div className="bg-white shadow-2xl rounded-2xl p-6 border-2 border-green-50">
+                    <div className="bg-white shadow-xl rounded-xl p-6 border border-gray-200">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold text-green-800">자기소개</h2>
-                            {!editing ? (
-                                <button
-                                    onClick={handleEditToggle}
-                                    className="text-green-600 hover:text-green-800 transition px-3 py-1 rounded-full hover:bg-green-50"
-                                >
-                                    수정
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleIntroduceSave}
-                                    className="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition shadow-md"
-                                >
-                                    저장
-                                </button>
+                            <h2 className="text-2xl font-bold text-black">자기소개</h2>
+                            {isCurrentUser && (
+                                !editing ? (
+                                    <button
+                                        onClick={handleEditToggle}
+                                        className="text-black hover:text-gray-700 transition px-3 py-1 rounded-full hover:bg-gray-100 flex items-center"
+                                    >
+                                        <FaEdit className="mr-1" /> 수정
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={handleSave}
+                                        className="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 transition shadow-md flex items-center"
+                                    >
+                                        <FaSave className="mr-1" /> 저장
+                                    </button>
+                                )
                             )}
                         </div>
                         {editing ? (
                             <textarea
-                                className="w-full h-32 p-3 border-2 border-green-200 rounded-lg focus:border-green-500 transition"
-                                value={introduceText}
-                                onChange={handleIntroduceChange}
+                                className="w-full h-32 p-3 border-2 border-gray-200 rounded-lg focus:border-gray-500 focus:outline-none transition"
+                                value={userIntroduce}
+                                onChange={(e) => onIntroduceChange(e.target.value)}
                                 placeholder="당신에 대해 알려주세요..."
                             />
                         ) : (
                             <p className="text-gray-700 leading-relaxed">
-                                {introduceText || '아직 자기소개가 없습니다.'}
+                                {userIntroduce || '아직 자기소개가 없습니다.'}
                             </p>
                         )}
                     </div>
-                    <UserDetailCard user={user} />
+                    <UserDetailCard user={user || {}} />
                 </div>
             </div>
             <div ref={postsRef} className="mt-12">
-                <h2 className="text-2xl font-bold text-green-800 mb-6 border-b-2 border-green-100 pb-3">
+                <h2 className="text-2xl font-bold text-black mb-6 border-b border-gray-200 pb-3">
                     피드
                 </h2>
             </div>
-            <AnimatePresence>
-                {isFollowersModalOpen && (
-                    <FollowListModal
-                        users={followersData}
-                        onClose={() => setIsFollowersModalOpen(false)}
-                        title="팔로워"
-                    />
-                )}
-            </AnimatePresence>
-            <AnimatePresence>
-                {isFollowingModalOpen && (
-                    <FollowListModal
-                        users={followingData}
-                        onClose={() => setIsFollowingModalOpen(false)}
-                        title="팔로잉"
-                    />
-                )}
-            </AnimatePresence>
         </div>
     );
 };
