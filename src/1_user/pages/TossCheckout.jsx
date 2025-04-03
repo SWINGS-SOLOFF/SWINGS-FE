@@ -1,62 +1,73 @@
 // src/1_user/pages/TossCheckout.jsx
 import { useEffect, useState } from "react";
 import { fetchUserData } from "../api/userapi";
+import { requestTossPayment } from "../utils/paymentUtils";
 
 export default function TossCheckout() {
   const clientKey = import.meta.env.VITE_TOSS_CLIENT_KEY;
   const [user, setUser] = useState(null);
 
-  // ✅ 유저 정보 가져오기
+  const coinOptions = [
+    { coin: 5, price: 5000, icon: "🪙" },
+    { coin: 10, price: 10000, icon: "💰" },
+    { coin: 30, price: 30000, icon: "💵" },
+    { coin: 50, price: 50000, icon: "💸" },
+    { coin: 100, price: 100000, icon: "🏆" },
+    { coin: 300, price: 300000, icon: "👑" }, // 👑 추가!
+  ];
+
   useEffect(() => {
     fetchUserData()
-      .then((data) => {
-        setUser(data);
-      })
+      .then((data) => setUser(data))
       .catch((err) => {
         console.error("유저 정보 가져오기 실패:", err);
       });
   }, []);
 
-  // ✅ Toss SDK 로드
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://js.tosspayments.com/v1";
     script.async = true;
     document.body.appendChild(script);
-
     return () => {
       document.body.removeChild(script);
     };
   }, []);
 
-  // ✅ 결제 요청
-  const handlePayment = () => {
-    if (!window.TossPayments || !clientKey || !user) {
+  const handlePayment = (coin) => {
+    if (!clientKey || !user) {
       alert("결제 준비가 완료되지 않았습니다.");
       return;
     }
 
-    const tossPayments = window.TossPayments(clientKey);
-
-    tossPayments.requestPayment("카드", {
-      amount: 1000,
-      orderId: `order-${Date.now()}`,
-      orderName: "포인트 1000P 충전",
-      successUrl: `${window.location.origin}/swings/mypage/points/success`,
-      failUrl: `${window.location.origin}/swings/mypage/points/fail`,
-      customerName: user.userId || user.username,
+    requestTossPayment({
+      clientKey,
+      coin,
+      userId: user.userId,
     });
   };
 
   return (
-    <div className="p-6 text-center space-y-4">
-      <h1 className="text-2xl font-bold">포인트 결제</h1>
-      <button
-        onClick={handlePayment}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        토스로 1000P 결제
-      </button>
+    <div className="p-6 space-y-6 max-w-md mx-auto">
+      <h1 className="text-2xl font-bold text-[#2E384D] text-center">
+        포인트 충전
+      </h1>
+
+      <div className="grid grid-cols-2 gap-4">
+        {coinOptions.map(({ coin, price, icon }) => (
+          <button
+            key={coin}
+            onClick={() => handlePayment(coin)}
+            className="bg-white border border-gray-300 rounded-lg shadow-md p-4 flex flex-col items-center hover:shadow-lg hover:border-blue-500 transition-all"
+          >
+            <div className="text-3xl mb-2">{icon}</div>
+            <div className="font-semibold text-base text-black">{coin}코인</div>
+            <div className="text-sm text-gray-600">
+              {price.toLocaleString()}원
+            </div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
