@@ -1,92 +1,73 @@
-import { useState, useEffect } from "react";
+// src/1_user/pages/PointCharge.jsx
+import { useEffect, useState } from "react";
+import { Coins, DollarSign, Gem, PiggyBank, Wallet } from "lucide-react";
+import CoinSelectModal from "../components/CoinSelectModal";
 import { fetchUserData } from "../api/userapi";
 
 const coinOptions = [
-  { amount: 5, price: 5000 },
-  { amount: 10, price: 10000 },
-  { amount: 30, price: 30000 },
-  { amount: 50, price: 50000 },
-  { amount: 100, price: 100000 },
+  { coin: 5, price: 5000, icon: PiggyBank },
+  { coin: 10, price: 10000, icon: Coins },
+  { coin: 30, price: 30000, icon: DollarSign },
+  { coin: 50, price: 50000, icon: Wallet },
+  { coin: 100, price: 100000, icon: Gem },
+  { coin: 300, price: 300000, icon: Gem },
 ];
 
 export default function PointCharge() {
-  const [selectedCoin, setSelectedCoin] = useState(null);
   const [user, setUser] = useState(null);
+  const [selectedCoin, setSelectedCoin] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchUserData()
-      .then(setUser)
-      .catch((err) => {
-        console.error("유저 정보 가져오기 실패:", err);
-      });
+      .then((data) => setUser(data))
+      .catch((err) => console.error("유저 정보 오류:", err));
   }, []);
 
-  const handlePayment = (method) => {
-    if (!selectedCoin || !user) {
-      alert("결제 금액과 유저 정보가 필요합니다.");
-      return;
-    }
-
-    const tossPayments = window.TossPayments(
-      import.meta.env.VITE_TOSS_CLIENT_KEY
-    );
-    tossPayments.requestPayment(method, {
-      amount: selectedCoin.price,
-      orderId: `order-${Date.now()}`,
-      orderName: `${selectedCoin.amount}코인 충전`,
-      successUrl: `${window.location.origin}/swings/mypage/points/success`,
-      failUrl: `${window.location.origin}/swings/mypage/points/fail`,
-      customerName: user.userId.toString(), // 💡 userId만 넘겨도 됨
-    });
+  const handleCoinClick = (coin) => {
+    setSelectedCoin(coin);
+    setIsModalOpen(true);
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-center">포인트 충전하기</h1>
+    <div className="p-6 text-center space-y-8">
+      <h1 className="text-3xl font-bold text-[#2E384D] animate-fade-in">
+        포인트 충전
+      </h1>
 
-      {/* 코인 선택 */}
-      <div className="grid grid-cols-2 gap-4">
-        {coinOptions.map((option) => (
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 max-w-lg mx-auto">
+        {coinOptions.map(({ coin, price, icon: Icon }) => (
           <button
-            key={option.amount}
-            onClick={() => setSelectedCoin(option)}
-            className={`p-4 rounded-lg border-2 ${
-              selectedCoin?.amount === option.amount
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-300"
-            }`}
+            key={coin}
+            onClick={() => handleCoinClick(coin)}
+            className="group border rounded-xl p-6 shadow-md hover:shadow-xl transition-transform duration-300 transform hover:scale-105 hover:-translate-y-1"
           >
-            <p className="text-lg font-bold">{option.amount}코인</p>
-            <p>{option.price.toLocaleString()}원</p>
+            <div className="flex justify-center text-yellow-500 mb-3">
+              <Icon
+                size={36}
+                className="transition-transform duration-300 group-hover:rotate-6"
+              />
+            </div>
+            <div className="text-lg font-bold text-black">{coin}코인</div>
+            <div className="text-sm text-gray-600">
+              ₩{price.toLocaleString()}
+            </div>
           </button>
         ))}
       </div>
 
-      {/* 결제수단 선택 */}
-      {selectedCoin && (
-        <div className="space-y-2 text-center">
-          <p className="text-lg font-medium">
-            선택한 금액:{" "}
-            <span className="text-blue-600">
-              {selectedCoin.price.toLocaleString()}원
-            </span>
-          </p>
-          <p className="text-sm text-gray-500">결제 수단을 선택해주세요</p>
-          <div className="flex justify-center gap-4 mt-4">
-            <button
-              onClick={() => handlePayment("카드")}
-              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-            >
-              토스페이
-            </button>
-            <button
-              onClick={() => handlePayment("카카오페이")}
-              className="bg-yellow-400 text-black px-6 py-2 rounded hover:bg-yellow-500"
-            >
-              카카오페이
-            </button>
-          </div>
-        </div>
+      <p className="text-gray-500 text-sm mt-4 animate-pulse">
+        💰 1코인 = 1,000원
+      </p>
+
+      {isModalOpen && user?.userId && (
+        <CoinSelectModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          coin={selectedCoin}
+          userId={user.userId}
+          redirectToCheckout={true} // 🔥 추가!
+        />
       )}
     </div>
   );
