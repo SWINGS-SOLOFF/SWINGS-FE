@@ -3,9 +3,6 @@ import { MessageCircle, BellIcon } from "lucide-react";
 import { useState } from "react";
 import { useNotification } from "../5_notification/context/NotificationContext";
 import NotificationDropdown from "../5_notification/components/NotificationDropdown"; // ✅ 추가
-import { MessageCircle } from "lucide-react";
-import { FaCoins } from "react-icons/fa";
-
 export default function NavBar() {
   const navigate = useNavigate();
   const { notifications } = useNotification();
