@@ -6,10 +6,16 @@ import UpdateForm from "../components/UpdateForm";
 import PasswordChangeForm from "../components/PasswordChangeForm";
 import DeleteUser from "../components/DeleteUser";
 import PrivateRoute from "../components/PrivateRoute";
+import MyPointPage from "../pages/MyPointPage";
+import PointCharge from "../pages/PointCharge";
+import TossSuccess from "../pages/TossSuccess";
+import TossFail from "../pages/TossFail";
+import TossCheckout from "../pages/TossCheckout"; // ✅ 꼭 추가해줘야 함!
 
 export default function UserRoutes() {
   return (
     <Routes>
+      {/* 홈 */}
       <Route
         path="home"
         element={
@@ -18,6 +24,8 @@ export default function UserRoutes() {
           </PrivateRoute>
         }
       />
+
+      {/* 마이페이지 */}
       <Route
         path="mypage"
         element={
@@ -26,6 +34,57 @@ export default function UserRoutes() {
           </PrivateRoute>
         }
       />
+
+      {/* 마이페이지 - 포인트 관리 */}
+      <Route
+        path="mypage/points"
+        element={
+          <PrivateRoute>
+            <MyPointPage />
+          </PrivateRoute>
+        }
+      />
+
+      {/* 포인트 충전 페이지 (코인 선택 + 모달) ✅ */}
+      <Route
+        path="mypage/points/charge"
+        element={
+          <PrivateRoute>
+            <PointCharge />
+          </PrivateRoute>
+        }
+      />
+      {/* 포인트 충전 토스 SDK 열기 */}
+      <Route
+        path="mypage/points/checkout"
+        element={
+          <PrivateRoute>
+            <TossCheckout />
+          </PrivateRoute>
+        }
+      />
+
+      {/* 포인트 충전 완료 (토스 success callback) */}
+      <Route
+        path="mypage/points/success"
+        element={
+          <PrivateRoute>
+            <TossSuccess />
+          </PrivateRoute>
+        }
+      />
+
+      {/* 포인트 충전 실패 */}
+      <Route
+        path="mypage/points/fail"
+        element={
+          <PrivateRoute>
+            <TossFail />
+          </PrivateRoute>
+        }
+      />
+
+      {/* 회원정보 수정 */}
       <Route
         path="mypage/update"
         element={
@@ -34,6 +93,8 @@ export default function UserRoutes() {
           </PrivateRoute>
         }
       />
+
+      {/* 비밀번호 변경 */}
       <Route
         path="mypage/passwordchange"
         element={
@@ -42,6 +103,8 @@ export default function UserRoutes() {
           </PrivateRoute>
         }
       />
+
+      {/* 회원탈퇴 */}
       <Route
         path="mypage/userdelete"
         element={

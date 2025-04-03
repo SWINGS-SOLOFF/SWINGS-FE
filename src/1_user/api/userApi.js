@@ -70,6 +70,35 @@ export const deleteUserWithPassword = async (password) => {
   return response.data;
 };
 
+
+//  내 포인트 잔액 조회
+export const getPointBalance = async () => {
+  const response = await axios.get("/users/me/point");
+  return response.data;
+};
+
+//  내 포인트 사용 내역 조회
+export const getPointHistory = async () => {
+  const response = await axios.get("/users/me/pointslog");
+  return response.data;
+};
+
+//  포인트 충전
+export const chargePoint = async (amount, description = "포인트 충전") => {
+  const response = await axios.post("/users/me/points/charge", null, {
+    params: { amount, description },
+  });
+  return response.data;
+};
+
+//  포인트 사용
+export const usePoint = async (amount, description = "포인트 사용") => {
+  const response = await axios.post("/users/me/points/use", null, {
+    params: { amount, description },
+  });
+  return response.data;
+};
+
 //-관리자 페이지-
 // 전체 유저 목록 조회
 export const fetchAllUsers = async () => {
@@ -96,3 +125,4 @@ export const updateUserRole = async (username, newRole) => {
   });
   return response.data;
 };
+
