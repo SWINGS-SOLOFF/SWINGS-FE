@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
-  "__dependencies_comment": "런타임에 필요한 패키지들 (UI, 통신, 유틸 등)",
+  "__dependencies_comment": "런타임에 필요한 패키지들 (UI, 통신m, 유틸 등)",
   "dependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@headlessui/react": "^2.2.0",
