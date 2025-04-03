@@ -41,6 +41,7 @@ export default function TossSuccess() {
           orderId,
           amount: parseInt(amount),
           customerId: userId,
+          createdAt: new Date().toISOString(), // ISO 8601 형식으로 보냄
         });
 
         //[콘솔] 백엔드로 정보 전송 성공

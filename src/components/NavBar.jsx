@@ -18,15 +18,6 @@ export default function NavBar() {
 
       {/* 오른쪽 아이콘들 */}
       <div className="flex items-center gap-4">
-        {/* ✅ 포인트 아이콘 */}
-        <button
-          onClick={() => navigate("/swings/mypage/points")}
-          className="text-yellow-400 hover:opacity-80 transition-colors duration-200"
-          aria-label="포인트"
-        >
-          <FaCoins className="w-6 h-6" />
-        </button>
-
         {/* 메시지 아이콘 */}
         <button
           onClick={() => navigate("/swings/messages")}

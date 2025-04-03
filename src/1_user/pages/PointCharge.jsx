@@ -31,8 +31,10 @@ export default function PointCharge() {
 
   return (
     <div className="p-6 text-center space-y-8">
-      <h1 className="text-3xl font-bold text-[#2E384D] animate-fade-in">
-        포인트 충전
+      <br />
+      <br />
+      <h1 className="text-2xl font-semibold text-[#2E384D] animate-fade-in">
+        충전소
       </h1>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 max-w-lg mx-auto">
