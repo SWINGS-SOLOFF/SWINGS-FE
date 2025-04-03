@@ -1,13 +1,21 @@
+// src/1_user/pages/MyPage.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchUserData, getPointBalance } from "../api/userapi"; // ✅ 추가
+import { fetchUserData, getPointBalance } from "../api/userapi";
 import { removeToken } from "../utils/userUtils";
-import { MessageCircle, LogOut } from "lucide-react";
+import {
+  Coins,
+  LogOut,
+  Settings,
+  KeyRound,
+  Trash2,
+  UserCircle,
+} from "lucide-react";
 
 export default function MyPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(null);
-  const [point, setPoint] = useState(null); // ✅ 포인트 상태
+  const [point, setPoint] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,8 +23,7 @@ export default function MyPage() {
       try {
         const data = await fetchUserData();
         setFormData(data);
-
-        const balance = await getPointBalance(); // ✅ 포인트 잔액 조회
+        const balance = await getPointBalance();
         setPoint(balance);
       } catch (err) {
         console.error("유저 정보 또는 포인트 불러오기 실패:", err);
@@ -40,58 +47,84 @@ export default function MyPage() {
     );
   }
 
-  if (!formData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        사용자 정보를 불러올 수 없습니다.
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm space-y-4 text-center">
-        <h2 className="text-2xl font-bold text-[#2E384D]">마이페이지</h2>
-        <p className="text-gray-500 text-sm">
-          계정 관련 기능을 이용할 수 있어요.
-        </p>
-
-        {/* ✅ 포인트 잔액 표시 */}
-        <div className="text-lg font-semibold text-green-600">
-          보유 포인트: {point?.toLocaleString() ?? 0} P
+    <div className="min-h-screen bg-gradient-to-b from-white to-slate-100 px-6 py-10">
+      <div className="max-w-md mx-auto space-y-6">
+        {/* ✅ 사용자 아바타와 인삿말 */}
+        <div className="flex flex-col items-center text-center">
+          <UserCircle className="text-gray-400" size={60} />
+          <h2 className="text-xl font-bold text-[#2E384D] mt-2">
+            안녕하세요, {formData?.username} 님!
+          </h2>
+          <p className="text-gray-500 text-sm">
+            계정 설정 및 활동을 관리하세요.
+          </p>
         </div>
 
-        <button
-          onClick={() => navigate("/swings/mypage/update")}
-          className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg"
-        >
-          회원정보 수정
-        </button>
+        {/* ✅ 포인트 카드 */}
+        <div className="bg-white rounded-xl shadow p-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Coins className="text-yellow-500" />
+            <div>
+              <p className="text-sm text-gray-500">보유 코인</p>
+              <p className="text-lg font-semibold text-green-600">
+                {point.toLocaleString()}P
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate("/swings/mypage/points")}
+            className="text-sm text-blue-600 hover:underline font-medium"
+          >
+            내역 보기
+          </button>
+        </div>
 
-        <button
-          onClick={() => navigate("/swings/mypage/passwordchange")}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg"
-        >
-          비밀번호 변경
-        </button>
+        {/* ✅ 설정 액션 버튼들 */}
+        <div className="space-y-3">
+          <ActionButton
+            icon={<Settings size={18} />}
+            text="회원정보 수정"
+            color="indigo"
+            onClick={() => navigate("/swings/mypage/update")}
+          />
+          <ActionButton
+            icon={<KeyRound size={18} />}
+            text="비밀번호 변경"
+            color="blue"
+            onClick={() => navigate("/swings/mypage/passwordchange")}
+          />
+          <ActionButton
+            icon={<Trash2 size={18} />}
+            text="회원 탈퇴"
+            color="red"
+            onClick={() => navigate("/swings/mypage/userdelete")}
+          />
+        </div>
 
-        <button
-          onClick={() => navigate("/swings/mypage/userdelete")}
-          className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg"
-        >
-          회원 탈퇴
-        </button>
-
-        <div className="border-t border-gray-200 my-4" />
-
-        <button
-          onClick={handleLogout}
-          className="text-sm text-gray-600 hover:text-red-500 flex items-center gap-1"
-        >
-          <LogOut size={16} />
-          로그아웃
-        </button>
+        {/* ✅ 로그아웃 */}
+        <div className="mt-6 text-center">
+          <button
+            onClick={handleLogout}
+            className="text-sm text-gray-500 hover:text-red-500 flex items-center justify-center gap-1"
+          >
+            <LogOut size={16} />
+            로그아웃
+          </button>
+        </div>
       </div>
     </div>
+  );
+}
+
+function ActionButton({ icon, text, color, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 bg-${color}-500 hover:bg-${color}-600 text-white font-semibold py-2 px-4 rounded-lg shadow`}
+    >
+      {icon}
+      {text}
+    </button>
   );
 }
