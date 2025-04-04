@@ -34,7 +34,7 @@ const FeedPost = ({
     // 프로필 클릭 시 해당 사용자의 프로필 페이지로 이동
     const handleProfileClick = () => {
         if (post.userId) {
-            navigate(`/profile/${post.userId}`);
+            navigate(`/swings/profile/${post.userId}`);
         }
     };
 
@@ -133,13 +133,10 @@ const FeedPost = ({
                     ref={contentRef}
                     className={`
                         text-base text-gray-800 
+                        break-words whitespace-pre-line 
                         ${!isExpanded ? 'max-h-20 overflow-hidden' : ''}
-                        relative 
-                        transition-all 
-                        duration-300 
-                        ease-in-out
-                        rounded-lg
-                        ${post.image || post.imageUrl ? 'mt-2 p-2 bg-white shadow-sm' : 'p-3 bg-white shadow-sm'}
+                        relative transition-all duration-300 ease-in-out
+                        rounded-lg mt-2 p-2 bg-white shadow-sm
                     `}
                 >
                     {post.caption || '게시물 내용이 없습니다.'}

@@ -82,93 +82,86 @@ export const FollowListModal = ({ users, onClose, title }) => {
 
 // 사용자 상세 정보 카드 컴포넌트
 const UserDetailCard = ({ user }) => {
+    const 지역맵 = {
+      SEOUL: '서울', BUSAN: '부산', DAEGU: '대구', INCHEON: '인천', GWANGJU: '광주',
+      DAEJEON: '대전', ULSAN: '울산', SEJONG: '세종', GYEONGGI: '경기', GANGWON: '강원',
+      CHUNGBUK: '충북', CHUNGNAM: '충남', JEONBUK: '전북', JEONNAM: '전남',
+      GYEONGBUK: '경북', GYEONGNAM: '경남', JEJU: '제주',
+    };
+  
+    const 골프맵 = {
+      beginner: '초보자',
+      intermediate: '중급자',
+      advanced: '고급자',
+    };
+  
     const userDetails = [
-        {
-            icon: <FaMapMarkerAlt className="text-gray-700" />,
-            label: '활동 지역',
-            value: {
-                'SEOUL': '서울',
-                'BUSAN': '부산',
-                'DAEGU': '대구',
-                'INCHEON': '인천',
-                'GWANGJU': '광주',
-                'DAEJEON': '대전',
-                'ULSAN': '울산',
-                'SEJONG': '세종',
-                'GYEONGGI': '경기',
-                'GANGWON': '강원',
-                'CHUNGBUK': '충북',
-                'CHUNGNAM': '충남',
-                'JEONBUK': '전북',
-                'JEONNAM': '전남',
-                'GYEONGBUK': '경북',
-                'GYEONGNAM': '경남',
-                'JEJU': '제주'
-            }[user.activityRegion]
-        },
-        {
-            icon: user.gender === 'male' ? <FaMale className="text-gray-700" /> : <FaFemale className="text-gray-700" />,
-            label: '성별',
-            value: user.gender === 'male' ? '남성' : '여성'
-        },
-        {
-            icon: <FaBriefcase className="text-gray-700" />,
-            label: '직업',
-            value: user.job
-        },
-        {
-            icon: <FaGolfBall className="text-gray-700" />,
-            label: '골프 실력',
-            value: {
-                'beginner': '초보자',
-                'intermediate': '중급자',
-                'advanced': '고급자'
-            }[user.golfSkill]
-        },
-        {
-            icon: <MdFavorite className="text-gray-700" />,
-            label: 'MBTI',
-            value: user.mbti
-        },
-        {
-            icon: <FaHeart className="text-gray-700" />,
-            label: '취미',
-            value: user.hobbies
-        },
-        {
-            icon: <FaSmokingBan className="text-gray-700" />,
-            label: '흡연 여부',
-            value: user.smoking === 'yes' ? '흡연' : '비흡연'
-        },
-        {
-            icon: <FaWineGlass className="text-gray-700" />,
-            label: '음주 여부',
-            value: user.drinking === 'yes' ? '음주' : '비음주'
-        }
+      {
+        icon: <FaMapMarkerAlt className="text-red-500" />,
+        label: '활동 지역',
+        value: 지역맵[user?.activityRegion] || '정보 없음',
+      },
+      {
+        icon: user?.gender === 'male'
+          ? <FaMale className="text-blue-500" />
+          : <FaFemale className="text-pink-500" />,
+        label: '성별',
+        value: user?.gender === 'male' ? '남성' : '여성',
+      },
+      {
+        icon: <FaBriefcase className="text-gray-800" />,
+        label: '직업',
+        value: user?.job || '정보 없음',
+      },
+      {
+        icon: <FaGolfBall className="text-green-500" />,
+        label: '골프 실력',
+        value: 골프맵[user?.golfSkill] || '정보 없음',
+      },
+      {
+        icon: <MdFavorite className="text-purple-500" />,
+        label: 'MBTI',
+        value: user?.mbti || '정보 없음',
+      },
+      {
+        icon: <FaHeart className="text-pink-500" />,
+        label: '취미',
+        value: user?.hobbies || '정보 없음',
+      },
+      {
+        icon: <FaSmokingBan className="text-red-400" />,
+        label: '흡연 여부',
+        value: user?.smoking === 'yes' ? '흡연' : '비흡연',
+      },
+      {
+        icon: <FaWineGlass className="text-yellow-500" />,
+        label: '음주 여부',
+        value: user?.drinking === 'yes' ? '음주' : '비음주',
+      },
     ];
-
+  
     return (
-        <div className="bg-white shadow-xl rounded-xl p-6 border border-gray-200 transition-all hover:shadow-2xl">
-            <h2 className="text-2xl font-bold text-black mb-6 border-b border-gray-200 pb-3">
-                프로필 상세 정보
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-                {userDetails.map((detail, index) => (
-                    <div
-                        key={index}
-                        className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
-                    >
-                        <div className="text-2xl">{detail.icon}</div>
-                        <div>
-                            <p className="text-sm text-gray-600">{detail.label}</p>
-                            <p className="font-semibold text-gray-800">{detail.value || '정보 없음'}</p>
-                        </div>
-                    </div>
-                ))}
+      <div className="bg-white shadow-xl rounded-xl p-6 border border-gray-200 transition-all hover:shadow-2xl">
+        <h2 className="text-2xl font-bold text-black mb-6 border-b border-gray-200 pb-3">
+          프로필 상세 정보
+        </h2>
+        <div className="grid grid-cols-2 gap-4">
+          {userDetails.map((detail, index) => (
+            <div
+              key={index}
+              className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+            >
+              <div className="text-2xl">{detail.icon}</div>
+              <div>
+                <p className="text-sm text-gray-600">{detail.label}</p>
+                <p className="font-semibold text-gray-800">{detail.value}</p>
+              </div>
             </div>
+          ))}
         </div>
+      </div>
     );
-};
+  };
 
 // 메인 SocialProfile 컴포넌트
 const SocialProfile = ({ 
