@@ -4,13 +4,19 @@ const API_BASE = 'http://localhost:8090/swings';
 const USER_API_BASE = 'http://localhost:8090/swings/users';
 
 const feedApi = {
-    // 전체 피드 가져오기
-    getFeeds: async (userId, page, size = 10) => {
-        const params = { page, size, sort: 'createdAt,desc' }; 
-        if (userId) {
+
+    // 필터 및 정렬 적용된 피드 가져오기
+    getFeeds: async (userId, page, size = 10, options = { sort: 'latest', filter: 'all' }) => {
+        const params = {
+            page,
+            size,
+            sort: options.sort,
+            filter: options.filter
+        };
+        if (userId !== null && userId !== undefined) {
             params.userId = userId;
         }
-        const response = await axios.get(`${API_BASE}/feeds`, { params });
+        const response = await axios.get(`${API_BASE}/feeds/filtered`, { params });
         return response.data;
     },
 

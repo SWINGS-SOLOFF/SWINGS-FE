@@ -13,6 +13,7 @@ import ImageModal from '../components/ImageModal';
 import LikedUsersModal from '../components/LikedUsersModal';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import FeedHeader from '../components/FeedHeader';
 
 const FeedPage = () => {
     const [user, setUser] = useState(null);
@@ -48,7 +49,8 @@ const FeedPage = () => {
     const [newPostContent, setNewPostContent] = useState('');
     const [newPostImage, setNewPostImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
-    const [sortMethod, setSortMethod] = useState('latest'); // 'latest', 'random'
+    const [sortMethod, setSortMethod] = useState('latest');
+    const [filterOption, setFilterOption] = useState('all');
 
     const containerRef = useRef(null);
     const touchStartY = useRef(0);
@@ -67,31 +69,32 @@ const FeedPage = () => {
     }, [loading, fetchingMore, hasMore]);
 
     useEffect(() => {
-        fetchInitialPosts();
-    }, [sortMethod]); // sortMethod가 변경될 때마다 피드를 다시 불러옴
+        if (userId) {
+            fetchInitialPosts();
+        }
+    }, [sortMethod, filterOption, userId]); 
 
     const fetchInitialPosts = async () => {
         try {
             setLoading(true);
-            
-            // 최신순 또는 랜덤 정렬 옵션 추가
+    
             const options = {
-                sort: sortMethod
+                sort: sortMethod,
+                filter: filterOption
             };
-            
-            // userId 파라미터를 null로 전달하여 모든 사용자의 피드를 가져옴
-            const data = await feedApi.getFeeds(null, 0, ITEMS_PER_PAGE, options);
+    
+            const data = await feedApi.getFeeds(userId, 0, ITEMS_PER_PAGE, options);
+    
             if (data.length === 0) {
                 setHasMore(false);
                 setLoading(false);
                 return;
             }
-            
-            // 랜덤 정렬인 경우 프론트엔드에서 한 번 더 무작위로 섞기
-            const sortedData = sortMethod === 'random' 
-                ? shuffleArray([...data]) 
+    
+            const sortedData = sortMethod === 'random'
+                ? shuffleArray([...data])
                 : data;
-                
+    
             const postsWithComments = await addCommentsToFeed(sortedData);
             setPosts(postsWithComments);
             setPage(1);
@@ -144,7 +147,7 @@ const FeedPage = () => {
             };
             
             // userId 파라미터를 null로 전달하여 모든 사용자의 피드를 가져옴
-            const data = await feedApi.getFeeds(null, page, ITEMS_PER_PAGE, options);
+            const data = await feedApi.getFeeds(userId, page, ITEMS_PER_PAGE, options);
             if (data.length === 0) {
                 setHasMore(false);
                 return;
@@ -179,7 +182,7 @@ const FeedPage = () => {
             };
             
             // userId 파라미터를 null로 전달하여 모든 사용자의 피드를 가져옴
-            const data = await feedApi.getFeeds(null, 0, ITEMS_PER_PAGE, options);
+            const data = await feedApi.getFeeds(userId, 0, ITEMS_PER_PAGE, options);
             if (data.length === 0) {
                 setHasMore(false);
                 return;
@@ -202,11 +205,16 @@ const FeedPage = () => {
         }
     };
 
-    // 정렬 방식 변경 함수
     const toggleSortMethod = () => {
-        const newSortMethod = sortMethod === 'latest' ? 'random' : 'latest';
-        setSortMethod(newSortMethod);
-        toast.info(`${newSortMethod === 'latest' ? '최신순' : '랜덤'} 정렬로 변경되었습니다.`);
+        const newSort = sortMethod === 'latest' ? 'random' : 'latest';
+        setSortMethod(newSort);
+        toast.info(`${newSort === 'latest' ? '최신순' : '랜덤'} 정렬로 변경되었습니다.`);
+    };
+
+    const toggleFilterOption = () => {
+        const newFilter = filterOption === 'all' ? 'followings' : 'all';
+        setFilterOption(newFilter);
+        toast.info(`${newFilter === 'all' ? '전체 피드' : '팔로잉 피드'}로 전환되었습니다.`);
     };
 
     useEffect(() => {
@@ -214,7 +222,7 @@ const FeedPage = () => {
         if (!container) return;
 
         const handleTouchStart = (e) => {
-            if (container.scrollTop <= 0) {
+            if (container.scrollTop <= 10) {
                 touchStartY.current = e.touches[0].clientY;
             }
         };
@@ -233,7 +241,7 @@ const FeedPage = () => {
         };
 
         const handleTouchEnd = () => {
-            if (isPulling && pullY > 50) {
+            if (isPulling && pullY > 40) {
                 refreshFeed();
             }
             setIsPulling(false);
@@ -442,27 +450,14 @@ const FeedPage = () => {
                 )}
 
                 {/* 새 게시물 버튼과 정렬 방식 토글 버튼 */}
-                <div className="sticky top-0 bg-gradient-to-b from-gray-50 via-gray-50 to-transparent py-4 z-20">
-                    <div className="bg-white rounded-full shadow-md p-3 flex justify-between items-center">
-                        <div className="flex items-center">
-                            <h1 className="text-xl font-bold text-gray-900 ml-3">Feed</h1>
-                            <button 
-                                onClick={toggleSortMethod}
-                                className="ml-3 text-sm bg-gray-100 px-3 py-1 rounded-full text-gray-700 hover:bg-gray-200 flex items-center"
-                            >
-                                <FaRandom className="mr-1" />
-                                {sortMethod === 'latest' ? '최신순' : '랜덤'}
-                            </button>
-                        </div>
-                        <button
-                            onClick={() => setShowNewPostForm(!showNewPostForm)}
-                            className="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition shadow-md flex items-center justify-center"
-                        >
-                            <FaPlusCircle className="text-xl" />
-                            <span className="ml-2 mr-1 font-medium hidden sm:inline">새 게시물</span>
-                        </button>
-                    </div>
-                </div>
+                <FeedHeader
+                sortMethod={sortMethod}
+                toggleSortMethod={toggleSortMethod}
+                filterOption={filterOption}
+                toggleFilterOption={toggleFilterOption}
+                showNewPostForm={showNewPostForm}
+                setShowNewPostForm={setShowNewPostForm}
+                />
 
                 {/* 모달 */}
                 <AnimatePresence>
