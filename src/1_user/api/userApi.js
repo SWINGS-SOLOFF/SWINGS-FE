@@ -52,6 +52,25 @@ export const updateUserInfo = async (username, updatedFields) => {
   return response.data;
 };
 
+//프로필 사진 수정하기
+export const updateProfileImage = async (imageFile) => {
+  const formData = new FormData();
+  formData.append("image", imageFile); // 여기 key는 반드시 'image'
+
+  const response = await axios.patch("/users/me/profile-image", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  // 응답 상태 확인
+  if (response.status !== 200) {
+    throw new Error("이미지 업로드 실패");
+  }
+
+  return response.data;
+};
+
 /**
  * 비밀번호 변경 요청
  * @param {string} username
