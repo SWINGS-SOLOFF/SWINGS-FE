@@ -117,14 +117,7 @@ export default function UserRoutes() {
       />
 
       {/* 비밀번호 찾기 */}
-      <Route
-        path="/find-password"
-        element={
-          <PrivateRoute>
-            <FindPassword />
-          </PrivateRoute>
-        }
-      />
+      <Route path="/find-password" element={<FindPassword />} />
     </Routes>
   );
 }

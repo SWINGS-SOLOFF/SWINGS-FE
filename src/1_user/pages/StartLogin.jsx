@@ -1,17 +1,24 @@
+// src/1_user/pages/StartLogin.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { loginRequest } from "../api/userapi";
+import { loginRequest, googleLoginRequest } from "../api/userApi";
 import { saveToken } from "../utils/userUtils";
 import { motion } from "framer-motion";
-import { LinkIcon } from "@heroicons/react/24/outline";
 import { jwtDecode } from "jwt-decode";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function StartLogin() {
-  const [formData, setFormData] = useState({ username: "", password: "" });
-  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  const [formData, setFormData] = useState({
+    username: localStorage.getItem("savedUsername") || "",
+    password: "",
+  });
+
+  const [saveId, setSaveId] = useState(!!localStorage.getItem("savedUsername"));
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,20 +29,37 @@ export default function StartLogin() {
       login(accessToken);
       saveToken(accessToken);
 
-      // ✅ 토큰에서 role 추출
       const decoded = jwtDecode(accessToken);
       const role = decoded.role;
 
-      alert("로그인 성공!");
+      if (saveId) localStorage.setItem("savedUsername", formData.username);
+      else localStorage.removeItem("savedUsername");
 
-      // ✅ role에 따라 페이지 분기
-      if (role === "admin") {
-        navigate("/swings/admin");
-      } else {
-        navigate("/swings/home");
-      }
+      alert("로그인 성공!");
+      navigate(role === "admin" ? "/swings/admin" : "/swings/home");
     } catch (error) {
       setErrorMessage(error.message || "로그인 중 오류 발생");
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const idToken = credentialResponse.credential;
+      const result = await googleLoginRequest(idToken);
+
+      if (result.accessToken) {
+        login(result.accessToken);
+        saveToken(result.accessToken);
+        const decoded = jwtDecode(result.accessToken);
+        navigate(decoded.role === "admin" ? "/swings/admin" : "/swings/home");
+      } else if (result.isNew) {
+        navigate("/swings/signup", {
+          state: { email: result.email, name: result.name },
+        });
+      }
+    } catch (err) {
+      console.error("Google 로그인 실패", err);
+      setErrorMessage("Google 로그인 실패");
     }
   };
 
@@ -51,39 +75,42 @@ export default function StartLogin() {
         <p className="text-gray-500 animate-bounce">나랑 골프치러 갈래?</p>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-left">
-          <div>
-            <label className="block text-sm mb-1 text-gray-700">아이디</label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
-              placeholder="SWINGS_ID"
-              value={formData.username}
-              onChange={(e) =>
-                setFormData({ ...formData, username: e.target.value })
-              }
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="아이디"
+            className="w-full border p-2 rounded text-black"
+            value={formData.username}
+            onChange={(e) =>
+              setFormData({ ...formData, username: e.target.value })
+            }
+          />
+          <input
+            type="password"
+            placeholder="비밀번호"
+            className="w-full border p-2 rounded text-black"
+            value={formData.password}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+          />
 
-          <div>
-            <label className="block text-sm mb-1 text-gray-700">비밀번호</label>
-            <input
-              type="password"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
-              placeholder="••••"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-            />
-            <div className="text-right text-sm mt-1">
-              <button
-                type="button"
-                className="text-blue-500 hover:underline"
-                onClick={() => navigate("/swings/find-password")}
-              >
-                비밀번호 찾기
-              </button>
-            </div>
+          <div className="flex justify-between items-center text-sm text-gray-600 mt-1">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={saveId}
+                onChange={(e) => setSaveId(e.target.checked)}
+                className="mr-2"
+              />
+              아이디 저장
+            </label>
+            <button
+              type="button"
+              className="text-blue-500 hover:underline"
+              onClick={() => navigate("/swings/find-password")}
+            >
+              비밀번호 찾기
+            </button>
           </div>
 
           {errorMessage && (
@@ -104,17 +131,14 @@ export default function StartLogin() {
           <div className="flex-grow h-px bg-gray-300" />
         </div>
 
-        <button
-          onClick={() => alert("구글 로그인은 준비 중입니다.")}
-          className="w-full flex justify-center items-center gap-2 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-100"
-        >
-          <LinkIcon className="w-5 h-5 text-gray-500" />
-          <span>Google로 로그인</span>
-        </button>
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={() => setErrorMessage("Google 로그인 실패")}
+        />
 
         <button
           onClick={() => navigate("/swings/signup")}
-          className="w-full flex justify-center items-center bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 rounded-lg"
+          className="w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 rounded-lg"
         >
           회원가입
         </button>

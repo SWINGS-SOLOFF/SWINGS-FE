@@ -1,8 +1,21 @@
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; // ✅ 추가
 import { checkUsername } from "../api/userApi";
-import { useState } from "react";
 
 export default function SignupStep1({ formData, updateData }) {
   const [usernameCheck, setUsernameCheck] = useState("");
+  const location = useLocation(); // ✅
+
+  // ✅ 처음 렌더링 시 Google로 받은 이메일 자동 입력
+  useEffect(() => {
+    const state = location.state;
+    if (state?.email && !formData.email) {
+      updateData({ email: state.email });
+    }
+    if (state?.name && !formData.name) {
+      updateData({ name: state.name });
+    }
+  }, [location.state, formData.email, formData.name, updateData]);
 
   const handleUsernameCheck = async () => {
     if (!formData.username) {
@@ -59,8 +72,7 @@ export default function SignupStep1({ formData, updateData }) {
       <input
         type="email"
         placeholder="이메일"
-        className="w-full border p-2 rounded
-        text-black"
+        className="w-full border p-2 rounded text-black"
         value={formData.email || ""}
         onChange={(e) => updateData({ email: e.target.value })}
       />
