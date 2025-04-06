@@ -79,7 +79,7 @@ export default function StartLogin() {
               <button
                 type="button"
                 className="text-blue-500 hover:underline"
-                onClick={() => alert("비밀번호 찾기 기능은 준비 중입니다.")}
+                onClick={() => navigate("/swings/find-password")}
               >
                 비밀번호 찾기
               </button>

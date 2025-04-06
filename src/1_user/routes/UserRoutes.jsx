@@ -10,7 +10,9 @@ import MyPointPage from "../pages/MyPointPage";
 import PointCharge from "../pages/PointCharge";
 import TossSuccess from "../pages/TossSuccess";
 import TossFail from "../pages/TossFail";
-import TossCheckout from "../pages/TossCheckout"; // ✅ 꼭 추가해줘야 함!
+import TossCheckout from "../pages/TossCheckout";
+
+import FindPassword from "../pages/FindPassword";
 
 export default function UserRoutes() {
   return (
@@ -110,6 +112,16 @@ export default function UserRoutes() {
         element={
           <PrivateRoute>
             <DeleteUser />
+          </PrivateRoute>
+        }
+      />
+
+      {/* 비밀번호 찾기 */}
+      <Route
+        path="/find-password"
+        element={
+          <PrivateRoute>
+            <FindPassword />
           </PrivateRoute>
         }
       />

@@ -99,6 +99,13 @@ export const usePoint = async (amount, description = "포인트 사용") => {
   return response.data;
 };
 
+
+// 비밀번호 찾기 및 재설정
+export const resetPassword = (username) => {
+  return axios.post('/users/reset-password', { username });
+};
+
+
 //-관리자 페이지-
 // 전체 유저 목록 조회
 export const fetchAllUsers = async () => {
@@ -125,4 +132,5 @@ export const updateUserRole = async (username, newRole) => {
   });
   return response.data;
 };
+
 
