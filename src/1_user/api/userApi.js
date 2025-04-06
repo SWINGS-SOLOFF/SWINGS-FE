@@ -70,7 +70,6 @@ export const deleteUserWithPassword = async (password) => {
   return response.data;
 };
 
-
 //  내 포인트 잔액 조회
 export const getPointBalance = async () => {
   const response = await axios.get("/users/me/point");
@@ -99,12 +98,18 @@ export const usePoint = async (amount, description = "포인트 사용") => {
   return response.data;
 };
 
-
 // 비밀번호 찾기 및 재설정
 export const resetPassword = (username) => {
-  return axios.post('/users/reset-password', { username });
+  return axios.post("/users/reset-password", { username });
 };
 
+//  Google 로그인 요청 함수 추가
+export const googleLoginRequest = async (idToken) => {
+  const response = await axios.post("/auth/oauth/google", {
+    idToken,
+  });
+  return response.data; // accessToken 또는 { email, name, isNew: true }
+};
 
 //-관리자 페이지-
 // 전체 유저 목록 조회
@@ -132,5 +137,3 @@ export const updateUserRole = async (username, newRole) => {
   });
   return response.data;
 };
-
-
