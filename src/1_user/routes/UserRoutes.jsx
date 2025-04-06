@@ -13,6 +13,8 @@ import TossFail from "../pages/TossFail";
 import TossCheckout from "../pages/TossCheckout";
 
 import FindPassword from "../pages/FindPassword";
+import ProfileImageUploader from "../components/ProfileImageUploader";
+import ProfileImage from "../pages/ProfileImage";
 
 export default function UserRoutes() {
   return (
@@ -33,6 +35,15 @@ export default function UserRoutes() {
         element={
           <PrivateRoute>
             <MyPage />
+          </PrivateRoute>
+        }
+      />
+      {/* 프로필 사진 수정 */}
+      <Route
+        path="mypage/profileImage"
+        element={
+          <PrivateRoute>
+            <ProfileImage />
           </PrivateRoute>
         }
       />
