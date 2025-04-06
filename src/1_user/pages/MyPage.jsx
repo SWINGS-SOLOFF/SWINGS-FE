@@ -1,4 +1,3 @@
-// src/1_user/pages/MyPage.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchUserData, getPointBalance } from "../api/userapi";
@@ -10,6 +9,7 @@ import {
   KeyRound,
   Trash2,
   UserCircle,
+  ImageIcon,
 } from "lucide-react";
 
 export default function MyPage() {
@@ -52,7 +52,15 @@ export default function MyPage() {
       <div className="max-w-md mx-auto space-y-6">
         {/* ✅ 사용자 아바타와 인삿말 */}
         <div className="flex flex-col items-center text-center">
-          <UserCircle className="text-gray-400" size={60} />
+          {formData?.userImg ? (
+            <img
+              src={`C:/uploads/${formData.userImg}`} // 서버에서 이미지 경로 받아오기
+              alt="프로필"
+              className="w-24 h-24 object-cover rounded-full border border-gray-300"
+            />
+          ) : (
+            <UserCircle className="text-gray-400" size={60} />
+          )}
           <h2 className="text-xl font-bold text-[#2E384D] mt-2">
             안녕하세요, {formData?.username} 님!
           </h2>
@@ -88,6 +96,14 @@ export default function MyPage() {
             color="green"
             onClick={() => navigate("/swings/mypage/update")}
           />
+
+          <ActionButton
+            icon={<ImageIcon size={18} />}
+            text="프로필 사진 수정"
+            color="yellow"
+            onClick={() => navigate("/swings/mypage/profileImage")}
+          />
+
           <ActionButton
             icon={<KeyRound size={18} />}
             text="비밀번호 변경"
