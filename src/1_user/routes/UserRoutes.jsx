@@ -1,6 +1,5 @@
 // src/1_user/routes/UserRoutes.jsx
 import { Routes, Route } from "react-router-dom";
-import Home from "../pages/Home";
 import MyPage from "../pages/MyPage";
 import UpdateForm from "../components/UpdateForm";
 import PasswordChangeForm from "../components/PasswordChangeForm";
@@ -13,7 +12,6 @@ import TossFail from "../pages/TossFail";
 import TossCheckout from "../pages/TossCheckout";
 
 import FindPassword from "../pages/FindPassword";
-import ProfileImageUploader from "../components/ProfileImageUploader";
 import ProfileImage from "../pages/ProfileImage";
 import FeedPage from "../../2_feed/pages/FeedPage";
 
