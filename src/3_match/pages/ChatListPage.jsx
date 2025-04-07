@@ -3,7 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { MessageCircle } from "lucide-react";
 import dayjs from "dayjs";
-import { fetchUserData } from "../../1_user/api/userApi"; // ✅ 로그인 유저 정보 불러오기
+import { fetchUserData } from "../../1_user/api/userApi";
+import { motion } from "framer-motion";
 
 const BASE_URL = "http://localhost:8090/swings";
 
@@ -39,40 +40,62 @@ const ChatListPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 text-gray-900">
+        <div className="min-h-screen bg-gradient-to-b from-white via-slate-100 to-white text-gray-900 pt-16 pb-20">
             {/* ✅ 상단 헤더 */}
-            <div className="flex justify-between items-center px-4 py-3 border-b border-zinc-700">
-                <h1 className="text-xl font-bold">SWINGS</h1>
-                <MessageCircle size={24} />
+            <div className="px-4 pb-3 sticky top-0 bg-white z-10 border-b border-gray-200 shadow-sm flex justify-between items-center">
+                <h1 className="text-xl font-bold">채팅 목록</h1>
             </div>
 
             {/* ✅ 채팅방 목록 */}
-            <div className="divide-y divide-gray-300">
+            <div className="divide-y divide-gray-200">
                 {chatRooms.length === 0 ? (
-                    <p className="text-center py-10 text-gray-400">채팅방이 없습니다</p>
+                    <p className="text-center py-10 text-gray-400 animate-pulse">채팅방이 없습니다</p>
                 ) : (
-                    chatRooms.map((room) => (
-                        <div
-                            key={room.roomId}
-                            className="px-4 py-3 hover:bg-zinc-800 cursor-pointer"
-                            onClick={() => navigate(`/swings/chat/${room.roomId}`)}
-                        >
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <p className="font-medium">
-                                        {/* 내 아이디가 user1이면 상대방은 user2 */}
-                                        {room.user1 === currentUser.username ? room.user2 : room.user1}
-                                    </p>
-                                    <p className="text-sm text-gray-400">마지막 메시지 미지원</p>
+                    chatRooms.map((room, idx) => {
+                        const targetUser = room.user1 === currentUser.username ? room.user2 : room.user1;
+                        const lastMessageTime = room.lastMessageTime
+                            ? dayjs(room.lastMessageTime).format("HH:mm")
+                            : "";
+                        const unread = room.unreadCount || 0;
+
+                        return (
+                            <motion.div
+                                key={room.roomId}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.05 }}
+                                className="px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                                onClick={() => navigate(`/swings/chat/${room.roomId}`)}
+                            >
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <p className="font-medium text-gray-800">{targetUser}</p>
+                                        <p className="text-sm text-gray-600 truncate max-w-[250px]">
+                                            {room.lastMessage || "아직 메시지가 없습니다."}
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-xs text-gray-500">{lastMessageTime}</span>
+                                        {unread > 0 && (
+                                            <span className="bg-red-500 text-white text-[11px] font-bold rounded-full px-2 mt-1">
+                                                {unread}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                                <span className="text-xs text-gray-500">
-                                    {dayjs(room.createdAt).format("HH:mm")}
-                                </span>
-                            </div>
-                        </div>
-                    ))
+                            </motion.div>
+                        );
+                    })
                 )}
             </div>
+
+            {/* ✅ 내가 보낸 하트 버튼 */}
+            <button
+                onClick={() => navigate("/swings/chat/sent")}
+                className="fixed bottom-24 right-6 bg-pink-500 text-white p-4 rounded-full shadow-lg hover:bg-pink-600 transition-all"
+            >
+                ❤️
+            </button>
         </div>
     );
 };

@@ -6,10 +6,10 @@ import { MessageCircleHeart, ArrowLeft } from "lucide-react";
 import { fetchRecommendedProfiles, sendLike } from "../api/matchApi";
 import { fetchUserData } from "../../1_user/api/userApi";
 import { useNavigate } from "react-router-dom";
-import { Toaster, toast } from "react-hot-toast"; // ✅ 추가된 라이브러리
+import { Toaster, toast } from "react-hot-toast";
 
 const BASE_URL = "http://localhost:8090/swings";
-const token = localStorage.getItem("accessToken");
+const token = sessionStorage.getItem("token"); // ✅ localStorage → sessionStorage로 변경
 
 function SwipePage() {
     const [currentUser, setCurrentUser] = useState(null);
@@ -77,9 +77,47 @@ function SwipePage() {
             });
     };
 
-    const handleSuperChat = () => {
-        if (!profile) return;
-        alert("🚀 슈퍼챗 기능은 유료입니다! (추후 연결 예정)");
+    const handleSuperChat = async () => {
+        if (!profile || !currentUser) return;
+
+        try {
+            const fromUsername = currentUser.username;
+            const toUsername = profile.username;
+
+            // ✅ 1. 포인트 차감
+            await axios.post(`${BASE_URL}/users/me/points/use`, null, {
+                params: {
+                    amount: 1,
+                    description: "슈퍼챗 사용"
+                },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            toast.success("1코인을 사용하였습니다 🎉");
+
+            // ✅ 2. 채팅방 생성
+            await axios.post(`${BASE_URL}/api/chat/room`, null, {
+                params: {
+                    user1: fromUsername,
+                    user2: toUsername
+                },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            toast.success("채팅방이 생성되었습니다 💬");
+
+
+        } catch (error) {
+            if (error.response?.status === 400) {
+                toast.error("코인이 부족합니다 🥲");
+            } else if (error.response?.status === 401 || error.response?.status === 403) {
+                toast.error("로그인이 필요합니다");
+                navigate("/swings/login");
+            } else {
+                toast.error("슈퍼챗 도중 오류가 발생했습니다");
+                console.error("❌ 슈퍼챗 오류:", error);
+            }
+        }
     };
 
     if (!currentUser) {
@@ -92,7 +130,7 @@ function SwipePage() {
 
     return (
         <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-pink-200 via-blue-200 to-green-100 px-4 pt-10">
-            <Toaster /> {/* ✅ Toast 메시지를 띄우기 위한 컴포넌트 */}
+            <Toaster />
 
             <div className="absolute top-4 left-4">
                 <button
@@ -104,7 +142,7 @@ function SwipePage() {
             </div>
 
             <h2 className="text-2xl font-bold text-gray-800 animate-bounce mb-4">
-                🎯 오늘의 골프 파트너 추천
+                💘 오늘의 골프 메이트 추천!
             </h2>
 
             <div className="relative w-[320px] h-[480px] mb-6">
