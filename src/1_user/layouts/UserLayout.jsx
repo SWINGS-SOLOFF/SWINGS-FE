@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import NavBar from "../../components/NavBar";
+import NavBar from "../../components/TopNavBar";
 import BottomNavBar from "../../components/BottomNavBar";
 
 // ✅ 숨길 경로 목록 설정

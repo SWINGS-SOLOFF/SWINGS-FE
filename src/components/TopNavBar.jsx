@@ -13,20 +13,13 @@ export default function NavBar() {
   return (
     <header className="w-full bg-white border-b border-gray-200 shadow-sm px-4 py-4 flex justify-between items-center fixed top-0 z-50">
       <Link
-        to="/swings/home"
+        to="/swings/feed"
         className="text-xl font-bold text-[#2E384D] hover:opacity-80"
       >
         SWINGS
       </Link>
 
       <div className="flex items-center space-x-4 relative">
-        <button
-          onClick={() => navigate("/swings/chat")}
-          className="text-[#2E384D] hover:opacity-80"
-        >
-          <MessageCircle size={24} />
-        </button>
-
         {/* 알림 아이콘 + 드롭다운 */}
         <div
           className="relative"
