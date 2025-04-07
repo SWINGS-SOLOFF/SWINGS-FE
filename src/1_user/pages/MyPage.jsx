@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchUserData, getPointBalance } from "../api/userapi";
+import {
+  fetchUserData,
+  getPointBalance,
+  getProfileImageUrl,
+} from "../api/userApi";
 import { removeToken } from "../utils/userUtils";
 import {
   Coins,
@@ -54,7 +58,7 @@ export default function MyPage() {
         <div className="flex flex-col items-center text-center">
           {formData?.userImg ? (
             <img
-              src={`C:/uploads/${formData.userImg}`} // 서버에서 이미지 경로 받아오기
+              src={getProfileImageUrl(formData.userImg)}
               alt="프로필"
               className="w-24 h-24 object-cover rounded-full border border-gray-300"
             />

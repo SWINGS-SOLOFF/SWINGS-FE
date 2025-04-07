@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "../api/axiosInstance";
-import { fetchUserData } from "../api/userapi";
+import { fetchUserData } from "../api/userApi";
 
 export default function TossSuccess() {
   const [searchParams] = useSearchParams();
