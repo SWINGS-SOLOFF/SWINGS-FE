@@ -12,6 +12,7 @@ import MatchGroupRoutes from "./4_matchgroup/routes/MatchGroupRoutes.jsx";
 import NotificationRoutes from "./5_notification/routes/NotificationRoutes.jsx";
 import SocialRoutes from "./2_feed/routes/SocialRoutes";
 import SocialPage from "./2_feed/pages/SocialPage";
+import MyPage from "./1_user/pages/MyPage";
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="notification/*" element={<NotificationRoutes />} />
         <Route path="profile/:userId" element={<SocialPage />} />
         <Route path="*" element={<UserRoutes />} />
+        <Route path="mypage" element={<MyPage />} />
       </Route>
     </Routes>
   );
