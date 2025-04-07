@@ -52,79 +52,83 @@ export default function MyPage() {
   }
 
   return (
-    <div className="bg-gradient-to-b from-white to-slate-100 px-4 py-8">
-      <div className="max-w-md mx-auto space-y-6">
-        {/* ✅ 사용자 아바타와 인삿말 */}
+    <div className="bg-gradient-to-b from-white to-slate-100 px-4 py-8 min-h-screen">
+      <div className="max-w-md mx-auto space-y-8">
+        {/* ✅ 프로필 섹션 */}
         <div className="flex flex-col items-center text-center">
           {formData?.userImg ? (
             <img
               src={getProfileImageUrl(formData.userImg)}
               alt="프로필"
-              className="w-24 h-24 object-cover rounded-full border border-gray-300 shadow-sm"
+              className="w-24 h-24 object-cover rounded-full border border-gray-300 shadow-md"
             />
           ) : (
-            <UserCircle className="text-gray-400" size={60} />
+            <UserCircle className="text-gray-400" size={64} />
           )}
-          <h2 className="text-lg font-bold text-[#2E384D] mt-3">
+          <h2 className="text-xl font-bold text-gray-800 mt-3">
             안녕하세요, {formData?.username} 님!
           </h2>
-          <p className="text-gray-500 text-sm">
+          <p className="text-sm text-gray-500">
             계정 설정 및 활동을 관리하세요.
           </p>
         </div>
 
-        {/* ✅ 포인트 카드 */}
-        <div className="bg-white rounded-xl shadow p-4 flex items-center justify-between">
+        {/* ✅ 포인트 */}
+        <div className="bg-white rounded-xl shadow-md px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Coins className="text-yellow-500" />
             <div>
               <p className="text-sm text-gray-500">보유 코인</p>
-              <p className="text-lg font-semibold text-green-600">
+              <p className="text-xl font-bold text-green-600">
                 {point.toLocaleString()}P
               </p>
             </div>
           </div>
           <button
             onClick={() => navigate("/swings/mypage/points")}
-            className="text-sm text-blue-600 hover:underline font-medium"
+            className="text-sm text-blue-600 hover:underline"
           >
             내역 보기
           </button>
         </div>
 
-        {/* ✅ 설정 액션 버튼들 */}
-        <div className="space-y-3">
-          <ActionButton
-            icon={<Settings size={18} />}
+        {/* ✅ 액션 버튼들 */}
+        <div className="grid gap-3">
+          <ActionCard
+            icon={<Settings size={20} />}
             text="회원정보 수정"
-            color="green"
+            bg="bg-green-100"
+            textColor="text-green-700"
             onClick={() => navigate("/swings/mypage/update")}
           />
-          <ActionButton
-            icon={<ImageIcon size={18} />}
+          <ActionCard
+            icon={<ImageIcon size={20} />}
             text="프로필 사진 수정"
-            color="yellow"
+            bg="bg-yellow-100"
+            textColor="text-yellow-700"
             onClick={() => navigate("/swings/mypage/profileImage")}
           />
-          <ActionButton
-            icon={<KeyRound size={18} />}
+          <ActionCard
+            icon={<KeyRound size={20} />}
             text="비밀번호 변경"
-            color="blue"
+            bg="bg-blue-100"
+            textColor="text-blue-700"
             onClick={() => navigate("/swings/mypage/passwordchange")}
           />
-          <ActionButton
-            icon={<Trash2 size={18} />}
+          <ActionCard
+            icon={<Trash2 size={20} />}
             text="회원 탈퇴"
-            color="red"
+            bg="bg-red-100"
+            textColor="text-red-700"
             onClick={() => navigate("/swings/mypage/userdelete")}
           />
         </div>
 
         {/* ✅ 로그아웃 */}
-        <div className="mt-6 text-center">
+        <div className="text-center pt-2">
           <button
             onClick={handleLogout}
-            className="text-sm text-gray-500 hover:text-red-500 flex items-center justify-center gap-1"
+            className="text-sm text-gray-400 hover:text-red-500 flex items-center justify-center gap-1 transition"
           >
             <LogOut size={16} />
             로그아웃
@@ -135,15 +139,14 @@ export default function MyPage() {
   );
 }
 
-// ✅ 색상 이름 그대로 Tailwind 클래스 지정
-function ActionButton({ icon, text, color, onClick }) {
+function ActionCard({ icon, text, bg, textColor, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 bg-${color}-500 hover:bg-${color}-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition`}
+      className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl ${bg} ${textColor} font-semibold shadow hover:shadow-md hover:scale-[1.01] transition-all duration-200`}
     >
       {icon}
-      {text}
+      <span>{text}</span>
     </button>
   );
 }
