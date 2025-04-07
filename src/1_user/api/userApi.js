@@ -52,10 +52,18 @@ export const updateUserInfo = async (username, updatedFields) => {
   return response.data;
 };
 
-//프로필 사진 수정하기
+// 프로필 이미지 가져오기
+export const getProfileImageUrl = (filename) => {
+  if (!filename) return null;
+  const baseUrl =
+    import.meta.env.VITE_API_BASE || "http://localhost:8090/swings";
+  return `${baseUrl}/users/me/profile-image/${filename}`;
+};
+
+// 프로필 이미지 수정
 export const updateProfileImage = async (imageFile) => {
   const formData = new FormData();
-  formData.append("image", imageFile); // 여기 key는 반드시 'image'
+  formData.append("image", imageFile);
 
   const response = await axios.patch("/users/me/profile-image", formData, {
     headers: {
@@ -63,7 +71,6 @@ export const updateProfileImage = async (imageFile) => {
     },
   });
 
-  // 응답 상태 확인
   if (response.status !== 200) {
     throw new Error("이미지 업로드 실패");
   }

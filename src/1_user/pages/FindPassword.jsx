@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { resetPassword } from "../api/userapi";
+import { resetPassword } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
