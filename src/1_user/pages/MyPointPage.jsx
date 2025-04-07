@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getPointBalance, getPointHistory } from "../api/userapi";
+import { getPointBalance, getPointHistory } from "../api/userApi";
 import { Coins } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatKoreanDate } from "../utils/userUtils";

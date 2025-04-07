@@ -1,7 +1,10 @@
-// src/1_user/pages/MyPage.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchUserData, getPointBalance } from "../api/userapi";
+import {
+  fetchUserData,
+  getPointBalance,
+  getProfileImageUrl,
+} from "../api/userApi";
 import { removeToken } from "../utils/userUtils";
 import {
   Coins,
@@ -10,6 +13,7 @@ import {
   KeyRound,
   Trash2,
   UserCircle,
+  ImageIcon,
 } from "lucide-react";
 
 export default function MyPage() {
@@ -41,19 +45,27 @@ export default function MyPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
+      <div className="flex items-center justify-center text-gray-500 h-[calc(100vh-128px)]">
         로딩 중...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-slate-100 px-6 py-10">
+    <div className="bg-gradient-to-b from-white to-slate-100 px-4 py-8">
       <div className="max-w-md mx-auto space-y-6">
         {/* ✅ 사용자 아바타와 인삿말 */}
         <div className="flex flex-col items-center text-center">
-          <UserCircle className="text-gray-400" size={60} />
-          <h2 className="text-xl font-bold text-[#2E384D] mt-2">
+          {formData?.userImg ? (
+            <img
+              src={getProfileImageUrl(formData.userImg)}
+              alt="프로필"
+              className="w-24 h-24 object-cover rounded-full border border-gray-300 shadow-sm"
+            />
+          ) : (
+            <UserCircle className="text-gray-400" size={60} />
+          )}
+          <h2 className="text-lg font-bold text-[#2E384D] mt-3">
             안녕하세요, {formData?.username} 님!
           </h2>
           <p className="text-gray-500 text-sm">
@@ -62,7 +74,7 @@ export default function MyPage() {
         </div>
 
         {/* ✅ 포인트 카드 */}
-        <div className="bg-white rounded-xl shadow p-5 flex items-center justify-between">
+        <div className="bg-white rounded-xl shadow p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Coins className="text-yellow-500" />
             <div>
@@ -85,8 +97,14 @@ export default function MyPage() {
           <ActionButton
             icon={<Settings size={18} />}
             text="회원정보 수정"
-            color="indigo"
+            color="green"
             onClick={() => navigate("/swings/mypage/update")}
+          />
+          <ActionButton
+            icon={<ImageIcon size={18} />}
+            text="프로필 사진 수정"
+            color="yellow"
+            onClick={() => navigate("/swings/mypage/profileImage")}
           />
           <ActionButton
             icon={<KeyRound size={18} />}
@@ -117,11 +135,12 @@ export default function MyPage() {
   );
 }
 
+// ✅ 색상 이름 그대로 Tailwind 클래스 지정
 function ActionButton({ icon, text, color, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 bg-${color}-500 hover:bg-${color}-600 text-white font-semibold py-2 px-4 rounded-lg shadow`}
+      className={`w-full flex items-center gap-3 bg-${color}-500 hover:bg-${color}-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition`}
     >
       {icon}
       {text}
