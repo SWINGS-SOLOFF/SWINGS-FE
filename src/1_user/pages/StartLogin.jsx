@@ -36,7 +36,7 @@ export default function StartLogin() {
       else localStorage.removeItem("savedUsername");
 
       alert("로그인 성공!");
-      navigate(role === "admin" ? "/swings/admin" : "/swings/home");
+      navigate(role === "admin" ? "/swings/admin" : "/swings/feed");
     } catch (error) {
       setErrorMessage(error.message || "로그인 중 오류 발생");
     }
@@ -51,7 +51,7 @@ export default function StartLogin() {
         login(result.accessToken);
         saveToken(result.accessToken);
         const decoded = jwtDecode(result.accessToken);
-        navigate(decoded.role === "admin" ? "/swings/admin" : "/swings/home");
+        navigate(decoded.role === "admin" ? "/swings/admin" : "/swings/feed");
       } else if (result.isNew) {
         navigate("/swings/signup", {
           state: { email: result.email, name: result.name },

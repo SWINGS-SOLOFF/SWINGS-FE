@@ -1,19 +1,19 @@
 // src/components/BottomNavBar.jsx
 import { Link, useLocation } from "react-router-dom";
 import {
-  Home,
-  UserPlus,
-  Users,
-  Newspaper,
-  User,
-} from "lucide-react"; // lucide 아이콘
+  Handshake,
+  HeartHandshake,
+  LayoutGrid,
+  MessageCircle,
+  CircleUser,
+} from "lucide-react";
 
 const navItems = [
-  { to: "/swings/home", label: "홈", icon: <Home size={20} /> },
-  { to: "/swings/matchgroup", label: "조인", icon: <UserPlus size={20} /> },
-  { to: "/swings/match", label: "메이트", icon: <Users size={20} /> },
-  { to: "/swings/feed", label: "피드", icon: <Newspaper size={20} /> },
-  { to: "/swings/social", label: "마이페이지", icon: <User size={20} /> },
+  { to: "/swings/matchgroup", label: "조인", icon: <Handshake size={20} /> },
+  { to: "/swings/match", label: "소개팅", icon: <HeartHandshake size={20} /> },
+  { to: "/swings/feed", label: "피드", icon: <LayoutGrid size={20} /> },
+  { to: "/swings/chat", label: "채팅", icon: <MessageCircle size={20} /> },
+  { to: "/swings/social", label: "마이페이지", icon: <CircleUser size={20} /> },
 ];
 
 export default function BottomNavBar() {
