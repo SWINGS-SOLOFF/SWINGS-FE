@@ -4,7 +4,7 @@ import App from "./App.jsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./1_user/context/AuthContext.jsx";
-import { NotificationProvider } from "./5_notification/context/NotificationContext.jsx";
+import { NotificationProvider } from "./5_notification/context/NotificationProvider.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google"; // ✅ 추가
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
