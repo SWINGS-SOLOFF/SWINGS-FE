@@ -1,4 +1,5 @@
 // src/1_user/utils/paymentUtils.js
+import { useNavigate } from "react-router-dom";
 
 const COIN_UNIT_PRICE = 1000;
 
@@ -20,4 +21,35 @@ export const requestTossPayment = ({ clientKey, coin, userId }) => {
     failUrl: `${window.location.origin}/swings/mypage/points/fail`,
     customerName: String(userId),
   });
+};
+
+/**
+ * Toss 결제 리디렉션 처리 함수
+ * @param {Object} options
+ * @param {string} options.coin
+ * @param {Function} options.navigate
+ * @param {Function} options.onClose
+ * @param {boolean} options.redirectToCheckout
+ */
+export const handleTossPayment = ({
+  coin,
+  navigate,
+  onClose,
+  redirectToCheckout,
+}) => {
+  if (redirectToCheckout) {
+    navigate(`/swings/mypage/points/checkout?coin=${coin}`);
+  } else {
+    // TODO: 직접 결제 방식 추가 예정
+  }
+  onClose();
+};
+
+/**
+ * 카카오페이 결제 처리 (예정)
+ * @param {Function} onClose
+ */
+export const handleKakaoPayment = (onClose) => {
+  alert("카카오페이 연동 예정입니다.");
+  onClose();
 };
