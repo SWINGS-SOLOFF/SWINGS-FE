@@ -1,4 +1,3 @@
-// src/layouts/UserLayout.jsx
 import { Outlet, useLocation } from "react-router-dom";
 import NavBar from "../../components/NavBar";
 import BottomNavBar from "../../components/BottomNavBar";
@@ -16,14 +15,19 @@ export default function UserLayout() {
 
   return (
     <div className="flex flex-col min-h-screen w-full">
-      {/* ✅ NavBar는 조건부 렌더링 */}
+      {/* ✅ 상단 고정 NavBar */}
       {!hideNavBar && <NavBar />}
 
-      <main className="flex-grow pb-16">
+      {/* ✅ 본문 영역 - NavBar/BottomNavBar 고려한 padding, 스크롤 가능 */}
+      <main
+        className={`flex-grow overflow-y-auto px-4 ${
+          !hideNavBar ? "pt-16" : ""
+        } ${!hideBottomBar ? "pb-16" : ""}`}
+      >
         <Outlet />
       </main>
 
-      {/* ✅ BottomNavBar도 조건부 렌더링 */}
+      {/* ✅ 하단 고정 BottomNavBar */}
       {!hideBottomBar && <BottomNavBar />}
     </div>
   );

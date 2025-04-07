@@ -52,6 +52,32 @@ export const updateUserInfo = async (username, updatedFields) => {
   return response.data;
 };
 
+// 프로필 이미지 가져오기
+export const getProfileImageUrl = (filename) => {
+  if (!filename) return null;
+  const baseUrl =
+    import.meta.env.VITE_API_BASE || "http://localhost:8090/swings";
+  return `${baseUrl}/users/me/profile-image/${filename}`;
+};
+
+// 프로필 이미지 수정
+export const updateProfileImage = async (imageFile) => {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+
+  const response = await axios.patch("/users/me/profile-image", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  if (response.status !== 200) {
+    throw new Error("이미지 업로드 실패");
+  }
+
+  return response.data;
+};
+
 /**
  * 비밀번호 변경 요청
  * @param {string} username
@@ -69,7 +95,6 @@ export const deleteUserWithPassword = async (password) => {
   });
   return response.data;
 };
-
 
 //  내 포인트 잔액 조회
 export const getPointBalance = async () => {
@@ -99,6 +124,19 @@ export const usePoint = async (amount, description = "포인트 사용") => {
   return response.data;
 };
 
+// 비밀번호 찾기 및 재설정
+export const resetPassword = (username) => {
+  return axios.post("/users/reset-password", { username });
+};
+
+//  Google 로그인 요청 함수 추가
+export const googleLoginRequest = async (idToken) => {
+  const response = await axios.post("/auth/oauth/google", {
+    idToken,
+  });
+  return response.data; // accessToken 또는 { email, name, isNew: true }
+};
+
 //-관리자 페이지-
 // 전체 유저 목록 조회
 export const fetchAllUsers = async () => {
@@ -125,4 +163,3 @@ export const updateUserRole = async (username, newRole) => {
   });
   return response.data;
 };
-
