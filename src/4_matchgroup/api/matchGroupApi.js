@@ -1,7 +1,7 @@
 import axiosInstance from "../../1_user/api/axiosInstance.js";
 
 const BASE_URL = "http://localhost:8090/swings/matchgroup";
-const API_URL = "http://localhost:8090/swings/user";
+const USERS_API_URL = "http://localhost:8090/swings/user";
 
 // 그룹 생성 API
 export const createMatchGroup = async (groupData) => {
@@ -45,7 +45,7 @@ export const getMatchGroupById = async (matchGroupId) => {
 // 현재 로그인한 사용자 정보 가져오기
 export const getCurrentUser = async () => {
     try {
-        const response = await axiosInstance.get(`${API_URL}/me`);
+        const response = await axiosInstance.get(`${USERS_API_URL}/me`);
         return response.data;
     } catch (error) {
         console.error("사용자 정보 가져오기 오류:", error);
