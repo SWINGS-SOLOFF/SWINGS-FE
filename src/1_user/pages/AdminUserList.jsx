@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchAllUsers } from "../api/userapi";
+import { fetchAllUsers } from "../api/userApi";
 import UserDetailModal from "../components/UserDetailModal";
 
 export default function AdminUserList() {
