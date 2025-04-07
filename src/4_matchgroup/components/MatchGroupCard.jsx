@@ -14,9 +14,9 @@ import {
     CardTitle,
 } from "./ui/Card.jsx";
 import { Badge } from "./ui/Badge.jsx";
-import Button from "./ui/Button.jsx";
 import {getParticipantsByGroupId} from "../api/matchParticipantApi.js";
 import JoinConfirmModal from "./JoinConfirmModal.jsx";
+import GroupButton from "./ui/GroupButton.jsx";
 
 export default function MatchGroupCard({ group }) {
     const navigate = useNavigate();
@@ -83,14 +83,14 @@ export default function MatchGroupCard({ group }) {
                 </CardContent>
 
                 <CardFooter>
-                    <Button
+                    <GroupButton
                         onClick={() => setShowJoinModal(true)}
                         disabled={isFull}
                         variant={isFull ? "outline" : "default"}
                         className="w-full"
                     >
                         {isFull ? "모집 완료" : "그룹 상세 보기"}
-                    </Button>
+                    </GroupButton>
                 </CardFooter>
             </Card>
 

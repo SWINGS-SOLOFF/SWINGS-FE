@@ -1,4 +1,3 @@
-// 참가자 관련 API 호출 함수 및 라우터 이동 기능 불러오기
 import {
     joinMatch,
     leaveMatch,
