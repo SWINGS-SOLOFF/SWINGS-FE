@@ -15,16 +15,17 @@ import TossCheckout from "../pages/TossCheckout";
 import FindPassword from "../pages/FindPassword";
 import ProfileImageUploader from "../components/ProfileImageUploader";
 import ProfileImage from "../pages/ProfileImage";
+import FeedPage from "../../2_feed/pages/FeedPage";
 
 export default function UserRoutes() {
   return (
     <Routes>
       {/* 홈 */}
       <Route
-        path="home"
+        path="feed"
         element={
           <PrivateRoute>
-            <Home />
+            <FeedPage />
           </PrivateRoute>
         }
       />
