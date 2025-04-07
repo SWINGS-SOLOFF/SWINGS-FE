@@ -1,7 +1,7 @@
 // src/1_user/pages/TossCheckout.jsx
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { fetchUserData } from "../api/userapi";
+import { fetchUserData } from "../api/userApi";
 import { requestTossPayment } from "../utils/paymentUtils";
 
 export default function TossCheckout() {

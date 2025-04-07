@@ -10,7 +10,11 @@ import MyPointPage from "../pages/MyPointPage";
 import PointCharge from "../pages/PointCharge";
 import TossSuccess from "../pages/TossSuccess";
 import TossFail from "../pages/TossFail";
-import TossCheckout from "../pages/TossCheckout"; // ✅ 꼭 추가해줘야 함!
+import TossCheckout from "../pages/TossCheckout";
+
+import FindPassword from "../pages/FindPassword";
+import ProfileImageUploader from "../components/ProfileImageUploader";
+import ProfileImage from "../pages/ProfileImage";
 
 export default function UserRoutes() {
   return (
@@ -31,6 +35,15 @@ export default function UserRoutes() {
         element={
           <PrivateRoute>
             <MyPage />
+          </PrivateRoute>
+        }
+      />
+      {/* 프로필 사진 수정 */}
+      <Route
+        path="mypage/profileImage"
+        element={
+          <PrivateRoute>
+            <ProfileImage />
           </PrivateRoute>
         }
       />
@@ -113,6 +126,9 @@ export default function UserRoutes() {
           </PrivateRoute>
         }
       />
+
+      {/* 비밀번호 찾기 */}
+      <Route path="/find-password" element={<FindPassword />} />
     </Routes>
   );
 }

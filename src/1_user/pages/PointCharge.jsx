@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Coins, DollarSign, Gem, PiggyBank, Wallet } from "lucide-react";
 import CoinSelectModal from "../components/CoinSelectModal";
-import { fetchUserData } from "../api/userapi";
+import { fetchUserData } from "../api/userApi";
 
 const coinOptions = [
   { coin: 5, price: 5000, icon: PiggyBank },
