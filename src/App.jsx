@@ -16,16 +16,16 @@ import SocialRoutes from "./2_feed/routes/SocialRoutes";
 export default function App() {
   return (
     <Routes>
-      {/* ✅ 로그인/회원가입 (Nav 없이) */}
+      {/* 로그인/회원가입 (Nav 없이) */}
       <Route path="/swings" element={<StartLogin />} />
       <Route path="/swings/signup" element={<SignUp />} />
 
-      {/* ✅ 관리자 페이지 (AdminNavBar 포함) */}
+      {/* 관리자 페이지 (AdminNavBar 포함) */}
       <Route path="/swings/admin/*" element={<AdminLayout />}>
         <Route path="*" element={<AdminRoutes />} />
       </Route>
 
-      {/* ✅ 사용자 페이지 (NavBar + BottomNavBar 포함) */}
+      {/* 사용자 페이지 (NavBar + BottomNavBar 포함) */}
       <Route path="/swings/*" element={<UserLayout />}>
         <Route path="match/*" element={<MatchRoutes />} />
         <Route path="matchgroup/*" element={<MatchGroupRoutes />} />

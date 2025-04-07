@@ -9,7 +9,6 @@ const NotificationPage = () => {
     //     const testNotification = {
     //         type: "JOIN_REQUEST",
     //         message: "홍길동 님이 [부산 스크린 골프]에 참가 신청했습니다."
-    //
     //     };
     //
     //     addNotification(testNotification);
