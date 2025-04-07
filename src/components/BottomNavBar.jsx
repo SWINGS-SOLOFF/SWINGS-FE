@@ -13,7 +13,7 @@ const navItems = [
   { to: "/swings/matchgroup", label: "조인", icon: <UserPlus size={20} /> },
   { to: "/swings/match", label: "메이트", icon: <Users size={20} /> },
   { to: "/swings/feed", label: "피드", icon: <Newspaper size={20} /> },
-  { to: "/swings/mypage", label: "마이페이지", icon: <User size={20} /> },
+  { to: "/swings/social", label: "마이페이지", icon: <User size={20} /> },
 ];
 
 export default function BottomNavBar() {
