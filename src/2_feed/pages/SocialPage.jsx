@@ -2,13 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import useProfileData from "../hooks/useProfileData";
 import { useFeedData } from "../hooks/useFeedData";
+
 import SocialProfile from "../components/SocialProfile";
 import ImageModal from "../components/ImageModal";
-import { FollowListModal } from "../components/SocialProfile";
-import LikedByModal from "../components/LikedByModal";
-import SocialFeedModal from "../components/SocialFeedModal";
+import FollowListModal from "../components/FollowListModal";
+import LikedUsersModal from "../components/LikedUsersModal";
+import FeedDetailModal from "../components/FeedDetailModal";
+
 import socialApi from "../api/socialApi";
 
 const SocialPage = () => {
@@ -19,6 +22,7 @@ const SocialPage = () => {
   const [viewedUserId, setViewedUserId] = useState(
     paramUserId ? Number(paramUserId) : null
   );
+
   const [selectedFeed, setSelectedFeed] = useState(null);
   const [showFeedModal, setShowFeedModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -26,7 +30,6 @@ const SocialPage = () => {
   const [showFollowingList, setShowFollowingList] = useState(false);
   const [likedByUsers, setLikedByUsers] = useState([]);
   const [showLikedByModal, setShowLikedByModal] = useState(false);
-  const [likeLoading, setLikeLoading] = useState({});
 
   const {
     loading: profileLoading,
@@ -46,11 +49,12 @@ const SocialPage = () => {
     feeds,
     handleLike,
     handleUnlike,
+    handleLikeToggle,
     handleDelete,
     handleCommentSubmit,
     handleCommentDelete,
     refreshFeeds,
-  } = useFeedData(viewedUserId, currentUser);
+  } = useFeedData(viewedUserId, currentUser, setSelectedFeed);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -74,7 +78,7 @@ const SocialPage = () => {
 
   const handleShowLikedBy = async (feedId) => {
     try {
-      const users = await socialApi.getLikedByUsers(feedId);
+      const users = await socialApi.getLikedUsers(feedId);
       setLikedByUsers(users);
       setShowLikedByModal(true);
     } catch {
@@ -87,22 +91,6 @@ const SocialPage = () => {
     setShowFeedModal(true);
   };
 
-  if (profileLoading || (feedsLoading && !feeds.length)) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-gray-500">불러오는 중...</p>
-      </div>
-    );
-  }
-
-  if (profileError || feedsError) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-red-500">{profileError || feedsError}</p>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-gray-50 min-h-screen pt-16">
       <ToastContainer position="bottom-right" />
@@ -113,7 +101,21 @@ const SocialPage = () => {
         userIntroduce={introduce}
         isCurrentUser={currentUser?.userId === viewedUserId}
         isFollowing={isFollowing}
-        onFollowToggle={() => {}}
+        onFollowToggle={async () => {
+          if (!currentUser) return;
+          try {
+            if (isFollowing) {
+              await socialApi.unfollowUser(currentUser.userId, viewedUserId);
+              toast.success("언팔로우 완료");
+            } else {
+              await socialApi.followUser(currentUser.userId, viewedUserId);
+              toast.success("팔로우 완료");
+            }
+            refreshProfileData();
+          } catch {
+            toast.error("팔로우 처리에 실패했습니다.");
+          }
+        }}
         onShowFollowers={() => setShowFollowersList(true)}
         onShowFollowing={() => setShowFollowingList(true)}
         onGoToSettings={() => navigate("/swings/mypage")}
@@ -121,6 +123,7 @@ const SocialPage = () => {
         onFeedClick={handleFeedClick}
       />
 
+      {/* 모달 */}
       {showFollowersList && (
         <FollowListModal
           users={followers}
@@ -128,7 +131,6 @@ const SocialPage = () => {
           title="팔로워"
         />
       )}
-
       {showFollowingList && (
         <FollowListModal
           users={followings}
@@ -136,30 +138,30 @@ const SocialPage = () => {
           title="팔로잉"
         />
       )}
-
       {showLikedByModal && (
-        <LikedByModal
+        <LikedUsersModal
           users={likedByUsers}
           onClose={() => setShowLikedByModal(false)}
         />
       )}
-
       {selectedFeed && (
-        <SocialFeedModal
+        <FeedDetailModal
           feed={selectedFeed}
           currentUser={currentUser}
-          likeLoading={likeLoading}
-          onClose={() => setShowFeedModal(false)}
-          onLike={(id) => handleLike(id)}
-          onUnlike={(id) => handleUnlike(id)}
+          onClose={() => {
+            setShowFeedModal(false);
+            setSelectedFeed(null);
+          }}
+          onLikeToggle={async (feedId, isLiked) => {
+            const updated = await handleLikeToggle(feedId, isLiked);
+            if (updated) setSelectedFeed({ ...updated });
+          }}
           onDelete={handleDelete}
-          onToggleComments={() => {}}
           onShowLikedBy={handleShowLikedBy}
           onCommentSubmit={handleCommentSubmit}
           onCommentDelete={handleCommentDelete}
         />
       )}
-
       {selectedImage && (
         <ImageModal
           imageUrl={selectedImage}
