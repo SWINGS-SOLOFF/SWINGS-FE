@@ -1,6 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { handleTossPayment, handleKakaoPayment } from "../utils/paymentUtils";
 
 export default function CoinSelectModal({
   isOpen,
@@ -10,20 +11,6 @@ export default function CoinSelectModal({
   redirectToCheckout,
 }) {
   const navigate = useNavigate();
-
-  const handleTossPayment = () => {
-    if (redirectToCheckout) {
-      navigate(`/swings/mypage/points/checkout?coin=${coin}`);
-    } else {
-      // 직접 결제 처리 (이전 방식)
-    }
-    onClose();
-  };
-
-  const handleKakaoPayment = () => {
-    alert("카카오페이 연동 예정입니다.");
-    onClose();
-  };
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
@@ -45,13 +32,20 @@ export default function CoinSelectModal({
 
           <div className="flex flex-col gap-3">
             <button
-              onClick={handleTossPayment}
+              onClick={() =>
+                handleTossPayment({
+                  coin,
+                  navigate,
+                  onClose,
+                  redirectToCheckout,
+                })
+              }
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded"
             >
               토스페이로 결제
             </button>
             <button
-              onClick={handleKakaoPayment}
+              onClick={() => handleKakaoPayment(onClose)}
               className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 rounded"
             >
               카카오페이로 결제
