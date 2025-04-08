@@ -71,7 +71,8 @@ const SentLikeListPage = () => {
                             transition={{ delay: idx * 0.05 }}
                             key={idx}
                             className="px-4 py-3 flex justify-between items-center hover:bg-gray-50 cursor-pointer"
-                            onClick={() => navigate(`/swings/profile/${item.toUsername}`)}
+                            onClick={() => navigate(`/swings/profile/${item.toUsername || item.username}`)}
+
                         >
                             <div className="flex items-center gap-3">
                                 <img
