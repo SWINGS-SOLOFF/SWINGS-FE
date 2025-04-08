@@ -134,7 +134,7 @@ function SwipePage() {
 
             <div className="absolute top-4 left-4">
                 <button
-                    onClick={() => navigate("/swings/home")}
+                    onClick={() => navigate("/swings/feed")}
                     className="absolute top-4 left-1 text-gray-700 hover:text-blue-600 transition-all"
                 >
                     <ArrowLeft size={25} />
