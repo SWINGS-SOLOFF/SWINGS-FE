@@ -84,58 +84,13 @@ const socialApi = {
     return res.data;
   },
 
-  getUserFeeds: async (userId) => {
-    const res = await socialApi.request("get", `/feeds/user/${userId}`);
-    return res.data;
-  },
-
-  likeFeed: async (feedId, userId) => {
-    const res = await socialApi.request("put", `/feeds/${feedId}/like`, null, {
-      userId,
-    });
-    return res.data;
-  },
-
-  unlikeFeed: async (feedId, userId) => {
+  getUserFeeds: async (userId, page = 0, size = 10) => {
     const res = await socialApi.request(
-      "put",
-      `/feeds/${feedId}/unlike`,
+      "get",
+      `/social/feeds/user/${userId}`,
       null,
-      { userId }
+      { page, size }
     );
-    return res.data;
-  },
-
-  deleteFeed: async (feedId) => {
-    const res = await socialApi.request("delete", `/feeds/${feedId}`);
-    return res.data;
-  },
-
-  getCommentsByFeedId: async (feedId) => {
-    const res = await socialApi.request("get", `/feeds/${feedId}/comments`);
-    return res.data;
-  },
-
-  addComment: async (feedId, userId, content) => {
-    const res = await socialApi.request(
-      "post",
-      `/feeds/${feedId}/comments`,
-      null,
-      { userId, content }
-    );
-    return res.data;
-  },
-
-  deleteComment: async (feedId, commentId) => {
-    const res = await socialApi.request(
-      "delete",
-      `/feeds/${feedId}/comments/${commentId}`
-    );
-    return res.data;
-  },
-
-  getLikedByUsers: async (feedId) => {
-    const res = await socialApi.request("get", `/feeds/${feedId}/liked-users`);
     return res.data;
   },
 };
