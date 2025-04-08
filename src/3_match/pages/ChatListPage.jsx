@@ -40,14 +40,10 @@ const ChatListPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white via-slate-100 to-white text-gray-900 pt-16 pb-20">
-            {/* ✅ 상단 헤더 */}
-            <div className="px-4 pb-3 sticky top-0 bg-white z-10 border-b border-gray-200 shadow-sm flex justify-between items-center">
-                <h1 className="text-xl font-bold">채팅 목록</h1>
-            </div>
+        <div className="flex flex-col h-full min-h-screen bg-gradient-to-b from-white via-slate-100 to-white text-gray-900">
 
-            {/* ✅ 채팅방 목록 */}
-            <div className="divide-y divide-gray-200">
+            {/* ✅ 내부 스크롤 가능한 리스트 영역 */}
+            <div className="flex-1 overflow-y-auto divide-y divide-gray-200 px-4 pb-20">
                 {chatRooms.length === 0 ? (
                     <p className="text-center py-10 text-gray-400 animate-pulse">채팅방이 없습니다</p>
                 ) : (
@@ -64,7 +60,7 @@ const ChatListPage = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.05 }}
-                                className="px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                                className="py-3 hover:bg-gray-50 cursor-pointer"
                                 onClick={() => navigate(`/swings/chat/${room.roomId}`)}
                             >
                                 <div className="flex justify-between items-center">
@@ -89,7 +85,7 @@ const ChatListPage = () => {
                 )}
             </div>
 
-            {/* ✅ 내가 보낸 하트 버튼 */}
+            {/* ✅ 플로팅 하트 버튼 */}
             <button
                 onClick={() => navigate("/swings/chat/sent")}
                 className="fixed bottom-24 right-6 bg-pink-500 text-white p-4 rounded-full shadow-lg hover:bg-pink-600 transition-all"

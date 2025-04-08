@@ -20,7 +20,7 @@ export default function UserLayout() {
 
       {/* ✅ 본문 영역 - NavBar/BottomNavBar 고려한 padding, 스크롤 가능 */}
       <main
-        className={`flex-grow overflow-y-auto px-4 ${
+        className={`flex-grow  ${
           !hideNavBar ? "pt-16" : ""
         } ${!hideBottomBar ? "pb-16" : ""}`}
       >

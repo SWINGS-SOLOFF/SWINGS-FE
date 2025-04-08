@@ -87,13 +87,13 @@ function SwipePage() {
             // ✅ 1. 포인트 차감
             await axios.post(`${BASE_URL}/users/me/points/use`, null, {
                 params: {
-                    amount: 1,
+                    amount: 3,
                     description: "슈퍼챗 사용"
                 },
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            toast.success("1코인을 사용하였습니다 🎉");
+            toast.success("3코인을 사용하였습니다 🎉");
 
             // ✅ 2. 채팅방 생성
             await axios.post(`${BASE_URL}/api/chat/room`, null, {
@@ -105,7 +105,7 @@ function SwipePage() {
             });
 
             toast.success("채팅방이 생성되었습니다 💬");
-
+            fetchRecommendedUser(currentUser.username);
 
         } catch (error) {
             if (error.response?.status === 400) {
@@ -129,7 +129,7 @@ function SwipePage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-pink-200 via-blue-200 to-green-100 px-4 pt-10">
+        <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-pink-200 via-blue-200 to-green-100 pt-[64px] pb-20">
             <Toaster />
 
             <div className="absolute top-4 left-4">
