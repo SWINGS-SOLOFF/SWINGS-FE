@@ -92,7 +92,7 @@ const SocialPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-16">
+    <div className="bg-gray-50 min-h-screen pt-4 sm:pt-8 md:pt-12">
       <ToastContainer position="bottom-right" />
 
       <SocialProfile

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AnimatePresence, motion } from "framer-motion";
 
 import useUser from "../hooks/useUser";
 import useFeed from "../hooks/useFeed";
@@ -21,6 +22,8 @@ const FeedPage = () => {
   const [likedUsers, setLikedUsers] = useState([]);
   const [isLikedModalOpen, setIsLikedModalOpen] = useState(false);
 
+  const formRef = useRef(null);
+
   const {
     posts,
     setPosts,
@@ -29,8 +32,6 @@ const FeedPage = () => {
     hasMore,
     loading,
     fetchingMore,
-    page,
-    setPage,
   } = useFeed(userId);
 
   const {
@@ -46,20 +47,38 @@ const FeedPage = () => {
   const lastPostRef = useRef(null);
 
   useEffect(() => {
-    if (userId) {
-      fetchInitialPosts();
-    }
+    if (userId) fetchInitialPosts();
   }, [userId]);
 
   useIntersectionObserver({
     targetRef: lastPostRef,
     onIntersect: () => {
-      if (!fetchingMore && hasMore) {
-        loadMorePosts();
-      }
+      if (!fetchingMore && hasMore) loadMorePosts();
     },
     enabled: hasMore && !loading,
   });
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (formRef.current && !formRef.current.contains(e.target)) {
+        setShowNewPostForm(false);
+        reset();
+      }
+    };
+    if (showNewPostForm) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showNewPostForm]);
+
+  const togglePostForm = () => {
+    if (showNewPostForm) {
+      setShowNewPostForm(false);
+      reset();
+    } else {
+      setShowNewPostForm(true);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -180,33 +199,43 @@ const FeedPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-16">
+    <div className="bg-gray-50 min-h-screen pt-4 sm:pt-8 md:pt-12">
       <ToastContainer position="bottom-right" />
+      <CreatePostButton onClick={togglePostForm} customPosition="right-20" />
 
-      <CreatePostButton
-        onClick={() => setShowNewPostForm((prev) => !prev)}
-        customPosition="right-20"
-      />
-
-      {showNewPostForm && (
-        <div className="fixed bottom-36 left-1/2 transform -translate-x-1/2 z-50 w-[90vw] max-w-md px-2">
-          <NewPostForm
-            newPostContent={newPostContent}
-            setNewPostContent={setNewPostContent}
-            handleImageChange={handleImageChange}
-            imagePreview={imagePreview}
-            handleSubmit={handleSubmit}
-            setShowNewPostForm={setShowNewPostForm}
-          />
-        </div>
-      )}
+      <AnimatePresence>
+        {showNewPostForm && (
+          <motion.div
+            key="new-post-form"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center"
+          >
+            <div ref={formRef} className="w-[90vw] max-w-md px-4">
+              <NewPostForm
+                newPostContent={newPostContent}
+                setNewPostContent={setNewPostContent}
+                handleImageChange={handleImageChange}
+                imagePreview={imagePreview}
+                handleSubmit={handleSubmit}
+                setShowNewPostForm={() => {
+                  setShowNewPostForm(false);
+                  reset();
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div
         ref={containerRef}
-        className="w-full max-w-xl mx-auto px-4 h-full overflow-y-auto"
+        className="w-full px-2 sm:px-4 md:px-6 lg:px-12 xl:px-24 h-full overflow-y-auto"
         style={{ height: "calc(100vh - 64px)" }}
       >
-        <div className="space-y-6 mt-4 pb-24">
+        <div className="space-y-4 pb-24">
           {posts.map((post, index) => (
             <div
               key={post.feedId}
