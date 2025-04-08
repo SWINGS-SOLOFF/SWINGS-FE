@@ -11,7 +11,6 @@ const MatchGroupRoutes = () => {
             <Route path="create" element={<MatchGroupCreate />} />
             <Route path=":category" element={<MatchGroupList />} />
             <Route path=":category/:matchGroupId" element={<MatchGroupDetail />} />
-            <Route path=":matchGroupId" element={<MatchGroupDetail />} />
         </Routes>
     );
 };
