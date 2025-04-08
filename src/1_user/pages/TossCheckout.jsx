@@ -50,6 +50,7 @@ export default function TossCheckout() {
 
     if (sdkLoaded && user && selectedCoin) {
       console.log("🚀 결제 요청 시작");
+      
       requestTossPayment({
         clientKey,
         coin: selectedCoin,

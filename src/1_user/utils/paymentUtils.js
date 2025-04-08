@@ -7,6 +7,7 @@ export const getAmountFromCoin = (coin) => coin * COIN_UNIT_PRICE;
 
 export const requestTossPayment = ({ clientKey, coin, userId }) => {
   if (!window.TossPayments || !clientKey || !userId) {
+    console.log("토스키", clientKey);
     alert("결제 준비가 완료되지 않았습니다.");
     return;
   }
@@ -21,6 +22,7 @@ export const requestTossPayment = ({ clientKey, coin, userId }) => {
     failUrl: `${window.location.origin}/swings/mypage/points/fail`,
     customerName: String(userId),
   });
+  console.log("토스키", clientKey);
 };
 
 /**
