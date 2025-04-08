@@ -1,31 +1,21 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom"; // ✅ 추가
-import { checkUsername } from "../api/userApi";
+import { useLocation } from "react-router-dom";
+import {
+  handleUsernameCheckLogic,
+  prefillFromOAuthState,
+} from "../utils/userUtils";
 
 export default function SignupStep1({ formData, updateData }) {
   const [usernameCheck, setUsernameCheck] = useState("");
-  const location = useLocation(); // ✅
+  const location = useLocation();
 
-  // ✅ 처음 렌더링 시 Google로 받은 이메일 자동 입력
+  // ✅ 구글 OAuth로부터 값 채우기
   useEffect(() => {
-    const state = location.state;
-    if (state?.email && !formData.email) {
-      updateData({ email: state.email });
-    }
-    if (state?.name && !formData.name) {
-      updateData({ name: state.name });
-    }
+    prefillFromOAuthState(location, formData, updateData);
   }, [location.state, formData.email, formData.name, updateData]);
 
-  const handleUsernameCheck = async () => {
-    if (!formData.username) {
-      setUsernameCheck("아이디를 입력해주세요.");
-      return;
-    }
-    const exists = await checkUsername(formData.username);
-    setUsernameCheck(
-      exists ? "이미 사용 중인 아이디입니다." : "사용 가능한 아이디입니다."
-    );
+  const handleUsernameCheck = () => {
+    handleUsernameCheckLogic(formData.username, setUsernameCheck);
   };
 
   return (
