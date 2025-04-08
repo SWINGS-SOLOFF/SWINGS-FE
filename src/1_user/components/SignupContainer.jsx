@@ -7,6 +7,7 @@ import SignupStep3 from "./SignupStep3";
 import SignupStep4 from "./SignupStep4";
 import SignupStep5 from "./SignupStep5";
 import { signupUser } from "../api/userApi";
+import { formDataPerStep, hasEmptyFields } from "../utils/userUtils";
 
 const steps = [SignupStep1, SignupStep2, SignupStep3, SignupStep4, SignupStep5];
 
@@ -20,26 +21,8 @@ export default function SignupContainer() {
     setFormData((prev) => ({ ...prev, ...newData }));
   };
 
-  const formDataPerStep = [
-    {
-      username: "",
-      password: "",
-      confirmPassword: "",
-      name: "",
-      email: "",
-    },
-    { gender: "", birthDate: "", phonenumber: "" },
-    { mbti: "", job: "", activityRegion: "" },
-    { hobbies: "", religion: "", smoking: "", drinking: "" },
-    { golfSkill: "", introduce: "" },
-  ];
-
   const nextStep = () => {
-    const currentStepFields = Object.keys(formDataPerStep[step]);
-    const hasEmpty = currentStepFields.some(
-      (field) => !formData[field] || formData[field].trim() === ""
-    );
-    if (hasEmpty) {
+    if (hasEmptyFields(step, formData)) {
       setError("모든 항목을 입력해주세요.");
       return;
     }
@@ -80,7 +63,6 @@ export default function SignupContainer() {
           골프 동반자를 찾아보세요
         </p>
 
-        {/* 진행률 바 + 텍스트 */}
         <div className="w-full mb-6">
           <motion.div
             initial={{ width: 0 }}
@@ -93,7 +75,6 @@ export default function SignupContainer() {
           </p>
         </div>
 
-        {/* 폼 컨텐츠 */}
         <div className="space-y-6">
           <CurrentStep formData={formData} updateData={updateData} />
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
