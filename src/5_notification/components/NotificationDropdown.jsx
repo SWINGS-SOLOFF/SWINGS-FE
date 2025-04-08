@@ -1,15 +1,20 @@
 import { useNavigate } from "react-router-dom";
-import {useNotification} from "../context/NotificationContext.jsx";
+import { useNotification } from "../context/NotificationContext.jsx";
 
 export default function NotificationDropdown() {
-    const { notifications } = useNotification();
+    const { notifications, unreadCount } = useNotification();
     const navigate = useNavigate();
 
-    const latest = notifications.slice(0, 5); // 최근 5개만
+    const latest = notifications.slice(0, 10); // 최근 10개만
 
     return (
         <div className="absolute right-0 top-full mt-2 w-64 bg-white shadow-lg rounded border border-gray-200 z-50">
-            <div className="p-3 border-b font-bold text-gray-800">🔔 최근 알림</div>
+            <div className="relative p-3 border-b font-bold text-gray-800 flex items-center justify-between">
+                <span>🔔 최근 알림</span>
+                {unreadCount > 0 && (
+                    <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
+                )}
+            </div>
 
             {latest.length === 0 ? (
                 <div className="p-3 text-sm text-gray-500">알림이 없습니다.</div>
