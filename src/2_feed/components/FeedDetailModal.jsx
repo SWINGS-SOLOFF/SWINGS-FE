@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import {
   FaTimes,
   FaTrash,
@@ -19,6 +19,21 @@ const FeedDetailModal = ({
   onCommentDelete,
 }) => {
   const [newComment, setNewComment] = React.useState("");
+  const modalRef = useRef(null);
+
+  // 모달 외부 클릭시 닫기 기능 구현
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
 
   const handleLikeToggle = () => {
     if (!currentUser) return;
@@ -51,10 +66,19 @@ const FeedDetailModal = ({
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4 backdrop-blur-sm">
       <div
-        className={`bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col ${
+        ref={modalRef}
+        className={`relative bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col ${
           hasImage ? "md:flex-row" : ""
         }`}
       >
+        {/* 닫기 버튼 - 항상 오른쪽 상단에 고정 */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-20 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full p-2 text-gray-700 hover:text-black transition-colors duration-200 shadow-md"
+        >
+          <FaTimes size={20} />
+        </button>
+
         {/* 이미지 영역 (이미지가 있을 경우) */}
         {hasImage && (
           <div className="w-full md:w-1/2 bg-gray-100 flex items-center justify-center relative h-64 md:h-auto">
@@ -72,8 +96,8 @@ const FeedDetailModal = ({
             hasImage ? "md:w-1/2" : ""
           } flex flex-col bg-white`}
         >
-          {/* 상단 헤더 */}
-          <div className="flex items-center justify-between p-4 border-b">
+          {/* 상단 헤더 - 닫기 버튼 제거하고 프로필 정보만 표시 */}
+          <div className="flex items-center p-4 border-b">
             <div className="flex items-center space-x-3">
               <img
                 src={feed.userProfilePic || "/default-profile.jpg"}
@@ -98,12 +122,6 @@ const FeedDetailModal = ({
                 )}
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-black transition-colors duration-200"
-            >
-              <FaTimes size={20} />
-            </button>
           </div>
 
           {/* 게시글 본문 */}
