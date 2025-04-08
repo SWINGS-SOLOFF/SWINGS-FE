@@ -45,20 +45,24 @@ const SentLikeListPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white via-slate-100 to-white text-gray-800 pb-20">
-            {/* ✅ 상단 헤더 */}
-            <div className="pt-16 px-4 pb-3 sticky top-0 bg-white z-10 border-b border-gray-200 shadow-sm flex justify-between items-center">
-                <h1 className="text-xl font-bold text-gray-800">보낸 좋아요</h1>
-                <button
-                    onClick={() => navigate(-1)}
-                    className="text-sm text-blue-500 hover:underline"
-                >
-                    ← 뒤로가기
-                </button>
+        // ✅ 전체 영역 - 내부에서 스크롤 처리
+        <div className="flex flex-col h-full min-h-screen bg-gradient-to-b from-white via-slate-100 to-white text-gray-900">
+
+            {/* ✅ 고정 헤더 - SWINGS 밑에 붙고 스크롤해도 고정됨 */}
+            <div className="sticky top-16 z-10 bg-white border-b border-gray-200 shadow-sm px-4 py-4">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="text-lg text-gray-600 hover:text-blue-600"
+                    >
+                        ←
+                    </button>
+                    <h1 className="text-xl font-bold">보낸 좋아요</h1>
+                </div>
             </div>
 
-            {/* ✅ 좋아요 리스트 */}
-            <div className="divide-y divide-gray-200">
+            {/* ✅ 내부 스크롤 영역 */}
+            <div className="flex-1 overflow-y-auto px-4 pb-20">
                 {likeList.length === 0 ? (
                     <p className="text-center py-10 text-gray-400 animate-pulse">
                         보낸 좋아요가 없습니다.
@@ -66,36 +70,43 @@ const SentLikeListPage = () => {
                 ) : (
                     likeList.map((item, idx) => (
                         <motion.div
+                            key={idx}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.05 }}
-                            key={idx}
-                            className="px-4 py-3 flex justify-between items-center hover:bg-gray-50 cursor-pointer"
-                            onClick={() => navigate(`/swings/profile/${item.toUsername}`)}
+                            className="py-3 flex justify-between items-center hover:bg-gray-50 cursor-pointer"
+                            onClick={() =>
+                                navigate(`/swings/profile/${item.toUsername || item.username}`)
+                            }
                         >
                             <div className="flex items-center gap-3">
                                 <img
-                                    src={defaultImg}
+                                    src={item.userImg || defaultImg}
                                     alt="프로필"
                                     className="w-12 h-12 rounded-full object-cover shadow"
                                 />
                                 <div>
-                                    <p className="font-semibold text-base text-gray-800">{item.name || "이름없음"}</p>
-                                    <p className="text-sm text-gray-500">@{item.toUsername || item.username || "unknown"}</p>
+                                    <p className="font-semibold text-base text-gray-800">
+                                        {item.name || "이름없음"}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        @{item.toUsername || item.username || "unknown"}
+                                    </p>
                                 </div>
                             </div>
 
-                            <div className="pr-2">
+                            <div className="flex items-center justify-center h-full pr-1">
                                 {item.mutual ? (
-                                    <ThumbsUp className="text-pink-500 fill-pink-500" />
+                                    <ThumbsUp className="text-pink-500 fill-pink-500 w-5 h-5" />
                                 ) : (
-                                    <ThumbsUpIcon className="text-gray-300" />
+                                    <ThumbsUpIcon className="text-gray-300 w-5 h-5" />
                                 )}
                             </div>
                         </motion.div>
                     ))
                 )}
             </div>
+
         </div>
     );
 };
