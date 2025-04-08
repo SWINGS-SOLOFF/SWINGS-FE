@@ -46,8 +46,8 @@ export default function NavBar() {
             aria-label="알림"
           >
             <BellIcon size={24} />
-            {hasNotifications && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full" />
+            {unreadCount > 0 && ( // ✅ 안 읽은 알림이 있을 때만 뱃지 표시
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full" />
             )}
           </button>
 
