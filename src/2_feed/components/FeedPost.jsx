@@ -31,23 +31,13 @@ const FeedPost = ({
   const contentRef = useRef(null);
   const [isContentTruncated, setIsContentTruncated] = useState(false);
 
-  // 프로필 클릭 시 해당 사용자의 프로필 페이지로 이동
-  const handleProfileClick = () => {
-    if (post.userId) {
-      navigate(`/swings/profile/${post.userId}`);
+  useEffect(() => {
+    if (contentRef.current) {
+      const isOverflowing = contentRef.current.scrollHeight > 80;
+      setIsContentTruncated(isOverflowing);
     }
-  };
+  }, [post.caption]);
 
-  // 댓글 제출 핸들러
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-    if (newComment.trim()) {
-      onCommentSubmit(post.feedId, newComment);
-      setNewComment("");
-    }
-  };
-
-  // 시간 포맷 함수
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -58,63 +48,28 @@ const FeedPost = ({
     return `${Math.floor(diffMinutes / 1440)}일 전`;
   };
 
-  // 컴포넌트가 마운트되거나 업데이트될 때 내용의 높이 확인
-  useEffect(() => {
-    if (contentRef.current) {
-      const isOverflowing = contentRef.current.scrollHeight > 80; // 대략 3줄 높이
-      setIsContentTruncated(isOverflowing);
+  const handleProfileClick = () => {
+    if (post.userId) {
+      navigate(`/swings/profile/${post.userId}`);
     }
-  }, [post.caption]);
+  };
+
+  const handleCommentSubmit = (e) => {
+    e.preventDefault();
+    if (newComment.trim()) {
+      onCommentSubmit(post.feedId, newComment);
+      setNewComment("");
+    }
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 transition-all duration-300 ease-in-out hover:shadow-xl relative">
-      {/* 포스트 헤더 - 사용자 정보 */}
-      <div
-        className="flex items-center p-4 bg-gradient-to-r from-gray-50 to-white hover:bg-gray-100/30 transition-all duration-300"
-        onClick={handleProfileClick}
-        style={{ cursor: "pointer" }}
-      >
-        <div className="relative w-14 h-14 rounded-full bg-gray-100 border-2 border-gray-300 overflow-hidden flex items-center justify-center mr-4 shadow-md">
-          {post.userProfilePic || post.avatarUrl ? (
-            <img
-              src={post.userProfilePic || post.avatarUrl}
-              alt={post.username || "사용자"}
-              className="w-full h-full object-cover transition transform hover:scale-110"
-            />
-          ) : (
-            <FaUser className="text-3xl text-gray-700 opacity-70" />
-          )}
-        </div>
-        <div className="flex-grow">
-          <p className="font-bold text-gray-900 text-xl tracking-tight">
-            {post.username || "사용자"}
-          </p>
-          <p className="text-sm text-gray-500 font-light">
-            {post.createdAt ? formatTimeAgo(post.createdAt) : ""}
-          </p>
-        </div>
-        {currentUser && currentUser.userId === post.userId && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(post.feedId);
-            }}
-            className="absolute top-4 right-4 z-10 text-gray-400 hover:text-red-500 p-2 rounded-full bg-white/70 hover:bg-gray-200 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out group"
-            aria-label="게시물 삭제"
-          >
-            <FaTimesCircle className="text-xl group-hover:rotate-180 transition-transform duration-300" />
-          </button>
-        )}
-      </div>
-
-      {/* 이미지 섹션 - 이미지가 있을 경우에만 표시 */}
+      {/* 이미지 */}
       {(post.image || post.imageUrl) && (
         <div
           className="w-full overflow-hidden cursor-pointer relative group"
-          onClick={() => onImageClick(post.image || post.imageUrl)}
+          onClick={() => onImageClick(post)}
         >
-          {/* 이미지 오버레이 효과 - 호버 시 약간 어두워지는 효과 */}
-          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300 z-10"></div>
           <img
             src={post.image || normalizeImageUrl(post.imageUrl)}
             alt="게시물 이미지"
@@ -124,110 +79,51 @@ const FeedPost = ({
               e.target.src = "/placeholder-image.jpg";
             }}
           />
-          {/* 이미지 하단에 표시되는 그라데이션 효과 */}
-          <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-900/30 to-transparent pointer-events-none"></div>
         </div>
       )}
 
-      {/* 내용 섹션 - 시각적으로 구분된 카드 스타일 */}
-      <div className="p-5 bg-gradient-to-b from-white to-gray-50">
-        <div
-          ref={contentRef}
-          className={`
-                        text-base text-gray-800 
-                        break-words whitespace-pre-line 
-                        ${!isExpanded ? "max-h-20 overflow-hidden" : ""}
-                        relative transition-all duration-300 ease-in-out
-                        rounded-lg mt-2 p-2 bg-white shadow-sm
-                    `}
-        >
-          {post.caption || "게시물 내용이 없습니다."}
-
-          {/* 접힌 상태에서 그라데이션 효과 */}
-          {!isExpanded && isContentTruncated && (
-            <div
-              className="
-                                absolute
-                                bottom-0
-                                left-0
-                                right-0
-                                h-12
-                                bg-gradient-to-t
-                                from-white
-                                to-transparent
-                                pointer-events-none
-                            "
-            />
-          )}
+      {/* 프로필 + 게시글 */}
+      <div className="p-4 flex items-start">
+        <div className="mr-4 flex flex-col items-center">
+          <div
+            className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-300 overflow-hidden flex items-center justify-center cursor-pointer"
+            onClick={handleProfileClick}
+          >
+            {post.userProfilePic || post.avatarUrl ? (
+              <img
+                src={post.userProfilePic || post.avatarUrl}
+                alt="프로필"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <FaUser className="text-2xl text-gray-700" />
+            )}
+          </div>
+          <p className="text-xs text-gray-500 mt-1 text-center">
+            {post.username || "사용자"}
+          </p>
         </div>
 
-        {/* 내용 더보기/숨기기 버튼 - 내용이 3줄 이상일 때만 표시 */}
-        {isContentTruncated && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="
-                            mt-3
-                            text-gray-600
-                            hover:text-black
-                            font-medium
-                            text-sm
-                            flex
-                            items-center
-                            transition-colors
-                            duration-300
-                            ease-in-out
-                            group
-                            bg-white
-                            px-3
-                            py-1
-                            rounded-full
-                            shadow-sm
-                            hover:shadow
-                        "
+        <div
+          className="flex-1 relative cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <p
+            ref={contentRef}
+            className={`text-sm text-gray-800 break-words whitespace-pre-wrap ${
+              !isExpanded ? "line-clamp-3" : ""
+            }`}
           >
-            {isExpanded ? (
-              <>
-                내용 숨기기
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 ml-1 group-hover:-translate-y-1 transition-transform"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 15l7-7 7 7"
-                  />
-                </svg>
-              </>
-            ) : (
-              <>
-                내용 더보기
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 ml-1 group-hover:translate-y-1 transition-transform"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </>
-            )}
-          </button>
-        )}
+            {post.caption || "게시물 내용이 없습니다."}
+          </p>
+          {!isExpanded && isContentTruncated && (
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+          )}
+        </div>
       </div>
 
       {/* 좋아요 정보 및 액션 버튼 */}
-      <div className="bg-white p-4 flex items-center justify-between border-t border-gray-100">
+      <div className="bg-white px-4 py-2 flex items-center justify-between border-t border-gray-100">
         <p className="font-medium text-gray-800 text-sm flex items-center">
           <FaHeart className="inline-block mr-2 text-red-400" />
           {post.likes || 0}명이 좋아합니다
@@ -235,15 +131,14 @@ const FeedPost = ({
         {post.likes > 0 && (
           <button
             onClick={() => onShowLikedBy && onShowLikedBy(post.feedId)}
-            className="text-gray-700 hover:text-black flex items-center text-sm transition bg-gray-50 px-3 py-1 rounded-full hover:bg-gray-100"
+            className="text-gray-700 hover:text-black text-lg"
           >
-            <FaEye className="mr-2 group-hover:animate-pulse" />
-            좋아요 보기
+            <FaEye />
           </button>
         )}
       </div>
 
-      {/* 액션 버튼 영역 */}
+      {/* 액션 버튼 */}
       <div className="flex items-center space-x-2 px-4 pb-4 bg-white">
         <LikeButton
           liked={post.liked}
@@ -256,12 +151,11 @@ const FeedPost = ({
           onClick={() => onToggleComments(post.feedId)}
           className="flex-1 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-colors duration-300 flex items-center justify-center"
         >
-          <FaComment className="mr-2" />
-          댓글 {post.comments?.length || 0}개
+          <FaComment className="mr-2" /> 댓글 {post.comments?.length || 0}개
         </button>
       </div>
 
-      {/* 댓글 섹션 */}
+      {/* 댓글 영역 */}
       {post.showComments && (
         <div className="bg-gray-50 border-t border-gray-200">
           <div className="p-4 max-h-64 overflow-y-auto">
@@ -348,19 +242,6 @@ const FeedPost = ({
           </div>
         </div>
       )}
-      <style>
-        {`
-                    @keyframes pulse {
-                      0%, 100% { transform: scale(1); }
-                      50% { transform: scale(1.1); }
-                    }
-                    @keyframes send {
-                      0% { transform: translateX(0); }
-                      50% { transform: translateX(5px); }
-                      100% { transform: translateX(0); }
-                    }
-                 `}
-      </style>
     </div>
   );
 };
