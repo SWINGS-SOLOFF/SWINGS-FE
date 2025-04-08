@@ -17,6 +17,11 @@ const useNewPostForm = () => {
     setNewPostContent("");
     setNewPostImage(null);
     setImagePreview(null);
+
+    const fileInput = document.getElementById("image-upload");
+    if (fileInput) {
+      fileInput.value = "";
+    }
   };
 
   return {
