@@ -11,7 +11,6 @@ export const useProfileData = (userId, currentUser) => {
   const [followers, setFollowers] = useState([]);
   const [followings, setFollowings] = useState([]);
 
-  // 데이터를 가져오는 함수를 별도 함수로 분리
   const fetchProfileData = async () => {
     if (!userId || !currentUser) {
       setLoading(false);
@@ -21,7 +20,6 @@ export const useProfileData = (userId, currentUser) => {
     try {
       setLoading(true);
 
-      // 병렬로 데이터 로드
       const [
         profileData,
         introduceData,
@@ -38,7 +36,6 @@ export const useProfileData = (userId, currentUser) => {
         socialApi.isFollowing(currentUser.userId, userId),
       ]);
 
-      // 상태 업데이트
       setProfile(profileData);
       setIntroduce(introduceData || "");
       setFollowers(followersData || []);
@@ -57,14 +54,21 @@ export const useProfileData = (userId, currentUser) => {
     }
   };
 
-  // 처음 컴포넌트 렌더링시 데이터 로드
   useEffect(() => {
     fetchProfileData();
   }, [userId, currentUser]);
 
-  // 데이터 새로고침 함수 - SocialPage에서 호출할 수 있도록 제공
   const refreshProfileData = () => {
     fetchProfileData();
+  };
+
+  const saveIntroduce = async () => {
+    if (!currentUser || !userId) return;
+    try {
+      await socialApi.updateIntroduce(userId, introduce);
+    } catch (err) {
+      console.error("자기소개 업데이트 실패", err);
+    }
   };
 
   return {
@@ -78,6 +82,7 @@ export const useProfileData = (userId, currentUser) => {
     followings,
     setIntroduce,
     refreshProfileData,
+    saveIntroduce,
   };
 };
 

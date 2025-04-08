@@ -1,23 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import feedApi from "../api/feedApi";
 
 const useUser = () => {
-  const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const userData = await feedApi.getCurrentUser();
-        setUser(userData);
-      } catch (error) {
-        console.error("❌ 사용자 정보를 가져오는 데 실패했습니다.", error);
+        const user = await feedApi.getCurrentUser();
+        setUserId(user.userId);
+      } catch (err) {
+        console.error("❌ 사용자 정보를 가져오는 데 실패했습니다.", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserInfo();
   }, []);
 
-  return { user, userId: user?.userId };
+  return { userId, loading };
 };
 
 export default useUser;
