@@ -180,7 +180,7 @@ const FeedPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-16">
+    <div className="bg-gray-50 min-h-screen pt-4 sm:pt-8 md:pt-12">
       <ToastContainer position="bottom-right" />
 
       <CreatePostButton
@@ -203,10 +203,10 @@ const FeedPage = () => {
 
       <div
         ref={containerRef}
-        className="w-full max-w-xl mx-auto px-4 h-full overflow-y-auto"
+        className="w-full px-2 sm:px-4 md:px-6 lg:px-12 xl:px-24 h-full overflow-y-auto"
         style={{ height: "calc(100vh - 64px)" }}
       >
-        <div className="space-y-6 mt-4 pb-24">
+        <div className="space-y-4 pb-24">
           {posts.map((post, index) => (
             <div
               key={post.feedId}
