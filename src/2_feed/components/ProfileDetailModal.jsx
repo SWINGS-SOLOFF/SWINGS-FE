@@ -1,17 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
-import {
-  FaTimes,
-  FaMapMarkerAlt,
-  FaGolfBall,
-  FaSmokingBan,
-  FaWineGlass,
-  FaBirthdayCake,
-  FaRegEnvelope,
-  FaPhone,
-} from "react-icons/fa";
-import { RiMentalHealthFill } from "react-icons/ri";
-import { FiUser } from "react-icons/fi";
+import { getProfileImageUrl } from "../../1_user/api/userApi";
+import { FaTimes } from "react-icons/fa";
 
 const ProfileDetailModal = ({ user, onClose }) => {
   const regionMap = {
@@ -64,11 +54,15 @@ const ProfileDetailModal = ({ user, onClose }) => {
         </button>
 
         {/* 프로필 사진 */}
-        <div className="bg-gray-100 pt-8 pb-8 px-6 relative">
+        <div className="bg-gray-100 pt-8 pb-8 px-6">
           <div className="flex justify-center">
             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-lg">
               <img
-                src={user?.userImg || "/default-profile.jpg"}
+                src={
+                  user?.userImg
+                    ? getProfileImageUrl(user.userImg)
+                    : "/default-profile.jpg"
+                }
                 alt="프로필 사진"
                 className="w-full h-full object-cover"
               />
@@ -77,103 +71,38 @@ const ProfileDetailModal = ({ user, onClose }) => {
         </div>
 
         {/* 이름 */}
-        <div className="pb-4 px-6 text-center mt-4">
-          <h2 className="text-xl font-bold text-black mb-2">
-            {user?.username || user?.name || "닉네임 없음"}
+        <div className="pb-4 px-6 mt-4 text-center">
+          <h2 className="text-xl font-bold text-black">
+            @{user?.username || user?.name || "닉네임 없음"}
           </h2>
         </div>
 
         {/* 프로필 정보 */}
-        <div className="px-6 pb-6 overflow-y-auto max-h-[40vh] space-y-4 text-sm text-black">
-          {/* 기본 정보 */}
-          {(user?.activityRegion ||
-            user?.gender ||
-            user?.golfSkill ||
-            user?.mbti) && (
+        <div className="px-6 pb-6 overflow-y-auto max-h-[40vh] space-y-2 text-sm text-black bg-gray-50 rounded-lg p-4 mx-4 text-left">
+          {user?.activityRegion && (
             <div>
-              <h3 className="font-semibold mb-2">기본 정보</h3>
-              <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
-                {user?.activityRegion && (
-                  <div className="flex items-center">
-                    <FaMapMarkerAlt size={14} className="text-blue-500 mr-2" />
-                    {regionMap[user.activityRegion] || user.activityRegion}
-                  </div>
-                )}
-                {user?.gender && (
-                  <div className="flex items-center">
-                    <FiUser size={14} className="text-purple-500 mr-2" />
-                    {user.gender === "male" ? "남성" : "여성"}
-                  </div>
-                )}
-                {user?.golfSkill && (
-                  <div className="flex items-center">
-                    <FaGolfBall size={14} className="text-green-500 mr-2" />
-                    {golfLevelMap[user.golfSkill] || user.golfSkill}
-                  </div>
-                )}
-                {user?.mbti && (
-                  <div className="flex items-center">
-                    <RiMentalHealthFill
-                      size={14}
-                      className="text-indigo-500 mr-2"
-                    />
-                    {user.mbti}
-                  </div>
-                )}
-              </div>
+              지역: {regionMap[user.activityRegion] || user.activityRegion}
             </div>
           )}
-
-          {/* 라이프스타일 */}
-          {(user?.smoking || user?.drinking) && (
+          {user?.birthDate && (
+            <div>나이: {`${user.birthDate.slice(0, 4)}년생`}</div>
+          )}
+          {user?.gender && (
+            <div>성별: {user.gender === "male" ? "남성" : "여성"}</div>
+          )}
+          {user?.golfSkill && (
             <div>
-              <h3 className="font-semibold mb-2">라이프스타일</h3>
-              <div className="flex space-x-4 bg-gray-50 rounded-lg p-3">
-                {user?.smoking && (
-                  <div className="flex items-center">
-                    {user.smoking === "yes" ? (
-                      "🚬"
-                    ) : (
-                      <FaSmokingBan className="text-red-500 mr-1" />
-                    )}
-                    {user.smoking === "yes" ? "흡연" : "비흡연"}
-                  </div>
-                )}
-                {user?.drinking && (
-                  <div className="flex items-center">
-                    <FaWineGlass className="text-purple-500 mr-2" />
-                    {user.drinking === "yes" ? "음주" : "비음주"}
-                  </div>
-                )}
-              </div>
+              골프 실력: {golfLevelMap[user.golfSkill] || user.golfSkill}
             </div>
           )}
-
-          {/* 연락처 */}
-          {(user?.email || user?.phone || user?.birthday) && (
-            <div>
-              <h3 className="font-semibold mb-2">연락처</h3>
-              <div className="space-y-2 bg-gray-50 rounded-lg p-3">
-                {user?.email && (
-                  <div className="flex items-center">
-                    <FaRegEnvelope className="text-yellow-500 mr-2" />
-                    {user.email}
-                  </div>
-                )}
-                {user?.phone && (
-                  <div className="flex items-center">
-                    <FaPhone className="text-teal-500 mr-2" />
-                    {user.phone}
-                  </div>
-                )}
-                {user?.birthday && (
-                  <div className="flex items-center">
-                    <FaBirthdayCake className="text-pink-500 mr-2" />
-                    {user.birthday}
-                  </div>
-                )}
-              </div>
-            </div>
+          {user?.mbti && <div>MBTI: {user.mbti}</div>}
+          {user?.job && <div>직업: {user.job}</div>}
+          {user?.hobbies && <div>취미: {user.hobbies}</div>}
+          {user?.smoking && (
+            <div>{user.smoking === "yes" ? "흡연자" : "비흡연자"}</div>
+          )}
+          {user?.drinking && (
+            <div>{user.drinking === "yes" ? "음주함" : "음주하지 않음"}</div>
           )}
         </div>
       </motion.div>

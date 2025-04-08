@@ -1,26 +1,27 @@
 import React, { useState, useRef } from "react";
+import { getProfileImageUrl } from "../../1_user/api/userApi";
 import {
-  FaTimes,
   FaPhotoVideo,
-  FaEdit,
   FaHeart,
   FaComment,
   FaMapMarkerAlt,
   FaGolfBall,
-  FaSmokingBan,
-  FaWineGlass,
   FaBirthdayCake,
-  FaRegEnvelope,
-  FaPhone,
+  FaSearch,
 } from "react-icons/fa";
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
+
 import { RiMentalHealthFill } from "react-icons/ri";
-import { FiUser, FiSettings } from "react-icons/fi";
+import { FiSettings } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { normalizeImageUrl } from "../utils/imageUtils";
 import TruncatedText from "./TruncatedText";
 import { toast } from "react-toastify";
 import socialApi from "../api/socialApi";
+
 import ProfileDetailModal from "./ProfileDetailModal";
+import ImageModal from "./ImageModal"; // ✅ 이미지 확대 보기
+import IntroduceEditor from "../../1_user/components/IntroduceEditor.jsx";
 
 const SocialProfile = ({
   user,
@@ -37,24 +38,9 @@ const SocialProfile = ({
   onFeedClick = () => {},
   refreshProfileData,
 }) => {
-  const [editing, setEditing] = useState(false);
   const [showProfileDetail, setShowProfileDetail] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false); // ✅ 이미지 모달 상태
   const postsRef = useRef(null);
-
-  const handleEditToggle = () => {
-    setEditing(!editing);
-  };
-
-  const handleSaveIntroduce = async () => {
-    try {
-      await socialApi.updateIntroduce(user.userId, userIntroduce);
-      toast.success("자기소개가 저장되었습니다.");
-      refreshProfileData();
-    } catch {
-      toast.error("자기소개 저장 실패");
-    }
-    setEditing(false);
-  };
 
   const regionMap = {
     SEOUL: "서울",
@@ -84,7 +70,6 @@ const SocialProfile = ({
 
   return (
     <div className="relative max-w-4xl mx-auto bg-white shadow-md rounded-xl overflow-hidden">
-      {/* 환경설정 버튼 (우상단) */}
       {isCurrentUser && (
         <button
           onClick={onGoToSettings}
@@ -97,21 +82,26 @@ const SocialProfile = ({
       <div className="p-4">
         <div className="flex mb-6">
           <div className="mr-6 flex flex-col items-center">
+            {/* ✅ 프로필 이미지 클릭 시 확대 모달 */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="relative cursor-pointer"
-              onClick={() => setShowProfileDetail(true)}
+              onClick={() => setShowImageModal(true)}
             >
               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-100 shadow-lg">
                 <img
-                  src={user?.userImg || "/default-profile.jpg"}
+                  src={
+                    user?.userImg
+                      ? getProfileImageUrl(user.userImg)
+                      : "/default-profile.jpg"
+                  }
                   alt="프로필 사진"
                   className="w-full h-full object-cover"
                 />
               </div>
             </motion.div>
             <span className="mt-2 text-sm font-medium text-black">
-              {user?.username || user?.name}
+              @{user?.username || user?.name}
             </span>
           </div>
 
@@ -145,47 +135,17 @@ const SocialProfile = ({
           </div>
         </div>
 
-        {/* 자기소개 */}
+        {/* ✅ 자기소개 */}
         <div className="mb-4">
-          {editing ? (
-            <div className="relative">
-              <textarea
-                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-gray-500 bg-white text-black text-sm"
-                value={userIntroduce}
-                onChange={(e) => setIntroduce(e.target.value)}
-                rows={3}
-              />
-              <div className="flex justify-end space-x-2 mt-2">
-                <button
-                  onClick={handleEditToggle}
-                  className="bg-gray-200 text-black px-3 py-1 rounded-full text-sm"
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleSaveIntroduce}
-                  className="bg-black text-white px-3 py-1 rounded-full text-sm"
-                >
-                  저장
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="relative">
-              <p className="text-sm text-black leading-relaxed">
-                {userIntroduce || "아직 자기소개가 없습니다."}
-              </p>
-              {isCurrentUser && (
-                <button
-                  onClick={handleEditToggle}
-                  className="absolute top-0 right-0 text-gray-400 hover:text-gray-700 p-2"
-                  title="자기소개 수정"
-                >
-                  <FaEdit />
-                </button>
-              )}
-            </div>
-          )}
+          <IntroduceEditor
+            initialText={userIntroduce}
+            onSave={async (newText) => {
+              await socialApi.updateIntroduce(user.userId, newText);
+              setIntroduce(newText);
+              refreshProfileData();
+              toast.success("자기소개가 저장되었습니다.");
+            }}
+          />
         </div>
       </div>
 
@@ -207,6 +167,7 @@ const SocialProfile = ({
         </div>
       )}
 
+      {/* ✅ 지역/MBTI/골프/출생연도 + 상세보기 */}
       <div className="flex flex-wrap gap-2 mb-4 border-t border-gray-100 pt-2 px-4">
         {user?.activityRegion && (
           <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
@@ -230,8 +191,25 @@ const SocialProfile = ({
             <span className="text-black">{user.mbti}</span>
           </div>
         )}
+        {user?.birthDate && (
+          <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
+            <FaBirthdayCake className="text-pink-500 mr-1" size={12} />
+            <span className="text-black mr-2">{`${user.birthDate.slice(
+              0,
+              4
+            )}년생`}</span>
+          </div>
+        )}
+        <button
+          onClick={() => setShowProfileDetail(true)}
+          className="text-gray-500 hover:text-blue-600"
+          title="상세보기"
+        >
+          <HiOutlineDotsHorizontal size={18} />
+        </button>
       </div>
 
+      {/* ✅ 피드 영역 */}
       <div className="border-t border-gray-200">
         <div className="flex">
           <button className="flex-1 text-center py-2 border-b-2 border-black text-black font-medium">
@@ -286,6 +264,15 @@ const SocialProfile = ({
         )}
       </div>
 
+      {/* ✅ 이미지 크게 보기 */}
+      {showImageModal && (
+        <ImageModal
+          imageUrl={getProfileImageUrl(user.userImg)}
+          onClose={() => setShowImageModal(false)}
+        />
+      )}
+
+      {/* ✅ 프로필 상세 모달 */}
       <AnimatePresence>
         {showProfileDetail && (
           <ProfileDetailModal

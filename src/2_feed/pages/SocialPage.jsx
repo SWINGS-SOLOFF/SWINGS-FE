@@ -39,6 +39,7 @@ const SocialPage = () => {
     followers,
     followings,
     refreshProfileData,
+    setIntroduce, // ✅ 추가
   } = useProfileData(viewedUserId, currentUser);
 
   const {
@@ -86,13 +87,14 @@ const SocialPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-4 sm:pt-8 md:pt-12">
+    <div className="bg-gray-50 min-h-screen">
       <ToastContainer position="bottom-right" />
 
       <SocialProfile
         user={profile}
         userStats={stats}
         userIntroduce={introduce}
+        setIntroduce={setIntroduce} // ✅ 추가
         isCurrentUser={currentUser?.userId === viewedUserId}
         isFollowing={isFollowing}
         onFollowToggle={async () => {
@@ -115,6 +117,7 @@ const SocialPage = () => {
         onGoToSettings={() => navigate("/swings/mypage")}
         feeds={feeds}
         onFeedClick={handleFeedClick}
+        refreshProfileData={refreshProfileData} // ✅ 추가
       />
 
       {/* 모달 */}

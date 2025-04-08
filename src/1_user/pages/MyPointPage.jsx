@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { getPointBalance, getPointHistory } from "../api/userApi";
-import { Coins } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { formatKoreanDate } from "../utils/userUtils";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function MyPointPage() {
   const [balance, setBalance] = useState(0);
@@ -24,63 +25,131 @@ export default function MyPointPage() {
     loadData();
   }, []);
 
-  // ✅ 기존: TossCheckout으로 바로 이동
-  // ✅ 수정: PointCharge 페이지로 이동
   const goToChargePage = () => {
     navigate("/swings/mypage/points/charge");
   };
 
-  return (
-    <div className="p-6 max-w-xl mx-auto space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-[#2E384D] flex justify-center items-center gap-2">
-          <Coins className="text-yellow-400" />
-          코인 관리
-        </h1>
-        <p className="mt-2 text-green-600 text-xl font-semibold">
-          보유 코인: {balance.toLocaleString()}
-        </p>
-        <button
-          onClick={goToChargePage}
-          className="mt-4 bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg shadow-md"
-        >
-          💳 코인 충전하기
-        </button>
-      </div>
+  const formatPrettyDate = (dateString) => {
+    const date = new Date(dateString);
+    return format(date, "M월 d일 a h:mm", { locale: ko });
+  };
 
-      <div>
-        <h2 className="text-lg font-bold text-gray-700 mb-2">
-          📋 코인 사용 내역
-        </h2>
-        <ul className="space-y-3">
+  const groupedLogs = logs.reduce((acc, log) => {
+    const date = new Date(log.createdAt);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const isToday = date.toDateString() === today.toDateString();
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+
+    const key = isToday
+        ? "오늘"
+        : isYesterday
+            ? "어제"
+            : format(date, "M월 d일", { locale: ko });
+
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(log);
+    return acc;
+  }, {});
+
+  const totalSpent = logs.reduce(
+      (sum, log) => (log.amount < 0 ? sum + Math.abs(log.amount) : sum),
+      0
+  );
+
+  return (
+      <div className="min-h-screen bg-[#f8fafc] px-5 pt-6 pb-24">
+        {/* ✅ 카드형 보유 코인 UI */}
+        <motion.section
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white shadow-md rounded-2xl p-5 mb-6"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500 mb-1">보유 중인 코인</p>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {balance.toLocaleString()} Coin
+              </h1>
+              <p className="text-xs text-gray-400 mt-1">
+                지금까지{" "}
+                <span className="font-semibold text-gray-700">
+                {totalSpent.toLocaleString()} Coin
+              </span>{" "}
+                사용했어요
+              </p>
+            </div>
+            <button
+                onClick={goToChargePage}
+                className="bg-black text-white text-sm font-semibold py-2 px-4 rounded-xl hover:opacity-90 active:scale-95"
+            >
+              💳 충전
+            </button>
+          </div>
+        </motion.section>
+
+        {/* ✅ 이벤트 배너 - 말풍선처럼 작게 */}
+        <section className="bg-[#fff3cd] text-[#856404] px-4 py-2.5 rounded-xl text-xs font-medium mb-6 shadow-sm flex items-center gap-2">
+          🎁 이벤트: 이번 주 30코인 이상 충전 시 추가 코인을 드려요!
+        </section>
+
+        <hr className="my-6 border-gray-200" />
+
+        {/* ✅ 사용 내역 */}
+        <section>
+          <h2 className="text-base font-bold text-gray-800 mb-4">최근 활동</h2>
+
           {logs.length === 0 ? (
-            <p className="text-gray-400 text-sm">사용 내역이 없습니다.</p>
+              <p className="text-sm text-gray-400 text-center mt-10">
+                아직 사용 내역이 없어요!
+              </p>
           ) : (
-            logs.map((log, idx) => (
-              <li
-                key={idx}
-                className="bg-gray-50 border border-gray-200 rounded-md px-4 py-3 shadow-sm"
-              >
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-500">
-                    {formatKoreanDate(log.createdAt)}
-                  </span>
-                  <span
-                    className={`font-semibold ${
-                      log.amount >= 0 ? "text-green-600" : "text-red-500"
-                    }`}
-                  >
-                    {log.amount >= 0 ? `+${log.amount}` : log.amount}Coin
-                  </span>
-                </div>
-                <div className="mt-1 text-sm text-black">
-                  {log.description}{" "}
-                </div>
-              </li>
-            ))
+              <div className="space-y-8">
+                {Object.entries(groupedLogs).map(([label, group], i) => (
+                    <div key={i}>
+                      <p className="text-xs text-gray-500 font-medium mb-2">{label}</p>
+                      <ul className="space-y-4">
+                        <AnimatePresence>
+                          {group.map((log, idx) => (
+                              <motion.li
+                                  key={idx}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: 10 }}
+                                  transition={{ delay: idx * 0.05 }}
+                                  className="flex justify-between items-start"
+                              >
+                                <div>
+                                  <p className="text-[15px] text-gray-900 font-medium">
+                                    {log.description.includes("슈퍼챗")
+                                        ? "슈퍼챗 사용"
+                                        : log.description}
+                                  </p>
+                                  <p className="text-xs text-gray-400 mt-1">
+                                    {formatPrettyDate(log.createdAt)}
+                                  </p>
+                                </div>
+                                <p
+                                    className={`text-[15px] font-semibold ${
+                                        log.amount >= 0
+                                            ? "text-green-500"
+                                            : "text-red-500"
+                                    }`}
+                                >
+                                  {log.amount >= 0 ? `+${log.amount}` : log.amount} Coin
+                                </p>
+                              </motion.li>
+                          ))}
+                        </AnimatePresence>
+                      </ul>
+                    </div>
+                ))}
+              </div>
           )}
-        </ul>
+        </section>
       </div>
-    </div>
   );
 }
