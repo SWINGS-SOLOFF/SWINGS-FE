@@ -154,10 +154,11 @@ const FeedPost = ({
               }`}
             />
           </button>
-          <button onClick={() => onShowLikedBy && onShowLikedBy(post.feedId)}>
-            <span className="hover:underline">
-              {post.likes || 0}명이 좋아합니다
-            </span>
+          <button
+            onClick={() => onShowLikedBy && onShowLikedBy(post.feedId)}
+            className="text-sm text-blue-600 font-medium hover:underline hover:text-blue-800 transition cursor-pointer"
+          >
+            {post.likes || 0}명이 좋아합니다
           </button>
         </div>
 
