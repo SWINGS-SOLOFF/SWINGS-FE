@@ -49,6 +49,9 @@ const SwipeCard = ({ profile, onSwipe }) => {
                     <p className="text-sm text-gray-500 mb-1">
                         @{profile.username || "유저명없음"}
                     </p>
+                    <p className="text-sm text-gray-500 mb-1">
+                       활동 지역 : {profile.activityRegion || "지역없음"}
+                    </p>
                     <p className="mt-3 text-base text-gray-800 bg-pink-100 px-4 py-2 rounded-xl text-center shadow-inner">
                         {profile.introduce || "소개글없음"}
                     </p>
