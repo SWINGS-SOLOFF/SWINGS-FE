@@ -8,7 +8,6 @@ import coin from "../assets/coin.png"; // ✅ 하트코인 이미지 import
 export default function NavBar() {
   const navigate = useNavigate();
   const { unreadCount  } = useNotification();
-  const hasNotifications = notifications.length > 0;
   const [showDropdown, setShowDropdown] = useState(false);
 
   return (
