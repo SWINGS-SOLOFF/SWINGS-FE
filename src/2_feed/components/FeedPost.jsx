@@ -6,6 +6,7 @@ import {
   FaComment,
   FaPaperPlane,
 } from "react-icons/fa";
+import { motion } from "framer-motion";
 import { normalizeImageUrl } from "../utils/imageUtils";
 import { useNavigate } from "react-router-dom";
 
@@ -85,13 +86,12 @@ const FeedPost = ({
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 transition-all duration-300 ease-in-out hover:shadow-xl relative">
-      <div className="flex items-center justify-between px-4 py-1 text-sm bg-gray-50 border-b border-gray-200">
-        {" "}
+      <div className="flex items-center justify-between px-4 py-2 text-sm bg-gray-50 border-b border-gray-200">
         <div
           className="flex items-center gap-2 cursor-pointer"
           onClick={handleProfileClick}
         >
-          <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
             {post.userProfilePic ? (
               <img
                 src={post.userProfilePic}
@@ -99,10 +99,10 @@ const FeedPost = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <FaUser className="text-gray-600 text-xs" />
+              <FaUser className="text-gray-600 text-lg" />
             )}
           </div>
-          <span className="text-gray-700 text-xs">
+          <span className="text-gray-700 text-sm">
             {post.username || "사용자"}
           </span>
         </div>
@@ -144,16 +144,18 @@ const FeedPost = ({
 
       <div className="px-4 py-2 border-t border-gray-100 bg-white">
         <div className="flex items-center justify-between text-sm text-gray-700">
-          <button
+          <motion.button
+            whileTap={{ scale: 0.85 }}
             onClick={handleToggleLike}
-            className="flex items-center gap-1 text-red-500"
+            className="flex items-center gap-2 text-red-500"
           >
             <FaHeart
-              className={`text-sm ${
+              className={`text-xl ${
                 post.liked ? "fill-current" : "opacity-50"
               }`}
             />
-          </button>
+          </motion.button>
+
           <button
             onClick={() => onShowLikedBy && onShowLikedBy(post.feedId)}
             className="text-sm text-blue-600 font-medium hover:underline hover:text-blue-800 transition cursor-pointer"

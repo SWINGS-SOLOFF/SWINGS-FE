@@ -252,48 +252,34 @@ const SocialProfile = ({
             {feeds.map((feed) => (
               <div
                 key={feed.feedId}
-                className="aspect-square relative overflow-hidden cursor-pointer group"
+                className="aspect-square relative overflow-hidden cursor-pointer group bg-white border border-gray-100"
                 onClick={() => onFeedClick(feed)}
               >
                 {feed.imageUrl ? (
-                  <>
-                    <img
-                      src={normalizeImageUrl(feed.imageUrl)}
-                      alt="피드"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 flex items-center justify-center transition-opacity">
-                      <div className="text-white flex items-center space-x-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="flex items-center">
-                          <FaHeart className="mr-1" />
-                          <span>{feed.likes || feed.likeCount || 0}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <FaComment className="mr-1" />
-                          <span>{feed.commentCount || 0}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </>
+                  <img
+                    src={normalizeImageUrl(feed.imageUrl)}
+                    alt="피드 이미지"
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  <div className="w-full h-full flex flex-col justify-center items-center bg-gray-100 p-2">
-                    <TruncatedText
-                      text={feed.caption || "내용 없음"}
-                      maxLines={3}
-                      className="text-xs text-center text-black"
-                    />
-                    <div className="mt-2 flex items-center space-x-3 text-xs text-black">
-                      <div className="flex items-center">
-                        <FaHeart className="mr-1 text-red-500" />
-                        <span>{feed.likes || feed.likeCount || 0}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <FaComment className="mr-1" />
-                        <span>{feed.commentCount || 0}</span>
-                      </div>
-                    </div>
+                  <div className="w-full h-full flex items-center justify-center px-2 bg-white">
+                    <p className="text-black text-xs text-center line-clamp-3 whitespace-pre-wrap">
+                      {feed.caption || "내용 없음"}
+                    </p>
                   </div>
                 )}
+
+                {/* 하단 오버레이 (좋아요/댓글 수) */}
+                <div className="absolute bottom-0 w-full bg-black bg-opacity-40 text-white text-[11px] px-2 py-1 flex justify-between items-center">
+                  <span className="flex items-center gap-1">
+                    <FaHeart className="text-red-400" />
+                    {feed.likes ?? feed.likeCount ?? 0}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <FaComment />
+                    {feed.comments?.length ?? feed.commentCount ?? 0}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
