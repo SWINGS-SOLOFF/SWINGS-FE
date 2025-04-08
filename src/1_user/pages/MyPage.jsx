@@ -68,14 +68,6 @@ export default function MyPage() {
           <h2 className="text-2xl font-extrabold text-gray-800 mt-3 tracking-tight">
             @{formData?.username}
           </h2>
-          <p className="text-sm text-gray-500">안녕하세요 👋</p>
-          <button
-              onClick={() => navigate("/swings/mypage/update")}
-              className="mt-2 text-xs text-blue-500 hover:underline flex items-center gap-1"
-          >
-            <Pencil size={14} />
-            프로필 수정
-          </button>
         </div>
 
         {/* ✨ 선으로 구분되는 통계 */}
