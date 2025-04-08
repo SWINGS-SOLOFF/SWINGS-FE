@@ -1,7 +1,7 @@
 import axiosInstance from "../../1_user/api/axiosInstance.js";
 
 const BASE_URL = "http://localhost:8090/swings/matchgroup";
-const USERS_API_URL = "http://localhost:8090/swings/user";
+const USERS_API_URL = "http://localhost:8090/swings/users";
 
 // 그룹 생성 API
 export const createMatchGroup = async (groupData) => {
