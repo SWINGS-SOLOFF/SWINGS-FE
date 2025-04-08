@@ -20,8 +20,11 @@ const useMatchGroupActions = (
 
     // 1. 참가 신청
     const handleJoin = async () => {
+        console.log("✅ matchGroupId:", group?.matchGroupId);
+        console.log("✅ username:", currentUser?.username);
+
         try {
-            await joinMatch(group.id, currentUser.username);
+                await joinMatch(group.matchGroupId, currentUser.username);
             alert("✅ 참가 신청이 완료되었습니다.");
             reload();
         } catch (error) {

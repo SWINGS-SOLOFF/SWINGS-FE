@@ -35,11 +35,10 @@ const JoinGroupConfirmModal = ({ isOpen, onClose, group, participants, onConfirm
                         취소
                     </button>
                     <button
-                        onClick={() => {
-                            onConfirm();
+                        onClick={async () => {
+                            await onConfirm();   // ✅ 여기 반드시 await 붙이기
                             onClose();
                         }}
-                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                     >
                         ✅ 참여 신청
                     </button>
