@@ -32,8 +32,6 @@ const SocialPage = () => {
   const [showLikedByModal, setShowLikedByModal] = useState(false);
 
   const {
-    loading: profileLoading,
-    error: profileError,
     profile,
     introduce,
     isFollowing,
@@ -45,11 +43,7 @@ const SocialPage = () => {
   } = useProfileData(viewedUserId, currentUser);
 
   const {
-    loading: feedsLoading,
-    error: feedsError,
     feeds,
-    handleLike,
-    handleUnlike,
     handleLikeToggle,
     handleDelete,
     handleCommentSubmit,
