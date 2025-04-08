@@ -1,22 +1,12 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-    CalendarIcon,
-    MapPinIcon,
-    UsersIcon,
-} from "lucide-react";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "./ui/Card.jsx";
+import { CalendarIcon, MapPinIcon, UsersIcon } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/Card.jsx";
 import { Badge } from "./ui/Badge.jsx";
-import {getParticipantsByGroupId} from "../api/matchParticipantApi.js";
+import {getParticipantsByGroupId, joinMatch} from "../api/matchParticipantApi.js";
 import JoinConfirmModal from "./JoinConfirmModal.jsx";
 import GroupButton from "./ui/GroupButton.jsx";
+import {getCurrentUser} from "../api/matchGroupApi.js";
 
 export default function MatchGroupCard({ group }) {
     const navigate = useNavigate();
@@ -39,7 +29,7 @@ export default function MatchGroupCard({ group }) {
     useEffect(() => {
         if (showJoinModal && group?.matchGroupId) {
             getParticipantsByGroupId(group.matchGroupId).then((data) => {
-                const approved = data.filter(p => p.status === "approved");
+                const approved = data.filter((p) => p.participantStatus === "ACCEPTED");
                 setParticipants(approved);
             });
         }
@@ -94,14 +84,23 @@ export default function MatchGroupCard({ group }) {
                 </CardFooter>
             </Card>
 
-            {showJoinModal && (
-                <JoinConfirmModal
-                    group={group}
-                    participants={participants}
-                    onClose={() => setShowJoinModal(false)}
-                    onJoin={() => navigate(`/matchgroup/${group.matchGroupId}`)}
-                />
-            )}
+            <JoinConfirmModal
+                isOpen={showJoinModal}
+                onClose={() => setShowJoinModal(false)}
+                group={group}
+                participants={participants}
+                onConfirm={async () => {
+                    try {
+                        const currentUser = await getCurrentUser(); // 현재 사용자 정보 받아오기
+                        await joinMatch(group.matchGroupId, currentUser.userId); // 참가 신청
+                        alert("참가 신청 완료!");
+                        navigate(`/matchgroup/${group.matchGroupId}`);
+                    } catch (error) {
+                        console.error("신청 중 오류:", error);
+                        alert("신청에 실패했습니다.");
+                    }
+                }}
+            />
         </>
     );
 }
