@@ -4,7 +4,6 @@ const API_BASE = "http://localhost:8090/swings";
 const USER_API_BASE = "http://localhost:8090/swings/users";
 
 const feedApi = {
-  // 필터 및 정렬 적용된 피드 가져오기
   getFeeds: async (
     userId,
     page,
@@ -16,31 +15,19 @@ const feedApi = {
       size,
       sort: options.sort,
       filter: options.filter,
+      userId,
     };
-    if (userId !== null && userId !== undefined) {
-      params.userId = userId;
-    }
     const response = await axios.get(`${API_BASE}/feeds/filtered`, { params });
     return response.data;
   },
 
-  // 특정 사용자 피드
-  getUserFeeds: async (userId) => {
+  getUserFeeds: async (userId, page = 0, size = 10) => {
     const response = await axios.get(`${API_BASE}/feeds/user/${userId}`, {
-      params: { sort: "createdAt,desc" },
+      params: { page, size },
     });
     return response.data;
   },
 
-  // 댓글 목록
-  getCommentsByFeedId: async (feedId) => {
-    const response = await axios.get(`${API_BASE}/feeds/${feedId}/comments`, {
-      params: { sort: "createdAt,desc" },
-    });
-    return response.data;
-  },
-
-  // 피드 업로드
   uploadFeed: async (formData) => {
     const response = await axios.post(`${API_BASE}/feeds/upload`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
