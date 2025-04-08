@@ -1,4 +1,3 @@
-// src/1_user/pages/PointCharge.jsx
 import { useEffect, useState } from "react";
 import { Coins, DollarSign, Gem, PiggyBank, Wallet } from "lucide-react";
 import CoinSelectModal from "../components/CoinSelectModal";
@@ -30,9 +29,7 @@ export default function PointCharge() {
   };
 
   return (
-    <div className="p-6 text-center space-y-8">
-      <br />
-      <br />
+    <div className="px-6 pt-6 pb-10 text-center space-y-8">
       <h1 className="text-2xl font-semibold text-[#2E384D] animate-fade-in">
         충전소
       </h1>
@@ -58,9 +55,7 @@ export default function PointCharge() {
         ))}
       </div>
 
-      <p className="text-gray-500 text-sm mt-4 animate-pulse">
-        💰 1코인 = 1,000원
-      </p>
+      <p className="text-gray-500 text-sm animate-pulse">💰 1코인 = 1,000원</p>
 
       {isModalOpen && user?.userId && (
         <CoinSelectModal
@@ -68,7 +63,7 @@ export default function PointCharge() {
           onClose={() => setIsModalOpen(false)}
           coin={selectedCoin}
           userId={user.userId}
-          redirectToCheckout={true} // 🔥 추가!
+          redirectToCheckout={true}
         />
       )}
     </div>
