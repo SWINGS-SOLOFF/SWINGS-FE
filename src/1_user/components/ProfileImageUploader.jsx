@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { getProfileImageUrl } from "../api/userApi"; // 서버 이미지 경로 생성
+import { getProfileImageUrl } from "../api/userApi";
+import { ArrowLeft } from "lucide-react";
 
 export default function ProfileImageUploader({
   imageFile,
@@ -37,7 +38,14 @@ export default function ProfileImageUploader({
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-5">
+    <div className=" relative w-full flex flex-col items-center gap-5">
+      {/* ✅ 뒤로가기 버튼 */}
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-4 left-4 z-50 text-gray-500 hover:text-black transition-colors"
+      >
+        <ArrowLeft size={24} />
+      </button>
       <p className="text-sm font-semibold text-gray-700 tracking-wide">
         프로필 사진 업로드
       </p>

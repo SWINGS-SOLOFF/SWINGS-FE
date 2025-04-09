@@ -26,7 +26,7 @@ export default function MyPointPage() {
   }, []);
 
   const goToChargePage = () => {
-    navigate("/swings/mypage/points/charge");
+    navigate("/swings/shop");
   };
 
   const formatPrettyDate = (dateString) => {
@@ -44,10 +44,10 @@ export default function MyPointPage() {
     const isYesterday = date.toDateString() === yesterday.toDateString();
 
     const key = isToday
-        ? "오늘"
-        : isYesterday
-            ? "어제"
-            : format(date, "M월 d일", { locale: ko });
+      ? "오늘"
+      : isYesterday
+      ? "어제"
+      : format(date, "M월 d일", { locale: ko });
 
     if (!acc[key]) acc[key] = [];
     acc[key].push(log);
@@ -55,101 +55,101 @@ export default function MyPointPage() {
   }, {});
 
   const totalSpent = logs.reduce(
-      (sum, log) => (log.amount < 0 ? sum + Math.abs(log.amount) : sum),
-      0
+    (sum, log) => (log.amount < 0 ? sum + Math.abs(log.amount) : sum),
+    0
   );
 
   return (
-      <div className="min-h-screen bg-[#f8fafc] px-5 pt-6 pb-24">
-        {/* ✅ 카드형 보유 코인 UI */}
-        <motion.section
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="bg-white shadow-md rounded-2xl p-5 mb-6"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 mb-1">보유 중인 코인</p>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {balance.toLocaleString()} Coin
-              </h1>
-              <p className="text-xs text-gray-400 mt-1">
-                지금까지{" "}
-                <span className="font-semibold text-gray-700">
+    <div className="min-h-screen bg-[#f8fafc] px-5 pt-6 pb-24">
+      {/* ✅ 카드형 보유 코인 UI */}
+      <motion.section
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="bg-white shadow-md rounded-2xl p-5 mb-6"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-500 mb-1">보유 중인 코인</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {balance.toLocaleString()} Coin
+            </h1>
+            <p className="text-xs text-gray-400 mt-1">
+              지금까지{" "}
+              <span className="font-semibold text-gray-700">
                 {totalSpent.toLocaleString()} Coin
               </span>{" "}
-                사용했어요
-              </p>
-            </div>
-            <button
-                onClick={goToChargePage}
-                className="bg-black text-white text-sm font-semibold py-2 px-4 rounded-xl hover:opacity-90 active:scale-95"
-            >
-              💳 충전
-            </button>
+              사용했어요
+            </p>
           </div>
-        </motion.section>
+          <button
+            onClick={goToChargePage}
+            className="bg-black text-white text-sm font-semibold py-2 px-4 rounded-xl hover:opacity-90 active:scale-95"
+          >
+            💳 충전
+          </button>
+        </div>
+      </motion.section>
 
-        {/* ✅ 이벤트 배너 - 말풍선처럼 작게 */}
-        <section className="bg-[#fff3cd] text-[#856404] px-4 py-2.5 rounded-xl text-xs font-medium mb-6 shadow-sm flex items-center gap-2">
-          🎁 이벤트: 이번 주 30코인 이상 충전 시 추가 코인을 드려요!
-        </section>
+      {/* ✅ 이벤트 배너 - 말풍선처럼 작게 */}
+      <section className="bg-[#fff3cd] text-[#856404] px-4 py-2.5 rounded-xl text-xs font-medium mb-6 shadow-sm flex items-center gap-2">
+        🎁 이벤트: 이번 주 30코인 이상 충전 시 추가 코인을 드려요!
+      </section>
 
-        <hr className="my-6 border-gray-200" />
+      <hr className="my-6 border-gray-200" />
 
-        {/* ✅ 사용 내역 */}
-        <section>
-          <h2 className="text-base font-bold text-gray-800 mb-4">최근 활동</h2>
+      {/* ✅ 사용 내역 */}
+      <section>
+        <h2 className="text-base font-bold text-gray-800 mb-4">최근 활동</h2>
 
-          {logs.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center mt-10">
-                아직 사용 내역이 없어요!
-              </p>
-          ) : (
-              <div className="space-y-8">
-                {Object.entries(groupedLogs).map(([label, group], i) => (
-                    <div key={i}>
-                      <p className="text-xs text-gray-500 font-medium mb-2">{label}</p>
-                      <ul className="space-y-4">
-                        <AnimatePresence>
-                          {group.map((log, idx) => (
-                              <motion.li
-                                  key={idx}
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: 10 }}
-                                  transition={{ delay: idx * 0.05 }}
-                                  className="flex justify-between items-start"
-                              >
-                                <div>
-                                  <p className="text-[15px] text-gray-900 font-medium">
-                                    {log.description.includes("슈퍼챗")
-                                        ? "슈퍼챗 사용"
-                                        : log.description}
-                                  </p>
-                                  <p className="text-xs text-gray-400 mt-1">
-                                    {formatPrettyDate(log.createdAt)}
-                                  </p>
-                                </div>
-                                <p
-                                    className={`text-[15px] font-semibold ${
-                                        log.amount >= 0
-                                            ? "text-green-500"
-                                            : "text-red-500"
-                                    }`}
-                                >
-                                  {log.amount >= 0 ? `+${log.amount}` : log.amount} Coin
-                                </p>
-                              </motion.li>
-                          ))}
-                        </AnimatePresence>
-                      </ul>
-                    </div>
-                ))}
+        {logs.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center mt-10">
+            아직 사용 내역이 없어요!
+          </p>
+        ) : (
+          <div className="space-y-8">
+            {Object.entries(groupedLogs).map(([label, group], i) => (
+              <div key={i}>
+                <p className="text-xs text-gray-500 font-medium mb-2">
+                  {label}
+                </p>
+                <ul className="space-y-4">
+                  <AnimatePresence>
+                    {group.map((log, idx) => (
+                      <motion.li
+                        key={idx}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="flex justify-between items-start"
+                      >
+                        <div>
+                          <p className="text-[15px] text-gray-900 font-medium">
+                            {log.description.includes("슈퍼챗")
+                              ? "슈퍼챗 사용"
+                              : log.description}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {formatPrettyDate(log.createdAt)}
+                          </p>
+                        </div>
+                        <p
+                          className={`text-[15px] font-semibold ${
+                            log.amount >= 0 ? "text-green-500" : "text-red-500"
+                          }`}
+                        >
+                          {log.amount >= 0 ? `+${log.amount}` : log.amount} Coin
+                        </p>
+                      </motion.li>
+                    ))}
+                  </AnimatePresence>
+                </ul>
               </div>
-          )}
-        </section>
-      </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
   );
 }
