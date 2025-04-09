@@ -1,38 +1,37 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AnimatePresence, motion } from "framer-motion";
 
 import useUser from "../hooks/useUser";
-import useFeed from "../hooks/useFeed";
 import useNewPostForm from "../hooks/useNewPostForm";
 import useIntersectionObserver from "../hooks/useIntersectionObserver";
-import CreatePostButton from "../components/CreatePostButton";
+import usePullToRefresh from "../hooks/usePullToRefresh";
 
+import CreatePostButton from "../components/CreatePostButton";
 import FeedPost from "../components/FeedPost";
 import NewPostForm from "../components/NewPostForm";
 import ImageModal from "../components/ImageModal";
 import LikedUsersModal from "../components/LikedUsersModal";
 import feedApi from "../api/feedApi";
+import socialApi from "../api/socialApi";
 
 const FeedPage = () => {
   const { userId } = useUser();
+  const [currentUser, setCurrentUser] = useState(null);
   const [showNewPostForm, setShowNewPostForm] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [likedUsers, setLikedUsers] = useState([]);
   const [isLikedModalOpen, setIsLikedModalOpen] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [myFeedsLoaded, setMyFeedsLoaded] = useState(false);
 
   const formRef = useRef(null);
-
-  const {
-    posts,
-    setPosts,
-    fetchInitialPosts,
-    loadMorePosts,
-    hasMore,
-    loading,
-    fetchingMore,
-  } = useFeed(userId);
+  const containerRef = useRef(null);
+  const lastPostRef = useRef(null);
 
   const {
     newPostContent,
@@ -43,41 +42,87 @@ const FeedPage = () => {
     reset,
   } = useNewPostForm();
 
-  const containerRef = useRef(null);
-  const lastPostRef = useRef(null);
-
   useEffect(() => {
-    if (userId) fetchInitialPosts();
+    if (!userId) return;
+    const init = async () => {
+      try {
+        const user = await feedApi.getCurrentUser();
+        setCurrentUser(user);
+        setPage(0);
+        setHasMore(true);
+        setPosts([]);
+        await loadMoreFeedsWithUser(user);
+      } catch {
+        toast.error("사용자 정보를 불러오는 데 실패했습니다.");
+      }
+    };
+    init();
   }, [userId]);
+
+  const loadMoreFeedsWithUser = async (user) => {
+    if (!user || loading || !hasMore) return;
+    setLoading(true);
+    try {
+      const nextPage = posts.length === 0 ? 0 : page + 1;
+
+      const followings = (await socialApi.getFollowings?.(user.userId)) || [];
+      const filterType = followings.length > 0 ? "followings" : "all";
+
+      const newFeeds = await feedApi.getFeeds(user.userId, nextPage, 10, {
+        sort: "latest",
+        filter: filterType,
+      });
+
+      if (newFeeds.length === 0) {
+        setHasMore(false);
+      } else {
+        setPosts((prev) => [...prev, ...newFeeds]);
+        setPage(nextPage);
+      }
+    } catch (err) {
+      toast.error("피드를 불러오는 데 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMoreFeeds = async () => {
+    if (loading || !currentUser) return;
+
+    if (hasMore) {
+      await loadMoreFeedsWithUser(currentUser);
+    }
+
+    if (!hasMore && !myFeedsLoaded) {
+      try {
+        const myFeeds = await feedApi.getUserFeeds(currentUser.userId);
+        setPosts((prev) => [...prev, ...myFeeds]);
+        setMyFeedsLoaded(true);
+      } catch {
+        toast.error("내 피드를 불러오는 데 실패했습니다.");
+      }
+    }
+  };
 
   useIntersectionObserver({
     targetRef: lastPostRef,
-    onIntersect: () => {
-      if (!fetchingMore && hasMore) loadMorePosts();
-    },
-    enabled: hasMore && !loading,
+    onIntersect: loadMoreFeeds,
+    enabled: hasMore || !myFeedsLoaded,
   });
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (formRef.current && !formRef.current.contains(e.target)) {
-        setShowNewPostForm(false);
-        reset();
-      }
-    };
-    if (showNewPostForm) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showNewPostForm]);
+  const { isRefreshing } = usePullToRefresh({
+    onRefresh: () => {
+      setPage(0);
+      setHasMore(true);
+      setPosts([]);
+      loadMoreFeeds();
+    },
+    targetRef: containerRef,
+  });
 
   const togglePostForm = () => {
-    if (showNewPostForm) {
-      setShowNewPostForm(false);
-      reset();
-    } else {
-      setShowNewPostForm(true);
-    }
+    setShowNewPostForm((prev) => !prev);
+    if (showNewPostForm) reset();
   };
 
   const handleSubmit = async (e) => {
@@ -90,8 +135,8 @@ const FeedPage = () => {
     if (newPostImage) formData.append("file", newPostImage);
 
     try {
-      const newPostData = await feedApi.uploadFeed(formData);
-      setPosts((prev) => [newPostData, ...prev]);
+      const newPost = await feedApi.uploadFeed(formData);
+      setPosts((prev) => [newPost, ...prev]);
       reset();
       setShowNewPostForm(false);
       toast.success("게시물이 업로드되었습니다.");
@@ -100,82 +145,24 @@ const FeedPage = () => {
     }
   };
 
-  const handleLike = async (feedId) => {
-    try {
-      await feedApi.likeFeed(feedId, userId);
-      setPosts((prev) =>
-        prev.map((post) =>
-          post.feedId === feedId
-            ? { ...post, liked: true, likes: post.likes + 1 }
-            : post
-        )
-      );
-    } catch {
-      toast.error("좋아요 실패");
-    }
-  };
-
-  const handleUnlike = async (feedId) => {
-    try {
-      await feedApi.unlikeFeed(feedId, userId);
-      setPosts((prev) =>
-        prev.map((post) =>
-          post.feedId === feedId
-            ? { ...post, liked: false, likes: post.likes - 1 }
-            : post
-        )
-      );
-    } catch {
-      toast.error("좋아요 취소 실패");
-    }
-  };
-
-  const handleToggleComments = (feedId) => {
+  const updatePostInState = (updatedPost) => {
     setPosts((prev) =>
       prev.map((post) =>
-        post.feedId === feedId
-          ? { ...post, showComments: !post.showComments }
-          : post
+        post.feedId === updatedPost.feedId ? updatedPost : post
       )
     );
   };
 
-  const handleCommentSubmit = async (feedId, content) => {
-    try {
-      const newComment = await feedApi.addComment(feedId, userId, content);
-      setPosts((prev) =>
-        prev.map((post) =>
-          post.feedId === feedId
-            ? {
-                ...post,
-                comments: [...(post.comments || []), newComment],
-              }
-            : post
-        )
-      );
-    } catch {
-      toast.error("댓글 작성 실패");
-    }
+  const handleLike = async (feedId) => {
+    const post = posts.find((p) => p.feedId === feedId);
+    const updated = await feedApi.likeFeed(feedId, userId);
+    if (updated) updatePostInState(updated);
   };
 
-  const handleCommentDelete = async (commentId, feedId) => {
-    try {
-      await feedApi.deleteComment(feedId, commentId);
-      setPosts((prev) =>
-        prev.map((post) =>
-          post.feedId === feedId
-            ? {
-                ...post,
-                comments: post.comments.filter(
-                  (c) => c.commentId !== commentId
-                ),
-              }
-            : post
-        )
-      );
-    } catch {
-      toast.error("댓글 삭제 실패");
-    }
+  const handleUnlike = async (feedId) => {
+    const post = posts.find((p) => p.feedId === feedId);
+    const updated = await feedApi.unlikeFeed(feedId, userId);
+    if (updated) updatePostInState(updated);
   };
 
   const handleShowLikedBy = async (feedId) => {
@@ -188,20 +175,16 @@ const FeedPage = () => {
     }
   };
 
-  const handleDeletePost = async (feedId) => {
-    try {
-      await feedApi.deleteFeed(feedId);
-      setPosts((prev) => prev.filter((post) => post.feedId !== feedId));
-      toast.success("게시물이 삭제되었습니다");
-    } catch {
-      toast.error("게시물 삭제 실패");
-    }
-  };
-
   return (
     <div className="bg-gray-50 min-h-screen pt-4 sm:pt-8 md:pt-12">
       <ToastContainer position="bottom-right" />
       <CreatePostButton onClick={togglePostForm} customPosition="right-20" />
+
+      {isRefreshing && (
+        <div className="text-center py-3 text-sm text-blue-500 animate-pulse">
+          🔄 새로고침 중입니다...
+        </div>
+      )}
 
       <AnimatePresence>
         {showNewPostForm && (
@@ -236,6 +219,18 @@ const FeedPage = () => {
         style={{ height: "calc(100vh - 64px)" }}
       >
         <div className="space-y-4 pb-24">
+          {loading && (
+            <div className="text-center py-8 text-gray-500 text-sm">
+              피드를 불러오는 중...
+            </div>
+          )}
+
+          {!loading && posts.length === 0 && (
+            <div className="text-center py-8 text-gray-400 text-sm">
+              표시할 피드가 없습니다.
+            </div>
+          )}
+
           {posts.map((post, index) => (
             <div
               key={post.feedId}
@@ -243,15 +238,66 @@ const FeedPage = () => {
             >
               <FeedPost
                 post={post}
-                currentUser={{ userId }}
+                currentUser={currentUser}
                 onImageClick={setSelectedImage}
                 onLike={handleLike}
                 onUnlike={handleUnlike}
-                onToggleComments={handleToggleComments}
-                onCommentSubmit={handleCommentSubmit}
-                onCommentDelete={handleCommentDelete}
-                onDelete={handleDeletePost}
+                onToggleComments={(feedId) => {
+                  setPosts((prev) =>
+                    prev.map((p) =>
+                      p.feedId === feedId
+                        ? { ...p, showComments: !p.showComments }
+                        : p
+                    )
+                  );
+                }}
+                onCommentSubmit={async (feedId, content) => {
+                  try {
+                    const newComment = await feedApi.addComment(
+                      feedId,
+                      userId,
+                      content
+                    );
+                    setPosts((prev) =>
+                      prev.map((p) =>
+                        p.feedId === feedId
+                          ? { ...p, comments: [...p.comments, newComment] }
+                          : p
+                      )
+                    );
+                  } catch {
+                    toast.error("댓글 추가 실패");
+                  }
+                }}
+                onCommentDelete={async (commentId, feedId) => {
+                  try {
+                    await feedApi.deleteComment(feedId, commentId);
+                    setPosts((prev) =>
+                      prev.map((p) =>
+                        p.feedId === feedId
+                          ? {
+                              ...p,
+                              comments: p.comments.filter(
+                                (c) => c.commentId !== commentId
+                              ),
+                            }
+                          : p
+                      )
+                    );
+                  } catch {
+                    toast.error("댓글 삭제 실패");
+                  }
+                }}
+                onDelete={async (feedId) => {
+                  try {
+                    await feedApi.deleteFeed(feedId);
+                    setPosts((prev) => prev.filter((p) => p.feedId !== feedId));
+                  } catch {
+                    toast.error("게시물 삭제 실패");
+                  }
+                }}
                 onShowLikedBy={handleShowLikedBy}
+                updatePostInState={updatePostInState}
               />
             </div>
           ))}

@@ -15,12 +15,10 @@ import { RiMentalHealthFill } from "react-icons/ri";
 import { FiSettings } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { normalizeImageUrl } from "../utils/imageUtils";
-import TruncatedText from "./TruncatedText";
-import { toast } from "react-toastify";
 import socialApi from "../api/socialApi";
 
 import ProfileDetailModal from "./ProfileDetailModal";
-import ImageModal from "./ImageModal"; // ✅ 이미지 확대 보기
+import ImageModal from "./ImageModal";
 import IntroduceEditor from "../../1_user/components/IntroduceEditor.jsx";
 
 const SocialProfile = ({
@@ -143,7 +141,6 @@ const SocialProfile = ({
               await socialApi.updateIntroduce(user.userId, newText);
               setIntroduce(newText);
               refreshProfileData();
-              toast.success("자기소개가 저장되었습니다.");
             }}
           />
         </div>
@@ -152,17 +149,18 @@ const SocialProfile = ({
       {!isCurrentUser && (
         <div className="flex space-x-2 mb-4 px-4">
           <button
-            className={`flex-1 py-1.5 rounded-md text-sm font-medium transition ${
-              isFollowing
-                ? "bg-gray-100 text-black"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
+            className={`flex-1 py-1.5 rounded-md text-sm font-medium transition
+    ${
+      isFollowing
+        ? "bg-red-500 text-white hover:bg-red-600" // 언팔로우 버튼 (팔로우한 상태)
+        : "bg-blue-500 text-white hover:bg-blue-600" // 팔로우 버튼 (팔로우 전)
+    }`}
             onClick={onFollowToggle}
           >
-            {isFollowing ? "팔로잉" : "팔로우"}
+            {isFollowing ? "언팔로우" : "팔로우"}
           </button>
           <button className="flex-1 py-1.5 rounded-md bg-gray-100 text-black text-sm font-medium hover:bg-gray-200 transition">
-            메시지
+            슈퍼챗
           </button>
         </div>
       )}
