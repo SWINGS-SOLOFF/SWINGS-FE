@@ -4,7 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import useProfileData from "../hooks/useProfileData";
-import { useFeedData } from "../hooks/useFeedData";
+import useFeedData from "../hooks/useFeedData";
 
 import SocialProfile from "../components/SocialProfile";
 import ImageModal from "../components/ImageModal";
@@ -13,6 +13,7 @@ import LikedUsersModal from "../components/LikedUsersModal";
 import FeedDetailModal from "../components/FeedDetailModal";
 
 import socialApi from "../api/socialApi";
+import feedApi from "../api/feedApi"; // ✅ 추가된 부분
 
 const SocialPage = () => {
   const { userId: paramUserId } = useParams();
@@ -24,7 +25,6 @@ const SocialPage = () => {
   );
 
   const [selectedFeed, setSelectedFeed] = useState(null);
-  const [showFeedModal, setShowFeedModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showFollowersList, setShowFollowersList] = useState(false);
   const [showFollowingList, setShowFollowingList] = useState(false);
@@ -39,16 +39,17 @@ const SocialPage = () => {
     followers,
     followings,
     refreshProfileData,
-    setIntroduce, // ✅ 추가
+    setIntroduce,
   } = useProfileData(viewedUserId, currentUser);
 
   const {
-    feeds,
+    posts: feeds,
+    setPosts: setFeeds,
+    refreshFeeds,
     handleLikeToggle,
     handleDelete,
     handleCommentSubmit,
     handleCommentDelete,
-    refreshFeeds,
   } = useFeedData(viewedUserId, currentUser, setSelectedFeed);
 
   useEffect(() => {
@@ -73,7 +74,7 @@ const SocialPage = () => {
 
   const handleShowLikedBy = async (feedId) => {
     try {
-      const users = await socialApi.getLikedUsers(feedId);
+      const users = await feedApi.getLikedUsers(feedId); // ✅ feedApi로 수정됨
       setLikedByUsers(users);
       setShowLikedByModal(true);
     } catch {
@@ -83,7 +84,17 @@ const SocialPage = () => {
 
   const handleFeedClick = (feed) => {
     setSelectedFeed(feed);
-    setShowFeedModal(true);
+  };
+
+  const handleFeedDelete = async (feedId) => {
+    try {
+      await handleDelete(feedId);
+      setFeeds((prev) => prev.filter((feed) => feed.feedId !== feedId));
+      setSelectedFeed(null);
+      toast.success("게시물이 삭제되었습니다.");
+    } catch {
+      toast.error("게시물 삭제에 실패했습니다.");
+    }
   };
 
   return (
@@ -94,7 +105,7 @@ const SocialPage = () => {
         user={profile}
         userStats={stats}
         userIntroduce={introduce}
-        setIntroduce={setIntroduce} // ✅ 추가
+        setIntroduce={setIntroduce}
         isCurrentUser={currentUser?.userId === viewedUserId}
         isFollowing={isFollowing}
         onFollowToggle={async () => {
@@ -117,10 +128,9 @@ const SocialPage = () => {
         onGoToSettings={() => navigate("/swings/mypage")}
         feeds={feeds}
         onFeedClick={handleFeedClick}
-        refreshProfileData={refreshProfileData} // ✅ 추가
+        refreshProfileData={refreshProfileData}
       />
 
-      {/* 모달 */}
       {showFollowersList && (
         <FollowListModal
           users={followers}
@@ -141,24 +151,21 @@ const SocialPage = () => {
           onClose={() => setShowLikedByModal(false)}
         />
       )}
+
       {selectedFeed && (
         <FeedDetailModal
           feed={selectedFeed}
           currentUser={currentUser}
-          onClose={() => {
-            setShowFeedModal(false);
-            setSelectedFeed(null);
-          }}
-          onLikeToggle={async (feedId, isLiked) => {
-            const updated = await handleLikeToggle(feedId, isLiked);
-            if (updated) setSelectedFeed({ ...updated });
-          }}
-          onDelete={handleDelete}
+          onClose={() => setSelectedFeed(null)}
+          onLikeToggle={handleLikeToggle}
+          onDelete={handleFeedDelete}
           onShowLikedBy={handleShowLikedBy}
           onCommentSubmit={handleCommentSubmit}
           onCommentDelete={handleCommentDelete}
+          setSelectedFeed={setSelectedFeed}
         />
       )}
+
       {selectedImage && (
         <ImageModal
           imageUrl={selectedImage}
