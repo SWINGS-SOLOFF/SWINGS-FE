@@ -3,6 +3,7 @@ import { fetchUserData, updateUserInfo, checkUsername } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
 import { removeToken } from "../utils/userUtils";
 import Select from "react-select";
+import { ArrowLeft } from "lucide-react"; 
 
 const regionOptions = [
   "서울",
@@ -183,7 +184,14 @@ export default function UpdateForm() {
     );
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-10">
+    <div className=" relative  min-h-screen bg-white flex flex-col items-center justify-center px-4">
+      {/* ✅ 뒤로가기 버튼 */}
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-4 left-4 text-gray-500 hover:text-black transition-colors"
+      >
+        <ArrowLeft size={24} />
+      </button>
       <div className="w-full max-w-sm space-y-6">
         <br />
         <h2 className="text-2xl font-bold text-center text-[#2E384D]">
