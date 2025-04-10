@@ -3,5 +3,7 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [require("@tailwindcss/line-clamp")],
+  plugins: [
+    require("tailwind-scrollbar-hide"), // ✅ 새로 추가한 플러그인
+  ],
 };

@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Coins, DollarSign, Gem, PiggyBank, Wallet } from "lucide-react";
+import {
+  Coins,
+  DollarSign,
+  Gem,
+  PiggyBank,
+  Wallet,
+  ArrowLeft,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom"; // ✅ 추가
 import CoinSelectModal from "../components/CoinSelectModal";
 import { fetchUserData } from "../api/userApi";
 
@@ -16,6 +24,7 @@ export default function PointCharge() {
   const [user, setUser] = useState(null);
   const [selectedCoin, setSelectedCoin] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate(); // ✅ 뒤로가기용
 
   useEffect(() => {
     fetchUserData()
@@ -29,7 +38,15 @@ export default function PointCharge() {
   };
 
   return (
-    <div className="px-6 pt-6 pb-10 text-center space-y-8">
+    <div className="px-6 pt-6 pb-10 text-center space-y-8 relative">
+      {/* ✅ 뒤로가기 버튼 */}
+      <button
+        className="absolute left-4 top-4 text-gray-500 hover:text-black transition-colors"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft size={24} />
+      </button>
+
       <h1 className="text-2xl font-semibold text-[#2E384D] animate-fade-in">
         충전소
       </h1>

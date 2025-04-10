@@ -4,6 +4,7 @@ import {
   fetchUserData,
   getPointBalance,
   getProfileImageUrl,
+  updateUserInfo,
 } from "../api/userApi";
 import { removeToken } from "../utils/userUtils";
 import {
@@ -14,13 +15,25 @@ import {
   Trash2,
   UserCircle,
   ImageIcon,
+  ArrowLeft,
+  Pencil,
+  X,
 } from "lucide-react";
+import IntroduceEditor from "../components/IntroduceEditor";
+import ProfileImageUploader from "../components/ProfileImageUploader";
+import PasswordChangeForm from "../components/PasswordChangeForm";
+import { toast } from "react-toastify";
 
 export default function MyPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(null);
   const [point, setPoint] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+
+  const [showPasswordModal, setShowPasswordModal] = useState(false); // ✅ 추가
 
   useEffect(() => {
     const loadUser = async () => {
@@ -45,108 +58,161 @@ export default function MyPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center text-gray-500 h-[calc(100vh-128px)]">
+      <div className="flex items-center justify-center text-gray-400 h-[calc(100vh-128px)]">
         로딩 중...
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-b from-white to-slate-100 px-4 py-8 min-h-screen">
-      <div className="max-w-md mx-auto space-y-8">
-        {/* ✅ 프로필 섹션 */}
-        <div className="flex flex-col items-center text-center">
+    <div className="bg-gradient-to-b from-white to-[#f9f9fb] px-4 py-8 min-h-screen font-sans relative">
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-4 left-4 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition z-10"
+        aria-label="뒤로가기"
+      >
+        <ArrowLeft size={20} className="text-gray-600" />
+      </button>
+
+      {/* 프로필 영역 */}
+      <div className="flex flex-col items-center text-center mb-8">
+        <div
+          className="relative w-24 h-24 cursor-pointer group"
+          onClick={() => setShowImageModal(true)}
+          title="프로필 이미지 수정"
+        >
           {formData?.userImg ? (
             <img
               src={getProfileImageUrl(formData.userImg)}
               alt="프로필"
-              className="w-24 h-24 object-cover rounded-full border border-gray-300 shadow-md"
+              className="w-24 h-24 object-cover rounded-full border-4 border-white shadow-md group-hover:brightness-95 transition"
             />
           ) : (
-            <UserCircle className="text-gray-400" size={64} />
-          )}
-          <h2 className="text-xl font-bold text-gray-800 mt-3">
-            안녕하세요, {formData?.username} 님!
-          </h2>
-          <p className="text-sm text-gray-500">
-            계정 설정 및 활동을 관리하세요.
-          </p>
-        </div>
-
-        {/* ✅ 포인트 */}
-        <div className="bg-white rounded-xl shadow-md px-5 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Coins className="text-yellow-500" />
-            <div>
-              <p className="text-sm text-gray-500">보유 코인</p>
-              <p className="text-xl font-bold text-green-600">
-                {point.toLocaleString()}P
-              </p>
+            <div className="w-24 h-24 flex items-center justify-center rounded-full bg-gray-100 border-4 border-white shadow-md group-hover:brightness-95 transition">
+              <UserCircle className="text-gray-300" size={80} />
             </div>
+          )}
+          <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full border shadow group-hover:scale-105 transition">
+            <Pencil size={16} className="text-gray-600" />
           </div>
-          <button
-            onClick={() => navigate("/swings/mypage/points")}
-            className="text-sm text-blue-600 hover:underline"
-          >
-            내역 보기
-          </button>
         </div>
-
-        {/* ✅ 액션 버튼들 */}
-        <div className="grid gap-3">
-          <ActionCard
-            icon={<Settings size={20} />}
-            text="회원정보 수정"
-            bg="bg-green-100"
-            textColor="text-green-700"
-            onClick={() => navigate("/swings/mypage/update")}
-          />
-          <ActionCard
-            icon={<ImageIcon size={20} />}
-            text="프로필 사진 수정"
-            bg="bg-yellow-100"
-            textColor="text-yellow-700"
-            onClick={() => navigate("/swings/mypage/profileImage")}
-          />
-          <ActionCard
-            icon={<KeyRound size={20} />}
-            text="비밀번호 변경"
-            bg="bg-blue-100"
-            textColor="text-blue-700"
-            onClick={() => navigate("/swings/mypage/passwordchange")}
-          />
-          <ActionCard
-            icon={<Trash2 size={20} />}
-            text="회원 탈퇴"
-            bg="bg-red-100"
-            textColor="text-red-700"
-            onClick={() => navigate("/swings/mypage/userdelete")}
-          />
-        </div>
-
-        {/* ✅ 로그아웃 */}
-        <div className="text-center pt-2">
-          <button
-            onClick={handleLogout}
-            className="text-sm text-gray-400 hover:text-red-500 flex items-center justify-center gap-1 transition"
-          >
-            <LogOut size={16} />
-            로그아웃
-          </button>
-        </div>
+        <h2 className="text-2xl font-extrabold text-gray-800 mt-3 tracking-tight">
+          @{formData?.username}
+        </h2>
       </div>
+
+      {/* 자기소개 수정 */}
+      {formData && (
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-6 shadow-sm">
+          <div className="text-sm text-gray-500 mb-2">프로필 메시지</div>
+          <IntroduceEditor
+            initialText={formData.introduce || ""}
+            onSave={async (newText) => {
+              try {
+                await updateUserInfo(formData.userId, newText);
+                setFormData({ ...formData, introduce: newText });
+                toast.success("자기소개가 저장되었습니다.");
+              } catch (err) {
+                toast.error("자기소개 저장 실패");
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {/* 보유 코인 */}
+      <div className="backdrop-blur-sm bg-white/80 border border-gray-200 rounded-2xl p-4 mb-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-gray-600">
+            <Coins size={18} className="text-yellow-500" />
+            <span className="text-sm">보유 코인</span>
+          </div>
+          <div className="text-lg font-bold text-green-600">
+            {point.toLocaleString()}P
+          </div>
+        </div>
+        <button
+          onClick={() => navigate("/swings/mypage/points")}
+          className="mt-3 w-full text-center text-sm text-purple-600 hover:underline"
+        >
+          코인 내역 보기 →
+        </button>
+      </div>
+
+      {/* 설정 액션들 */}
+      <div className="space-y-3">
+        <LineAction
+          icon={<Settings size={18} />}
+          text="회원정보 수정"
+          onClick={() => navigate("/swings/mypage/update")}
+        />
+        <LineAction
+          icon={<KeyRound size={18} />}
+          text="비밀번호 변경"
+          onClick={() => setShowPasswordModal(true)} // ✅ 모달로 변경
+        />
+        <LineAction
+          icon={<Trash2 size={18} />}
+          text="회원 탈퇴"
+          textColor="text-red-500"
+          onClick={() => navigate("/swings/mypage/userdelete")}
+        />
+      </div>
+
+      {/* 로그아웃 */}
+      <div className="text-center mt-10 text-sm">
+        <button
+          onClick={handleLogout}
+          className="text-gray-400 hover:text-red-500 flex items-center justify-center gap-1 transition"
+        >
+          <LogOut size={16} />
+          로그아웃
+        </button>
+      </div>
+
+      {/* ✅ 이미지 수정 모달 */}
+      {showImageModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <ProfileImageUploader
+            imageFile={imageFile}
+            setImageFile={setImageFile}
+            initialImage={formData?.userImg}
+            onClose={() => setShowImageModal(false)}
+            onComplete={(filename) =>
+              setFormData({ ...formData, userImg: filename })
+            }
+          />
+        </div>
+      )}
+
+      {/* ✅ 비밀번호 변경 모달 */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="relative bg-white rounded-2xl p-6 w-full max-w-md shadow-lg">
+            <button
+              onClick={() => setShowPasswordModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-black"
+            >
+              <X size={20} />
+            </button>
+            <PasswordChangeForm isModal />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function ActionCard({ icon, text, bg, textColor, onClick }) {
+function LineAction({ icon, text, onClick, textColor = "text-gray-700" }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl ${bg} ${textColor} font-semibold shadow hover:shadow-md hover:scale-[1.01] transition-all duration-200`}
+      className={`w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-xl bg-white hover:bg-gray-50 transition ${textColor}`}
     >
-      {icon}
-      <span>{text}</span>
+      <div className="flex items-center gap-3 text-sm font-medium">
+        {icon} {text}
+      </div>
+      <span className="text-gray-300">›</span>
     </button>
   );
 }
