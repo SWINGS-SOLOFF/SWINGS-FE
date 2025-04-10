@@ -154,13 +154,11 @@ const FeedPage = () => {
   };
 
   const handleLike = async (feedId) => {
-    const post = posts.find((p) => p.feedId === feedId);
     const updated = await feedApi.likeFeed(feedId, userId);
     if (updated) updatePostInState(updated);
   };
 
   const handleUnlike = async (feedId) => {
-    const post = posts.find((p) => p.feedId === feedId);
     const updated = await feedApi.unlikeFeed(feedId, userId);
     if (updated) updatePostInState(updated);
   };

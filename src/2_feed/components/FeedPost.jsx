@@ -121,7 +121,7 @@ const FeedPost = ({
           <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
             {post.userProfilePic ? (
               <img
-                src={post.userProfilePic}
+                src={normalizeImageUrl(post.userProfilePic)}
                 alt="프로필"
                 className="w-full h-full object-cover"
               />
@@ -219,9 +219,9 @@ const FeedPost = ({
         <div className="px-4 pb-2">
           <div className="flex items-start p-2 bg-gray-50 rounded-lg">
             <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 flex-shrink-0">
-              {oldestComment.userAvatarUrl ? (
+              {oldestComment.userProfilePic ? (
                 <img
-                  src={oldestComment.userAvatarUrl}
+                  src={normalizeImageUrl(oldestComment.userProfilePic)}
                   alt={oldestComment.username}
                   className="w-full h-full object-cover rounded-full"
                 />
@@ -283,9 +283,9 @@ const FeedPost = ({
                     className="flex items-start mb-4 pb-4 border-b border-gray-200 last:border-b-0 hover:bg-gray-100/50 rounded-lg p-2 transition"
                   >
                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3 flex-shrink-0">
-                      {comment.userAvatarUrl ? (
+                      {comment.userProfilePic ? (
                         <img
-                          src={comment.userAvatarUrl}
+                          src={normalizeImageUrl(comment.userProfilePic)}
                           alt={comment.username}
                           className="w-full h-full object-cover rounded-full"
                         />
@@ -326,7 +326,7 @@ const FeedPost = ({
                         className="text-gray-400 hover:text-red-600 ml-2 transition"
                         aria-label="댓글 삭제"
                       >
-                        <FaTrash className="text-sm" />
+                        <FaTrash className="text-sm text-red-600" />
                       </button>
                     )}
                   </div>
