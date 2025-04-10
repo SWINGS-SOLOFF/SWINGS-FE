@@ -67,13 +67,16 @@ export default function IntroduceEditor() {
       <p className="text-sm text-black leading-relaxed whitespace-pre-wrap">
         {text || "아직 자기소개가 없습니다."}
       </p>
-      <button
-        onClick={() => setEditing(true)}
-        className="absolute top-0 right-0 text-gray-400 hover:text-gray-700 p-2"
-        title="자기소개 수정"
-      >
-        ✏️
-      </button>
+      <div className="absolute top-0 right-0 flex gap-2">
+        {/* 수정 버튼 */}
+        <button
+          onClick={() => setEditing(true)}
+          className="text-sm text-black border border-black rounded-md px-2 py-1 hover:bg-gray-100 transition"
+          title="자기소개 수정"
+        >
+          수정
+        </button>
+      </div>
     </div>
   );
 }
