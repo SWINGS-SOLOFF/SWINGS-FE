@@ -42,6 +42,19 @@ export const getMatchGroupById = async (matchGroupId) => {
     }
 };
 
+// 근처 그룹 조회
+export const fetchNearbyGroups = async (latitude, longitude, radiusInKm = 5) => {
+    try {
+        const response = await axiosInstance.get(`${BASE_URL}/nearby`, {
+            params: { latitude, longitude, radiusInKm },
+        });
+        return Array.isArray(response.data) ? response.data : [];
+    } catch (error) {
+        console.error("근처 그룹 조회 중 오류 발생:", error);
+        return [];
+    }
+};
+
 // 현재 로그인한 사용자 정보 가져오기
 export const getCurrentUser = async () => {
     try {
