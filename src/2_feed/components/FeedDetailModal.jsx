@@ -13,6 +13,7 @@ import {
 import LikedUsersModal from "./LikedUsersModal";
 import feedApi from "../api/feedApi";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+import { normalizeImageUrl } from "../utils/imageUtils";
 
 const FeedDetailModal = ({
   feed,
@@ -321,7 +322,7 @@ const FeedDetailModal = ({
                     <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden shrink-0">
                       {comment.userProfilePic ? (
                         <img
-                          src={comment.userProfilePic}
+                          src={normalizeImageUrl(comment.userProfilePic)}
                           alt={comment.username}
                           className="w-full h-full object-cover"
                         />
