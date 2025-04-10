@@ -1,26 +1,32 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { getProfileImageUrl } from "../api/userApi";
-import { ArrowLeft } from "lucide-react";
+import { getProfileImageUrl, updateProfileImage } from "../api/userApi";
+import { toast } from "react-toastify";
 
 export default function ProfileImageUploader({
   imageFile,
   setImageFile,
   initialImage,
+  onClose,
+  onComplete,
 }) {
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
+  // 🔄 이미지 미리보기 URL 관리
   useEffect(() => {
     if (imageFile) {
       const objectUrl = URL.createObjectURL(imageFile);
       setPreviewUrl(objectUrl);
       return () => URL.revokeObjectURL(objectUrl);
-    } else if (initialImage) {
-      setPreviewUrl(getProfileImageUrl(initialImage));
-    } else {
-      setPreviewUrl(null);
     }
-  }, [imageFile, initialImage]);
+  }, [imageFile]);
+
+  useEffect(() => {
+    if (!imageFile && initialImage) {
+      setPreviewUrl(getProfileImageUrl(initialImage));
+    }
+  }, [initialImage, imageFile]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -37,25 +43,47 @@ export default function ProfileImageUploader({
     setPreviewUrl(null);
   };
 
+  const handleSave = async () => {
+    if (!imageFile) {
+      toast.error("이미지를 선택해주세요.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const res = await updateProfileImage(imageFile);
+      toast.success("프로필 이미지가 저장되었습니다.");
+      onComplete?.(res.filename);
+      onClose();
+      window.location.reload(); // ✅ 새로고침
+    } catch (err) {
+      console.error("업로드 실패:", err);
+      toast.error("업로드에 실패했습니다.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
-    <div className=" relative w-full flex flex-col items-center gap-5">
-      {/* ✅ 뒤로가기 버튼 */}
+    <div className="bg-white rounded-2xl p-6 w-[90%] max-w-sm relative shadow-lg">
+      {/* 닫기 버튼 */}
       <button
-        onClick={() => navigate(-1)}
-        className="absolute top-4 left-4 z-50 text-gray-500 hover:text-black transition-colors"
+        onClick={onClose}
+        className="absolute top-4 right-4 text-gray-500 hover:text-black"
       >
-        <ArrowLeft size={24} />
+        <X size={20} />
       </button>
-      <p className="text-sm font-semibold text-gray-700 tracking-wide">
+
+      <p className="text-sm font-semibold text-gray-700 tracking-wide text-center mb-4">
         프로필 사진 업로드
       </p>
 
-      <div className="relative w-36 h-36">
+      <div className="relative w-36 h-36 mx-auto">
         {previewUrl ? (
           <>
             <img
               src={previewUrl}
-              alt="미리보기"
+              alt="프로필 이미지 미리보기"
               className="w-36 h-36 object-cover rounded-full shadow-lg border-2 border-gray-300 transition-transform duration-300 hover:scale-105"
             />
             <button
@@ -72,8 +100,8 @@ export default function ProfileImageUploader({
         )}
       </div>
 
-      {/* ✨ 트렌디하고 심플한 버튼 */}
-      <label className="cursor-pointer bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm px-6 py-2 rounded-full shadow-md hover:opacity-90 transition">
+      {/* 이미지 선택 - 가운데 정렬 */}
+      <label className="cursor-pointer mt-4 mx-auto block bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm px-6 py-2 rounded-full shadow-md hover:opacity-90 transition text-center">
         이미지 선택
         <input
           type="file"
@@ -82,6 +110,15 @@ export default function ProfileImageUploader({
           className="hidden"
         />
       </label>
+
+      {/* 저장 버튼 */}
+      <button
+        onClick={handleSave}
+        disabled={isSaving}
+        className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm py-2 rounded-full transition disabled:opacity-50"
+      >
+        {isSaving ? "저장 중..." : "저장하기"}
+      </button>
     </div>
   );
 }
