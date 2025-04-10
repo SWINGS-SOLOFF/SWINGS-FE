@@ -1,52 +1,50 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-const usePullToRefresh = ({
-  containerRef,
-  onRefresh,
-  setIsPulling,
-  setPullY,
-}) => {
-  const touchStartY = { current: 0 };
+const usePullToRefresh = ({ onRefresh, targetRef }) => {
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container || !("ontouchstart" in window)) return;
+    const target = targetRef.current;
+    if (!target) return;
+
+    let startY = 0;
+    let isPulling = false;
 
     const handleTouchStart = (e) => {
-      if (container.scrollTop === 0) {
-        touchStartY.current = e.touches[0].clientY;
-        setIsPulling(true);
+      if (target.scrollTop === 0) {
+        startY = e.touches[0].clientY;
+        isPulling = true;
       }
     };
 
     const handleTouchMove = (e) => {
-      const deltaY = e.touches[0].clientY - touchStartY.current;
-      if (deltaY > 0) {
-        e.preventDefault();
-        setPullY(Math.min(deltaY, 100));
+      if (!isPulling) return;
+      const currentY = e.touches[0].clientY;
+      if (currentY - startY > 80) {
+        isPulling = false;
+        setIsRefreshing(true);
+        Promise.resolve(onRefresh()).finally(() => {
+          setTimeout(() => setIsRefreshing(false), 800);
+        });
       }
     };
 
     const handleTouchEnd = () => {
-      if (touchStartY.current && pullY > 40) onRefresh();
-      setIsPulling(false);
-      setPullY(0);
+      isPulling = false;
     };
 
-    container.addEventListener("touchstart", handleTouchStart, {
-      passive: true,
-    });
-    container.addEventListener("touchmove", handleTouchMove, {
-      passive: false,
-    });
-    container.addEventListener("touchend", handleTouchEnd, { passive: true });
+    target.addEventListener("touchstart", handleTouchStart);
+    target.addEventListener("touchmove", handleTouchMove);
+    target.addEventListener("touchend", handleTouchEnd);
 
     return () => {
-      container.removeEventListener("touchstart", handleTouchStart);
-      container.removeEventListener("touchmove", handleTouchMove);
-      container.removeEventListener("touchend", handleTouchEnd);
+      target.removeEventListener("touchstart", handleTouchStart);
+      target.removeEventListener("touchmove", handleTouchMove);
+      target.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [containerRef, onRefresh, setIsPulling, setPullY]);
+  }, [onRefresh, targetRef]);
+
+  return { isRefreshing };
 };
 
 export default usePullToRefresh;
