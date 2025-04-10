@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  FaHeart,
   FaTrash,
   FaUser,
   FaComment,
   FaPaperPlane,
+  FaTimes,
 } from "react-icons/fa";
-import { motion } from "framer-motion";
 import { normalizeImageUrl } from "../utils/imageUtils";
 import { useNavigate } from "react-router-dom";
+import LikeButton from "./LikeButton";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 const FeedPost = ({
   post,
@@ -22,28 +23,34 @@ const FeedPost = ({
   onImageClick,
   onShowLikedBy,
   likeLoading = {},
+  updatePostInState,
 }) => {
   const [newComment, setNewComment] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isCommentExpanded, setIsCommentExpanded] = useState(false);
   const [expandedCommentIds, setExpandedCommentIds] = useState([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const navigate = useNavigate();
   const contentRef = useRef(null);
-  const firstCommentRef = useRef(null);
+  const commentRefs = useRef({});
 
   const [isContentTruncated, setIsContentTruncated] = useState(false);
-  const [isCommentTruncated, setIsCommentTruncated] = useState(false);
+  const [commentTruncatedState, setCommentTruncatedState] = useState({});
 
   useEffect(() => {
     if (contentRef.current) {
       const isOverflowing = contentRef.current.scrollHeight > 80;
       setIsContentTruncated(isOverflowing);
     }
-    if (firstCommentRef.current) {
-      const isOverflowing = firstCommentRef.current.scrollHeight > 80;
-      setIsCommentTruncated(isOverflowing);
-    }
+
+    const newTruncatedState = {};
+    Object.keys(commentRefs.current).forEach((commentId) => {
+      if (commentRefs.current[commentId]) {
+        newTruncatedState[commentId] =
+          commentRefs.current[commentId].scrollHeight > 80;
+      }
+    });
+    setCommentTruncatedState(newTruncatedState);
   }, [post.caption, post.comments]);
 
   const formatTimeAgo = (dateString) => {
@@ -60,16 +67,15 @@ const FeedPost = ({
     if (post.userId) navigate(`/swings/profile/${post.userId}`);
   };
 
-  const handleCommentSubmit = (e) => {
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (newComment.trim()) {
-      onCommentSubmit(post.feedId, newComment);
+    if (!newComment.trim()) return;
+    try {
+      await onCommentSubmit(post.feedId, newComment);
       setNewComment("");
+    } catch (err) {
+      console.error("❌ 댓글 추가 실패:", err);
     }
-  };
-
-  const handleToggleLike = () => {
-    post.liked ? onUnlike(post.feedId) : onLike(post.feedId);
   };
 
   const toggleCommentExpand = (commentId) => {
@@ -80,8 +86,29 @@ const FeedPost = ({
     );
   };
 
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    onDelete(post.feedId);
+    setShowDeleteConfirm(false);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+  };
+
   const sortedComments = [...(post.comments || [])].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
+  const oldestComment = [...(post.comments || [])].sort(
+    (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+  )[0];
+
+  const otherComments = sortedComments.filter(
+    (comment) => comment.commentId !== oldestComment?.commentId
   );
 
   return (
@@ -94,7 +121,7 @@ const FeedPost = ({
           <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
             {post.userProfilePic ? (
               <img
-                src={post.userProfilePic}
+                src={normalizeImageUrl(post.userProfilePic)}
                 alt="프로필"
                 className="w-full h-full object-cover"
               />
@@ -102,11 +129,32 @@ const FeedPost = ({
               <FaUser className="text-gray-600 text-lg" />
             )}
           </div>
-          <span className="text-gray-700 text-sm">
-            {post.username || "사용자"}
-          </span>
+          <div className="flex flex-col">
+            <span className="text-gray-700 text-sm font-medium">
+              {post.username || "사용자"}
+            </span>
+            <span className="text-xs text-gray-400">
+              {formatTimeAgo(post.createdAt)}
+            </span>
+          </div>
         </div>
+
+        {currentUser?.userId?.toString() === post?.userId?.toString() && (
+          <button
+            onClick={handleDeleteClick}
+            className="text-gray-400 hover:text-red-600 ml-2 transition w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100"
+            aria-label="게시물 삭제"
+          >
+            <FaTimes className="text-lg" />
+          </button>
+        )}
       </div>
+
+      <DeleteConfirmModal
+        visible={showDeleteConfirm}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+      />
 
       {(post.image || post.imageUrl) && (
         <div
@@ -144,17 +192,19 @@ const FeedPost = ({
 
       <div className="px-4 py-2 border-t border-gray-100 bg-white">
         <div className="flex items-center justify-between text-sm text-gray-700">
-          <motion.button
-            whileTap={{ scale: 0.85 }}
-            onClick={handleToggleLike}
-            className="flex items-center gap-2 text-red-500"
-          >
-            <FaHeart
-              className={`text-xl ${
-                post.liked ? "fill-current" : "opacity-50"
-              }`}
-            />
-          </motion.button>
+          <LikeButton
+            liked={post.liked}
+            likeCount={post.likes}
+            onLike={async () => {
+              const updated = await onLike(post.feedId);
+              if (updated && updatePostInState) updatePostInState(updated);
+            }}
+            onUnlike={async () => {
+              const updated = await onUnlike(post.feedId);
+              if (updated && updatePostInState) updatePostInState(updated);
+            }}
+            isLoading={likeLoading[post.feedId]}
+          />
 
           <button
             onClick={() => onShowLikedBy && onShowLikedBy(post.feedId)}
@@ -163,31 +213,52 @@ const FeedPost = ({
             {post.likes || 0}명이 좋아합니다
           </button>
         </div>
-
-        {sortedComments.length > 0 && (
-          <div
-            className="mt-2 text-sm text-gray-800 bg-gray-50 px-3 py-2 rounded-lg cursor-pointer relative"
-            onClick={() => setIsCommentExpanded(!isCommentExpanded)}
-          >
-            <div className="flex items-center">
-              <span className="font-semibold text-left">
-                {sortedComments[0].username}
-              </span>
-              <span
-                ref={firstCommentRef}
-                className={`ml-2 text-center flex-grow break-words whitespace-pre-wrap ${
-                  !isCommentExpanded ? "line-clamp-3" : ""
-                }`}
-              >
-                {sortedComments[0].content}
-              </span>
-            </div>
-            {!isCommentExpanded && isCommentTruncated && (
-              <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none" />
-            )}
-          </div>
-        )}
       </div>
+
+      {oldestComment && !post.showComments && (
+        <div className="px-4 pb-2">
+          <div className="flex items-start p-2 bg-gray-50 rounded-lg">
+            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 flex-shrink-0">
+              {oldestComment.userProfilePic ? (
+                <img
+                  src={normalizeImageUrl(oldestComment.userProfilePic)}
+                  alt={oldestComment.username}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <FaUser className="text-gray-700 text-sm" />
+              )}
+            </div>
+            <div className="flex-grow">
+              <div className="flex items-center mb-1">
+                <span className="font-semibold text-gray-900 text-xs mr-2">
+                  {oldestComment.username || "사용자"}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {formatTimeAgo(oldestComment.createdAt)}
+                </span>
+              </div>
+              <div
+                ref={(el) =>
+                  (commentRefs.current[oldestComment.commentId] = el)
+                }
+                className={`text-xs text-black font-medium leading-relaxed p-1 rounded-lg ${
+                  expandedCommentIds.includes(oldestComment.commentId)
+                    ? ""
+                    : "line-clamp-3 relative"
+                } cursor-pointer`}
+                onClick={() => toggleCommentExpand(oldestComment.commentId)}
+              >
+                {oldestComment.content}
+                {!expandedCommentIds.includes(oldestComment.commentId) &&
+                  commentTruncatedState[oldestComment.commentId] && (
+                    <span className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none" />
+                  )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="px-4 pb-4">
         <button
@@ -212,9 +283,9 @@ const FeedPost = ({
                     className="flex items-start mb-4 pb-4 border-b border-gray-200 last:border-b-0 hover:bg-gray-100/50 rounded-lg p-2 transition"
                   >
                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3 flex-shrink-0">
-                      {comment.userAvatarUrl ? (
+                      {comment.userProfilePic ? (
                         <img
-                          src={comment.userAvatarUrl}
+                          src={normalizeImageUrl(comment.userProfilePic)}
                           alt={comment.username}
                           className="w-full h-full object-cover rounded-full"
                         />
@@ -232,12 +303,19 @@ const FeedPost = ({
                         </p>
                       </div>
                       <p
+                        ref={(el) =>
+                          (commentRefs.current[comment.commentId] = el)
+                        }
                         className={`text-sm text-black font-medium leading-relaxed bg-gray-50 p-2 rounded-lg ${
-                          isExpanded ? "" : "line-clamp-3"
+                          isExpanded ? "" : "line-clamp-3 relative"
                         } cursor-pointer border border-transparent hover:border-black`}
                         onClick={() => toggleCommentExpand(comment.commentId)}
                       >
                         {comment.content}
+                        {!isExpanded &&
+                          commentTruncatedState[comment.commentId] && (
+                            <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none" />
+                          )}
                       </p>
                     </div>
                     {currentUser.userId === comment.userId && (
@@ -248,7 +326,7 @@ const FeedPost = ({
                         className="text-gray-400 hover:text-red-600 ml-2 transition"
                         aria-label="댓글 삭제"
                       >
-                        <FaTrash className="text-sm" />
+                        <FaTrash className="text-sm text-red-600" />
                       </button>
                     )}
                   </div>
@@ -278,11 +356,18 @@ const FeedPost = ({
                   className="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-sm transition text-black"
                   maxLength={300}
                 />
+                <div className="absolute right-3 bottom-1 text-xs text-gray-500">
+                  {newComment.length}/300
+                </div>
               </div>
               <button
                 type="submit"
                 disabled={!newComment.trim()}
-                className="ml-3 bg-black hover:bg-gray-800 text-white p-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center group"
+                className={`ml-3 ${
+                  !newComment.trim()
+                    ? "bg-gray-400"
+                    : "bg-black hover:bg-gray-800"
+                } text-white p-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center group`}
               >
                 <FaPaperPlane />
               </button>
