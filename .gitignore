@@ -26,3 +26,7 @@ dist-ssr
 # 환경변수 파일
 .env.local
 .env.*.local
+
+#pwa 자동 생성 파일
+dist/
+dev-dist/
