@@ -70,15 +70,6 @@ const SocialProfile = ({
 
   return (
     <div className="relative max-w-4xl mx-auto bg-white shadow-md rounded-xl overflow-hidden">
-      {isCurrentUser && (
-        <button
-          onClick={onGoToSettings}
-          className="absolute top-4 right-4 bg-black text-white text-sm px-3 py-1 rounded-full flex items-center gap-1 hover:bg-gray-900 z-10"
-        >
-          <FiSettings size={14} />
-        </button>
-      )}
-
       <div className="p-4">
         <div className="flex mb-6">
           <div className="mr-6 flex flex-col items-center">
@@ -100,8 +91,8 @@ const SocialProfile = ({
                 />
               </div>
             </motion.div>
-            <span className="mt-2 text-sm font-medium text-black">
-              @{user?.username || user?.name}
+            <span className="mt-2 text-sm font-bold text-black">
+              {user?.username || user?.name}
             </span>
           </div>
 
@@ -136,16 +127,10 @@ const SocialProfile = ({
         </div>
 
         {/* ✅ 자기소개 */}
-        <div className="mb-4">
-          <IntroduceEditor
-            initialText={userIntroduce}
-            onSave={async (newText) => {
-              await socialApi.updateIntroduce(user.userId, newText);
-              setIntroduce(newText);
-              refreshProfileData();
-              toast.success("자기소개가 저장되었습니다.");
-            }}
-          />
+        <div className="mb-4 text-center px-4">
+          <p className="text-sm text-black whitespace-pre-wrap break-words">
+            {userIntroduce || "아직 자기소개가 없습니다."}
+          </p>
         </div>
       </div>
 
@@ -167,39 +152,43 @@ const SocialProfile = ({
         </div>
       )}
 
-      {/* ✅ 지역/MBTI/골프/출생연도 + 상세보기 */}
-      <div className="flex flex-wrap gap-2 mb-4 border-t border-gray-100 pt-2 px-4">
-        {user?.activityRegion && (
-          <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-            <FaMapMarkerAlt className="text-gray-500 mr-1" size={12} />
-            <span className="text-black">
-              {regionMap[user.activityRegion] || user.activityRegion}
-            </span>
-          </div>
-        )}
-        {user?.golfSkill && (
-          <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-            <FaGolfBall className="text-green-500 mr-1" size={12} />
-            <span className="text-black">
-              {golfLevelMap[user.golfSkill] || user.golfSkill}
-            </span>
-          </div>
-        )}
-        {user?.mbti && (
-          <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-            <RiMentalHealthFill className="text-purple-500 mr-1" size={12} />
-            <span className="text-black">{user.mbti}</span>
-          </div>
-        )}
-        {user?.birthDate && (
-          <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-            <FaBirthdayCake className="text-pink-500 mr-1" size={12} />
-            <span className="text-black mr-2">{`${user.birthDate.slice(
-              0,
-              4
-            )}년생`}</span>
-          </div>
-        )}
+      {/* ✅ 지역 / MBTI / 골프 / 출생연도 + 오른쪽 끝 상세보기 버튼 */}
+      <div className="flex justify-between items-center px-4 mb-4 border-t border-gray-100 pt-2">
+        {/* ⬅️ 왼쪽 태그들 */}
+        <div className="flex flex-wrap gap-2 flex-1">
+          {user?.activityRegion && (
+            <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
+              <FaMapMarkerAlt className="text-gray-500 mr-1" size={12} />
+              <span className="text-black">
+                {regionMap[user.activityRegion] || user.activityRegion}
+              </span>
+            </div>
+          )}
+          {user?.golfSkill && (
+            <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
+              <FaGolfBall className="text-green-500 mr-1" size={12} />
+              <span className="text-black">
+                {golfLevelMap[user.golfSkill] || user.golfSkill}
+              </span>
+            </div>
+          )}
+          {user?.mbti && (
+            <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
+              <RiMentalHealthFill className="text-purple-500 mr-1" size={12} />
+              <span className="text-black">{user.mbti}</span>
+            </div>
+          )}
+          {user?.birthDate && (
+            <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
+              <FaBirthdayCake className="text-pink-500 mr-1" size={12} />
+              <span className="text-black mr-2">
+                {`${user.birthDate.slice(0, 4)}년생`}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* ➡️ 오른쪽 상세보기 버튼 */}
         <button
           onClick={() => setShowProfileDetail(true)}
           className="text-gray-500 hover:text-blue-600"
@@ -209,15 +198,8 @@ const SocialProfile = ({
         </button>
       </div>
 
-      {/* ✅ 피드 영역 */}
-      <div className="border-t border-gray-200">
-        <div className="flex">
-          <button className="flex-1 text-center py-2 border-b-2 border-black text-black font-medium">
-            <FaPhotoVideo className="inline-block mr-1" />
-            <span>피드</span>
-          </button>
-        </div>
-      </div>
+      <hr />
+      <br />
 
       <div ref={postsRef} className="px-4 pb-6">
         {feeds.length === 0 ? (
@@ -230,48 +212,34 @@ const SocialProfile = ({
             {feeds.map((feed) => (
               <div
                 key={feed.feedId}
-                className="aspect-square relative overflow-hidden cursor-pointer group"
+                className="aspect-square relative overflow-hidden cursor-pointer group bg-white border border-gray-100"
                 onClick={() => onFeedClick(feed)}
               >
                 {feed.imageUrl ? (
-                  <>
-                    <img
-                      src={normalizeImageUrl(feed.imageUrl)}
-                      alt="피드"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 flex items-center justify-center transition-opacity">
-                      <div className="text-white flex items-center space-x-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="flex items-center">
-                          <FaHeart className="mr-1" />
-                          <span>{feed.likes || feed.likeCount || 0}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <FaComment className="mr-1" />
-                          <span>{feed.commentCount || 0}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </>
+                  <img
+                    src={normalizeImageUrl(feed.imageUrl)}
+                    alt="피드 이미지"
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  <div className="w-full h-full flex flex-col justify-center items-center bg-gray-100 p-2">
-                    <TruncatedText
-                      text={feed.caption || "내용 없음"}
-                      maxLines={3}
-                      className="text-xs text-center text-black"
-                    />
-                    <div className="mt-2 flex items-center space-x-3 text-xs text-black">
-                      <div className="flex items-center">
-                        <FaHeart className="mr-1 text-red-500" />
-                        <span>{feed.likes || feed.likeCount || 0}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <FaComment className="mr-1" />
-                        <span>{feed.commentCount || 0}</span>
-                      </div>
-                    </div>
+                  <div className="w-full h-full flex items-center justify-center px-2 bg-white">
+                    <p className="text-black text-xs text-center line-clamp-3 whitespace-pre-wrap">
+                      {feed.caption || "내용 없음"}
+                    </p>
                   </div>
                 )}
+
+                {/* 하단 오버레이 (좋아요/댓글 수) */}
+                <div className="absolute bottom-0 w-full bg-black bg-opacity-40 text-white text-[11px] px-2 py-1 flex justify-between items-center">
+                  <span className="flex items-center gap-1">
+                    <FaHeart className="text-red-400" />
+                    {feed.likes ?? feed.likeCount ?? 0}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <FaComment />
+                    {feed.comments?.length ?? feed.commentCount ?? 0}
+                  </span>
+                </div>
               </div>
             ))}
           </div>

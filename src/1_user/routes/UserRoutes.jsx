@@ -49,7 +49,7 @@ export default function UserRoutes() {
 
       {/* 마이페이지 - 포인트 관리 */}
       <Route
-        path="mypage/points"
+        path="points"
         element={
           <PrivateRoute>
             <MyPointPage />
@@ -59,7 +59,7 @@ export default function UserRoutes() {
 
       {/* 포인트 충전 페이지 (코인 선택 + 모달) ✅ */}
       <Route
-        path="mypage/points/charge"
+        path="shop"
         element={
           <PrivateRoute>
             <PointCharge />

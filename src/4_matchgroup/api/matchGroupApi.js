@@ -1,7 +1,7 @@
 import axiosInstance from "../../1_user/api/axiosInstance.js";
 
 const BASE_URL = "http://localhost:8090/swings/matchgroup";
-const USERS_API_URL = "http://localhost:8090/swings/user";
+const USERS_API_URL = "http://localhost:8090/swings/users";
 
 // 그룹 생성 API
 export const createMatchGroup = async (groupData) => {
@@ -39,6 +39,19 @@ export const getMatchGroupById = async (matchGroupId) => {
     } catch (error) {
         console.error(`그룹(${matchGroupId}) 조회 중 오류 발생:`, error);
         throw error;
+    }
+};
+
+// 근처 그룹 조회
+export const fetchNearbyGroups = async (latitude, longitude, radiusInKm = 5) => {
+    try {
+        const response = await axiosInstance.get(`${BASE_URL}/nearby`, {
+            params: { latitude, longitude, radiusInKm },
+        });
+        return Array.isArray(response.data) ? response.data : [];
+    } catch (error) {
+        console.error("근처 그룹 조회 중 오류 발생:", error);
+        return [];
     }
 };
 

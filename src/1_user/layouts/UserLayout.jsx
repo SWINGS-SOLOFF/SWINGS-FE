@@ -14,15 +14,15 @@ export default function UserLayout() {
   const hideBottomBar = hideBottomBarPaths.includes(pathname);
 
   return (
-    <div className="flex flex-col min-h-screen w-full">
+    <div className="flex flex-col min-h-screen w-full overflow-y-scroll scrollbar-hide">
       {/* ✅ 상단 고정 NavBar */}
       {!hideNavBar && <NavBar />}
 
-      {/* ✅ 본문 영역 - NavBar/BottomNavBar 고려한 padding, 스크롤 가능 */}
+      {/* ✅ 본문 영역 - NavBar/BottomNavBar 고려한 padding */}
       <main
-        className={`flex-grow  ${
-          !hideNavBar ? "pt-16" : ""
-        } ${!hideBottomBar ? "pb-16" : ""}`}
+        className={`flex-grow ${!hideNavBar ? "pt-16" : ""} ${
+          !hideBottomBar ? "pb-16" : ""
+        }`}
       >
         <Outlet />
       </main>

@@ -3,6 +3,7 @@ import { fetchUserData, updateUserInfo, checkUsername } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
 import { removeToken } from "../utils/userUtils";
 import Select from "react-select";
+import { ArrowLeft } from "lucide-react";
 
 const regionOptions = [
   "서울",
@@ -79,6 +80,13 @@ const selectStyles = {
     overflowY: "auto",
     color: "#000",
   }),
+  control: (base) => ({
+    ...base,
+    borderColor: "#CBD5E0",
+    borderRadius: "0.5rem",
+    padding: "0.25rem 0.5rem",
+    fontSize: "0.875rem",
+  }),
 };
 
 export default function UpdateForm() {
@@ -127,8 +135,6 @@ export default function UpdateForm() {
   };
 
   const handleUpdate = async () => {
-    console.log("📦 회원가입 전송 데이터:", formData);
-
     if (!formData || !formData.username) {
       setErrorMsg("사용자 정보가 없습니다.");
       return;
@@ -183,13 +189,15 @@ export default function UpdateForm() {
     );
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-10">
+    <div className="relative min-h-screen bg-white flex flex-col items-center justify-center px-4">
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-4 left-4 text-gray-500 hover:text-black transition-colors"
+      >
+        <ArrowLeft size={24} />
+      </button>
       <div className="w-full max-w-sm space-y-6">
         <br />
-        <h2 className="text-2xl font-bold text-center text-[#2E384D]">
-          회원정보 수정
-        </h2>
-
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1">
             아이디
@@ -207,7 +215,7 @@ export default function UpdateForm() {
             />
             <button
               onClick={handleUsernameCheck}
-              className="bg-blue-500 text-white px-3 rounded"
+              className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded-lg text-sm"
             >
               중복 확인
             </button>
@@ -295,7 +303,7 @@ export default function UpdateForm() {
 
         <button
           onClick={handleUpdate}
-          className="w-full bg-[#2E384D] hover:bg-[#1f2c3a] text-white font-semibold py-2 rounded-lg mt-2"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg mt-2"
         >
           수정 완료
         </button>
@@ -307,6 +315,7 @@ export default function UpdateForm() {
           <p className="text-red-500 text-sm text-center">{errorMsg}</p>
         )}
       </div>
+      <br />
     </div>
   );
 }
@@ -325,7 +334,7 @@ function InputField({
       </label>
       <input
         type={type}
-        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
+        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black text-sm"
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
