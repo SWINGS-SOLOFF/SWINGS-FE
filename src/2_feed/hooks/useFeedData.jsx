@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import feedApi from "../api/feedApi";
+import { processFeed } from "../utils/feedUtils";
 
 const useFeedData = (userId, currentUser, setSelectedFeed = null) => {
   const [posts, setPosts] = useState([]);
@@ -24,15 +25,6 @@ const useFeedData = (userId, currentUser, setSelectedFeed = null) => {
   useEffect(() => {
     if (userId && currentUser) refreshFeeds();
   }, [userId, currentUser]);
-
-  const processFeed = (feed) => ({
-    ...feed,
-    liked: feed.liked || false,
-    likes: feed.likes ?? feed.likeCount ?? 0,
-    comments: feed.comments ?? [],
-    username: feed.username ?? feed.user?.username ?? "익명",
-    userProfilePic: feed.user?.userImg || null,
-  });
 
   const updateFeedLocally = (feedId, updateFn) => {
     setPosts((prev) =>
