@@ -12,16 +12,11 @@ import {
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 import { RiMentalHealthFill } from "react-icons/ri";
-import { FiSettings } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { normalizeImageUrl } from "../utils/imageUtils";
-import TruncatedText from "./TruncatedText";
-import { toast } from "react-toastify";
-import socialApi from "../api/socialApi";
 
 import ProfileDetailModal from "./ProfileDetailModal";
-import ImageModal from "./ImageModal"; // ✅ 이미지 확대 보기
-import IntroduceEditor from "../../1_user/components/IntroduceEditor.jsx";
+import ImageModal from "./ImageModal";
 
 const SocialProfile = ({
   user,
