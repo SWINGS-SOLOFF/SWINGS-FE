@@ -24,10 +24,9 @@ const FeedPage = () => {
   const [likedUsers, setLikedUsers] = useState([]);
   const [isLikedModalOpen, setIsLikedModalOpen] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
+  const [feedOrder, setFeedOrder] = useState([]);
+  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [myFeedsLoaded, setMyFeedsLoaded] = useState(false);
 
   const formRef = useRef(null);
   const containerRef = useRef(null);
@@ -48,10 +47,13 @@ const FeedPage = () => {
       try {
         const user = await feedApi.getCurrentUser();
         setCurrentUser(user);
-        setPage(0);
-        setHasMore(true);
         setPosts([]);
-        await loadMoreFeedsWithUser(user);
+        const order = ["followings", "all", "mine"].sort(
+          () => Math.random() - 0.5
+        );
+        setFeedOrder(order);
+        setStep(0);
+        await loadFeeds(order[0], user);
       } catch {
         toast.error("사용자 정보를 불러오는 데 실패했습니다.");
       }
@@ -59,27 +61,23 @@ const FeedPage = () => {
     init();
   }, [userId]);
 
-  const loadMoreFeedsWithUser = async (user) => {
-    if (!user || loading || !hasMore) return;
+  const loadFeeds = async (type, user) => {
     setLoading(true);
     try {
-      const nextPage = posts.length === 0 ? 0 : page + 1;
-
-      const followings = (await socialApi.getFollowings?.(user.userId)) || [];
-      const filterType = followings.length > 0 ? "followings" : "all";
-
-      const newFeeds = await feedApi.getFeeds(user.userId, nextPage, 10, {
-        sort: "latest",
-        filter: filterType,
-      });
-
-      if (newFeeds.length === 0) {
-        setHasMore(false);
+      let newFeeds = [];
+      if (type === "mine") {
+        newFeeds = await feedApi.getUserFeeds(user.userId);
       } else {
-        setPosts((prev) => [...prev, ...newFeeds]);
-        setPage(nextPage);
+        const followings = (await socialApi.getFollowings?.(user.userId)) || [];
+        const filter =
+          type === "followings" && followings.length > 0 ? "followings" : "all";
+        newFeeds = await feedApi.getFeeds(user.userId, 0, 10, {
+          sort: "random",
+          filter,
+        });
       }
-    } catch (err) {
+      setPosts((prev) => [...prev, ...newFeeds]);
+    } catch {
       toast.error("피드를 불러오는 데 실패했습니다.");
     } finally {
       setLoading(false);
@@ -87,35 +85,27 @@ const FeedPage = () => {
   };
 
   const loadMoreFeeds = async () => {
-    if (loading || !currentUser) return;
-
-    if (hasMore) {
-      await loadMoreFeedsWithUser(currentUser);
-    }
-
-    if (!hasMore && !myFeedsLoaded) {
-      try {
-        const myFeeds = await feedApi.getUserFeeds(currentUser.userId);
-        setPosts((prev) => [...prev, ...myFeeds]);
-        setMyFeedsLoaded(true);
-      } catch {
-        toast.error("내 피드를 불러오는 데 실패했습니다.");
-      }
-    }
+    if (loading || !currentUser || step >= feedOrder.length) return;
+    await loadFeeds(feedOrder[step], currentUser);
+    setStep((prev) => prev + 1);
   };
 
   useIntersectionObserver({
     targetRef: lastPostRef,
     onIntersect: loadMoreFeeds,
-    enabled: hasMore || !myFeedsLoaded,
+    enabled: step < feedOrder.length,
   });
 
   const { isRefreshing } = usePullToRefresh({
-    onRefresh: () => {
-      setPage(0);
-      setHasMore(true);
+    onRefresh: async () => {
+      if (!currentUser) return;
+      const order = ["followings", "all", "mine"].sort(
+        () => Math.random() - 0.5
+      );
+      setFeedOrder(order);
+      setStep(0);
       setPosts([]);
-      loadMoreFeeds();
+      await loadFeeds(order[0], currentUser);
     },
     targetRef: containerRef,
   });
@@ -128,7 +118,6 @@ const FeedPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!userId) return toast.error("로그인 후 작성해주세요");
-
     const formData = new FormData();
     formData.append("userId", userId);
     formData.append("content", newPostContent);
