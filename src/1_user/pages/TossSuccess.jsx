@@ -49,7 +49,7 @@ export default function TossSuccess() {
         setMessage("포인트 충전이 완료되었습니다!");
 
         setTimeout(() => {
-          navigate("/swings/mypage/points");
+          navigate("/swings/points");
         }, 1000);
       } catch (err) {
         //[콘솔] 백엔드로 정보 전송 실패
