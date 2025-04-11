@@ -33,7 +33,7 @@ export default function MyPage() {
   const [showImageModal, setShowImageModal] = useState(false);
   const [imageFile, setImageFile] = useState(null);
 
-  const [showPasswordModal, setShowPasswordModal] = useState(false); // ✅ 추가
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -120,23 +120,20 @@ export default function MyPage() {
         </div>
       )}
 
-      {/* 보유 코인 */}
-      <div className="backdrop-blur-sm bg-white/80 border border-gray-200 rounded-2xl p-4 mb-6 shadow-sm">
+      {/* ✅ 보유 코인 (버튼처럼 작동) */}
+      <div
+        className="cursor-pointer backdrop-blur-sm bg-white/80 border border-gray-200 rounded-2xl p-4 mb-6 shadow-sm transition hover:shadow-md"
+        onClick={() => navigate("/swings/points")}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-gray-600">
             <Coins size={18} className="text-yellow-500" />
             <span className="text-sm">보유 코인</span>
           </div>
-          <div className="text-lg font-bold text-green-600">
+          <div className="text-lg font-bold text-gray-900">
             {point.toLocaleString()}P
           </div>
         </div>
-        <button
-          onClick={() => navigate("/swings/mypage/points")}
-          className="mt-3 w-full text-center text-sm text-purple-600 hover:underline"
-        >
-          코인 내역 보기 →
-        </button>
       </div>
 
       {/* 설정 액션들 */}
@@ -149,7 +146,7 @@ export default function MyPage() {
         <LineAction
           icon={<KeyRound size={18} />}
           text="비밀번호 변경"
-          onClick={() => setShowPasswordModal(true)} // ✅ 모달로 변경
+          onClick={() => setShowPasswordModal(true)}
         />
         <LineAction
           icon={<Trash2 size={18} />}
@@ -170,7 +167,7 @@ export default function MyPage() {
         </button>
       </div>
 
-      {/* ✅ 이미지 수정 모달 */}
+      {/* 이미지 수정 모달 */}
       {showImageModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <ProfileImageUploader
@@ -185,7 +182,7 @@ export default function MyPage() {
         </div>
       )}
 
-      {/* ✅ 비밀번호 변경 모달 */}
+      {/* 비밀번호 변경 모달 */}
       {showPasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="relative bg-white rounded-2xl p-6 w-full max-w-md shadow-lg">
