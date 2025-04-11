@@ -33,6 +33,22 @@ const feedApi = {
     return response.data;
   },
 
+  updateFeed: async (feedId, { caption, file }) => {
+    const formData = new FormData();
+    formData.append("caption", caption);
+    if (file) {
+      formData.append("file", file);
+    }
+
+    const response = await axios.put(`${API_BASE}/feeds/${feedId}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  },
+
   getMainFeeds: async (userId) => {
     const response = await axios.get(`${API_BASE}/feeds/main`, {
       params: { userId },

@@ -10,7 +10,7 @@ const useFeedData = (userId, currentUser, setSelectedFeed = null) => {
     if (!userId || !currentUser) return setLoading(false);
     try {
       setLoading(true);
-      const fetchedFeeds = await feedApi.getMainFeeds(userId);
+      const fetchedFeeds = await feedApi.getUserFeeds(userId);
       const processed = fetchedFeeds.map((feed) => processFeed(feed));
       setPosts(processed);
     } catch (err) {
@@ -27,7 +27,7 @@ const useFeedData = (userId, currentUser, setSelectedFeed = null) => {
 
   const processFeed = (feed) => ({
     ...feed,
-    isLiked: feed.liked || false,
+    liked: feed.liked || false,
     likes: feed.likes ?? feed.likeCount ?? 0,
     comments: feed.comments ?? [],
     username: feed.username ?? feed.user?.username ?? "익명",
@@ -51,7 +51,7 @@ const useFeedData = (userId, currentUser, setSelectedFeed = null) => {
 
     const updatedPost = {
       ...prev,
-      isLiked: !isLiked,
+      liked: !isLiked,
       likes: isLiked ? prev.likes - 1 : prev.likes + 1,
     };
     updateFeedLocally(feedId, () => updatedPost);
