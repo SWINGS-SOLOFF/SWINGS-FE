@@ -14,6 +14,8 @@ import LikedUsersModal from "./LikedUsersModal";
 import feedApi from "../api/feedApi";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { normalizeImageUrl } from "../utils/imageUtils";
+import socialApi from "../api/socialApi";
+import { processFeed } from "../utils/feedUtils";
 
 const FeedDetailModal = ({
   feed,
@@ -32,11 +34,28 @@ const FeedDetailModal = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLikedByModal, setShowLikedByModal] = useState(false);
   const [likedByUsers, setLikedByUsers] = useState([]);
+  const [authorProfile, setAuthorProfile] = useState(null);
+
   const modalRef = useRef(null);
   const commentInputRef = useRef(null);
   const commentsContainerRef = useRef(null);
   const captionRef = useRef(null);
   const [isCaptionLong, setIsCaptionLong] = useState(false);
+  const [localFeed, setLocalFeed] = useState(processFeed(feed));
+
+  useEffect(() => {
+    const fetchAuthor = async () => {
+      if (feed?.userId) {
+        try {
+          const profile = await socialApi.getProfile(feed.userId);
+          setAuthorProfile(profile);
+        } catch (err) {
+          console.error("작성자 프로필 로딩 실패", err);
+        }
+      }
+    };
+    fetchAuthor();
+  }, [feed?.userId]);
 
   useEffect(() => {
     if (captionRef.current) {
@@ -86,22 +105,36 @@ const FeedDetailModal = ({
     }
   }, [feed?.comments?.length]);
 
+  useEffect(() => {
+    if (feed) {
+      const processed = processFeed(feed);
+
+      processed.comments = processed.comments.map((c) => ({
+        ...c,
+        userProfilePic: c.userProfilePic ?? null,
+      }));
+
+      setLocalFeed(processed);
+    }
+  }, [feed]);
+
   const handleLikeToggle = async () => {
-    if (!currentUser || !feed) return;
-    const optimisticFeed = {
-      ...feed,
-      isLiked: !feed.isLiked,
-      likes: feed.isLiked ? feed.likes - 1 : feed.likes + 1,
+    if (!currentUser || !localFeed) return;
+    const nextLiked = !localFeed.liked;
+    const updatedFeed = {
+      ...localFeed,
+      liked: nextLiked,
+      likes: nextLiked ? localFeed.likes + 1 : localFeed.likes - 1,
     };
-    setSelectedFeed(optimisticFeed);
+    setLocalFeed(updatedFeed);
     try {
-      const updated = await onLikeToggle?.(feed.feedId, feed.isLiked);
-      if (updated) {
-        setSelectedFeed((prev) => ({ ...prev, ...updated }));
+      const result = await onLikeToggle?.(localFeed.feedId, localFeed.liked);
+      if (result) {
+        setLocalFeed((prev) => ({ ...prev, ...result }));
       }
     } catch (err) {
-      console.error("❌ 좋아요 처리 실패:", err);
-      setSelectedFeed(feed);
+      console.error("좋아요 처리 실패:", err);
+      setLocalFeed(feed);
     }
   };
 
@@ -120,8 +153,21 @@ const FeedDetailModal = ({
     if (!newComment.trim() || isSubmitting || !feed) return;
     setIsSubmitting(true);
     try {
-      await onCommentSubmit?.(feed.feedId, newComment);
+      const newCommentRes = await onCommentSubmit?.(feed.feedId, newComment);
       setNewComment("");
+
+      setLocalFeed((prev) => ({
+        ...prev,
+        comments: [
+          ...prev.comments,
+          {
+            ...newCommentRes,
+            username: newCommentRes.username ?? currentUser?.username ?? "익명",
+            userProfilePic:
+              newCommentRes.userProfilePic ?? currentUser?.userImg ?? null,
+          },
+        ],
+      }));
     } catch (err) {
       console.error("❌ 댓글 추가 실패:", err);
     } finally {
@@ -210,16 +256,19 @@ const FeedDetailModal = ({
             hasImage ? "md:w-2/5" : ""
           } flex flex-col bg-white max-h-[85vh] relative`}
         >
-          {/* 상단 프로필 영역 */}
           <div className="flex items-center space-x-2 w-full">
             <img
-              src={feed.userProfilePic || "/default-profile.jpg"}
-              alt={`${feed.username} 프로필`}
+              src={normalizeImageUrl(
+                authorProfile?.userImg || "/default-profile.jpg"
+              )}
+              alt={authorProfile?.username || "익명"}
               className="w-8 h-8 rounded-full object-cover border border-gray-200"
             />
 
             <div className="flex-1">
-              <p className="font-bold text-black text-sm">{feed.username}</p>
+              <p className="font-bold text-black text-sm">
+                {authorProfile?.username || "익명"}
+              </p>
               <p className="text-xs text-gray-500">
                 {formatTimeAgo(feed.createdAt)}
               </p>
@@ -282,23 +331,23 @@ const FeedDetailModal = ({
                 <button
                   onClick={handleLikeToggle}
                   className={`flex items-center gap-2 p-1.5 rounded-full transition ${
-                    feed.isLiked
+                    localFeed.liked
                       ? "text-red-500 hover:bg-red-50"
                       : "text-gray-600 hover:bg-gray-50"
                   }`}
-                  aria-label={feed.isLiked ? "좋아요 취소" : "좋아요"}
+                  aria-label={localFeed.liked ? "좋아요 취소" : "좋아요"}
                 >
-                  {feed.isLiked ? (
+                  {localFeed.liked ? (
                     <FaHeart size={18} className="fill-current" />
                   ) : (
                     <FaRegHeart size={18} />
                   )}
                 </button>
                 <button
-                  onClick={() => onShowLikedBy?.(feed.feedId)}
+                  onClick={() => onShowLikedBy?.(localFeed.feedId)}
                   className="text-sm text-blue-600 font-medium hover:underline hover:text-blue-800 transition"
                 >
-                  {feed.likes || 0}명이 좋아합니다
+                  {localFeed.likes || 0}명이 좋아합니다
                 </button>
               </div>
             </div>
@@ -313,8 +362,8 @@ const FeedDetailModal = ({
                 overflowY: "auto",
               }}
             >
-              {feed.comments?.length > 0 ? (
-                feed.comments.map((comment) => (
+              {localFeed.comments?.length > 0 ? (
+                localFeed.comments.map((comment) => (
                   <div
                     key={comment.commentId}
                     className="flex items-start gap-2 py-1.5 border-b border-gray-100 last:border-0"
