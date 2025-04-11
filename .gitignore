@@ -32,3 +32,5 @@ dist/
 dev-dist/
 dist/*
 dev-dist/*
+**/sw.js
+**/workbox-*.js

@@ -33,8 +33,8 @@ const MatchGroupDetail = () => {
 
             setCurrentUser(user);
             setGroup(groupData);
-            setParticipants(allParticipants.filter(p => p.participantStatus === "ACCEPTED"));
-            setPendingParticipants(allParticipants.filter(p => p.participantStatus === "PENDING"));
+            setParticipants(allParticipants.filter((p) => p.participantStatus === "ACCEPTED"));
+            setPendingParticipants(allParticipants.filter((p) => p.participantStatus === "PENDING"));
         } catch (error) {
             console.error("데이터 로딩 오류:", error);
         } finally {
@@ -68,7 +68,7 @@ const MatchGroupDetail = () => {
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4">{group.groupName}</h1>
+            <h1 className="text-2xl font-bold mb-2">{group.groupName}</h1>
             <p className="text-gray-600 mb-2">{group.description}</p>
             <p className="text-gray-500">📍 장소: {group.location}</p>
             <p className="text-gray-500">
@@ -78,6 +78,16 @@ const MatchGroupDetail = () => {
                 👥 모집 현황: {participants.length}/{group.maxParticipants}명
             </p>
             <p className="text-sm font-bold text-blue-500">⭐ 방장: {group.hostUsername}</p>
+            <p className="text-sm font-semibold text-gray-500">
+                상태:{" "}
+                <span
+                    className={`inline-block px-2 py-0.5 rounded-full text-white text-xs ${
+                        group.status === "모집중" ? "bg-green-500" : "bg-gray-500"
+                    }`}
+                >
+          {group.status}
+        </span>
+            </p>
 
             {!isParticipant ? (
                 <button
@@ -117,7 +127,7 @@ const MatchGroupDetail = () => {
                             onClick={() => setShowPendingModal(true)}
                             className="w-full px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
                         >
-                            대기자 목록 보기
+                            대기자 목록 보기 ({pendingParticipants.length})
                         </button>
                     )}
                 </div>
@@ -134,11 +144,20 @@ const MatchGroupDetail = () => {
                                 key={participant.userId}
                                 className="flex justify-between items-center bg-gray-100 p-2 rounded"
                             >
-                                <span>{participant.username}</span>
+                <span>
+                  {participant.username}
+                    {participant.userId === group.hostId && (
+                        <span className="ml-2 text-xs px-2 py-0.5 bg-yellow-400 text-white rounded-full">
+                      방장
+                    </span>
+                    )}
+                </span>
                                 {isHost && participant.userId !== currentUser?.userId && (
                                     <button
-                                        onClick={() => handleRemoveParticipant(participant.userId)}
-                                        className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                        onClick={() =>
+                                            handleRemoveParticipant(group.matchGroupId, participant.userId, currentUser.userId)
+                                        }
+                                        className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
                                     >
                                         강퇴
                                     </button>
@@ -153,8 +172,12 @@ const MatchGroupDetail = () => {
                 isOpen={showPendingModal}
                 onClose={() => setShowPendingModal(false)}
                 pendingParticipants={pendingParticipants}
-                onApprove={handleApprove}
-                onReject={handleReject}
+                onApprove={(matchParticipantId) =>
+                    handleApprove(group.matchGroupId, matchParticipantId, currentUser.userId)
+                }
+                onReject={(matchParticipantId) =>
+                    handleReject(group.matchGroupId, matchParticipantId, currentUser.userId)
+                }
             />
 
             <JoinConfirmModal
