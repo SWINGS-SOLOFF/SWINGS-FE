@@ -40,7 +40,7 @@ const ChatListPage = () => {
     }
 
     return (
-        <div className="flex flex-col h-full min-h-screen bg-gradient-to-b from-white via-slate-100 to-white text-gray-900">
+        <div className="relative flex flex-col h-full min-h-screen bg-gradient-to-b from-white via-slate-100 to-white text-gray-900">
 
             {/* ✅ 내부 스크롤 가능한 리스트 영역 */}
             <div className="flex-1 overflow-y-auto divide-y divide-gray-200 px-4 pb-20">
@@ -85,13 +85,14 @@ const ChatListPage = () => {
                 )}
             </div>
 
-            {/* ✅ 플로팅 하트 버튼 */}
+            {/* ✅ 좋아요 전체 보기 플로팅 버튼 */}
             <button
-                onClick={() => navigate("/swings/chat/sent")}
-                className="fixed bottom-24 right-6 bg-pink-500 text-white p-4 rounded-full shadow-lg hover:bg-pink-600 transition-all"
+                onClick={() => navigate(`/swings/chat/likes/${currentUser?.username}`)}
+                className="fixed bottom-24 right-6 px-5 py-3 rounded-full bg-pink-500 text-white text-sm font-bold shadow-xl hover:bg-pink-600 transition-all z-50"
             >
-                ❤️
+                💖 좋아요 보기
             </button>
+
         </div>
     );
 };
