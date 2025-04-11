@@ -20,6 +20,7 @@ export default function StartLogin() {
   const [saveId, setSaveId] = useState(!!localStorage.getItem("savedUsername"));
   const [errorMessage, setErrorMessage] = useState("");
 
+  // 🔑 일반 로그인 처리
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -42,6 +43,7 @@ export default function StartLogin() {
     }
   };
 
+  // 🔑 Google 로그인 처리
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const idToken = credentialResponse.credential;
@@ -74,6 +76,7 @@ export default function StartLogin() {
         <h1 className="text-3xl font-bold text-gray-800">SWINGS</h1>
         <p className="text-gray-500 animate-bounce">나랑 골프치러 갈래?</p>
 
+        {/* 🔑 일반 로그인 폼 */}
         <form onSubmit={handleSubmit} className="space-y-4 text-left">
           <input
             type="text"
@@ -125,17 +128,25 @@ export default function StartLogin() {
           </button>
         </form>
 
+        {/* 구분선 */}
         <div className="flex items-center my-4">
           <div className="flex-grow h-px bg-gray-300" />
           <span className="px-3 text-gray-400 text-sm">또는</span>
           <div className="flex-grow h-px bg-gray-300" />
         </div>
+        {/* 구글 로그인 버튼 - 다른 버튼들과 사이즈 통일 */}
+        <div className="w-full">
+          <div className="w-full flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setErrorMessage("Google 로그인 실패")}
+              size="large"
+              width="100%" // 혹시나 지원되는 경우
+            />
+          </div>
+        </div>
 
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={() => setErrorMessage("Google 로그인 실패")}
-        />
-
+        {/* 회원가입 버튼 */}
         <button
           onClick={() => navigate("/swings/signup")}
           className="w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 rounded-lg"
