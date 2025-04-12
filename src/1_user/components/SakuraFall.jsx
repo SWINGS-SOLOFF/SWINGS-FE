@@ -5,11 +5,11 @@ const SakuraFall = () => {
   const [petals, setPetals] = useState([]);
 
   useEffect(() => {
-    const newPetals = Array.from({ length: 15 }, (_, i) => ({
+    const newPetals = Array.from({ length: 50 }, (_, i) => ({
       id: i,
       left: Math.random() * 100, // %
       delay: Math.random() * 5,
-      duration: 5 + Math.random() * 5,
+      duration: 4 + Math.random() * 3,
       size: 20 + Math.random() * 20,
     }));
     setPetals(newPetals);

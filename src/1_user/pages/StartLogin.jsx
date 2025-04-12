@@ -94,7 +94,6 @@ export default function StartLogin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-white to-blue-100 flex items-center justify-center relative overflow-hidden px-4">
-      <SakuraFall />
       <AnimatePresence>
         <motion.div
           variants={fadeDrop}
