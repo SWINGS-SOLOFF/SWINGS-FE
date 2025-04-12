@@ -153,23 +153,26 @@ export default function StartLogin() {
             />
 
             <motion.div
-              className="flex justify-between items-center text-sm text-gray-600 mt-1"
+              className="flex items-center justify-between mt-1 text-sm px-1"
               custom={4}
               variants={itemVariants}
             >
-              <label className="flex items-center">
+              {/* 아이디 저장 */}
+              <label className="inline-flex items-center gap-2 text-gray-700 select-none">
                 <input
                   type="checkbox"
                   checked={saveId}
                   onChange={(e) => setSaveId(e.target.checked)}
-                  className="mr-2"
+                  className="accent-pink-500 w-4 h-4 rounded focus:ring-1 focus:ring-pink-300 transition"
                 />
-                아이디 저장
+                <span className="text-gray-500 font-semibold">아이디 저장</span>
               </label>
+
+              {/* 비밀번호 찾기 */}
               <button
                 type="button"
-                className="text-blue-500 hover:underline"
                 onClick={() => navigate("/swings/find-password")}
+                className="text-gray-500 font-semibold text-sm hover:underline transition"
               >
                 비밀번호 찾기
               </button>
