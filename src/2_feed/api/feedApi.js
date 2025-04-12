@@ -128,6 +128,17 @@ const feedApi = {
     const response = await axios.get(`${USER_API_BASE}/me`);
     return response.data;
   },
+
+  updateComment: async (feedId, commentId, content) => {
+    const response = await axios.patch(
+      `${API_BASE}/feeds/${feedId}/comments/${commentId}`,
+      null,
+      {
+        params: { content },
+      }
+    );
+    return response.data;
+  },
 };
 
 export default feedApi;

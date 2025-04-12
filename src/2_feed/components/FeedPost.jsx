@@ -7,6 +7,7 @@ import {
   FaTimes,
   FaEllipsisV,
   FaEdit,
+  FaPen,
 } from "react-icons/fa";
 import { normalizeImageUrl } from "../utils/imageUtils";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +38,8 @@ const FeedPost = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedCaption, setEditedCaption] = useState(post.caption || "");
   const [editedFile, setEditedFile] = useState(null);
+  const [editingCommentId, setEditingCommentId] = useState(null); // 어떤 댓글을 수정 중인지
+  const [editedComment, setEditedComment] = useState("");
 
   const navigate = useNavigate();
   const contentRef = useRef(null);
@@ -382,12 +385,14 @@ const FeedPost = ({
                 const isExpanded = expandedCommentIds.includes(
                   comment.commentId
                 );
+                const isEditingComment = editingCommentId === comment.commentId;
+
                 return (
                   <div
                     key={comment.commentId}
                     className="flex items-start mb-4 pb-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 rounded-lg p-2 transition"
                   >
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3 flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3 flex-shrink-0">
                       {comment.userProfilePic ? (
                         <img
                           src={normalizeImageUrl(comment.userProfilePic)}
@@ -395,44 +400,93 @@ const FeedPost = ({
                           className="w-full h-full object-cover rounded-full"
                         />
                       ) : (
-                        <FaUser className="text-gray-700" />
+                        <FaUser className="text-gray-700 text-xs" />
                       )}
                     </div>
                     <div className="flex-grow">
                       <div className="flex items-center mb-1">
-                        <p className="font-semibold text-gray-900 text-sm mr-2">
+                        <p className="font-medium text-gray-800 text-xs mr-2">
                           {comment.username || "사용자"}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-400 italic">
                           {formatTimeAgo(comment.createdAt)}
                         </p>
                       </div>
-                      <p
-                        ref={(el) =>
-                          (commentRefs.current[comment.commentId] = el)
-                        }
-                        className={`text-sm text-black font-medium leading-relaxed bg-white p-2 rounded-lg ${
-                          isExpanded ? "" : "line-clamp-3 relative"
-                        } cursor-pointer border border-transparent hover:border-gray-200`}
-                        onClick={() => toggleCommentExpand(comment.commentId)}
-                      >
-                        {comment.content}
-                        {!isExpanded &&
-                          commentTruncatedState[comment.commentId] && (
-                            <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-                          )}
-                      </p>
+
+                      {isEditingComment ? (
+                        <div className="flex gap-2 mt-2">
+                          <input
+                            value={editedComment}
+                            onChange={(e) => setEditedComment(e.target.value)}
+                            className="flex-grow border px-3 py-1 rounded text-sm"
+                          />
+                          <button
+                            onClick={async () => {
+                              try {
+                                const updated = await feedApi.updateComment(
+                                  post.feedId,
+                                  comment.commentId,
+                                  editedComment
+                                );
+                                updatePostInState({
+                                  ...post,
+                                  comments: post.comments.map((c) =>
+                                    c.commentId === comment.commentId
+                                      ? updated
+                                      : c
+                                  ),
+                                });
+                                setEditingCommentId(null);
+                              } catch (err) {
+                                toast.error("댓글 수정 실패");
+                              }
+                            }}
+                            className="text-white bg-indigo-600 hover:bg-indigo-700 rounded px-3 py-1 text-xs"
+                          >
+                            저장
+                          </button>
+                        </div>
+                      ) : (
+                        <p
+                          ref={(el) =>
+                            (commentRefs.current[comment.commentId] = el)
+                          }
+                          className={`text-sm text-black font-medium leading-relaxed bg-white p-2 rounded-lg ${
+                            isExpanded ? "" : "line-clamp-3 relative"
+                          } cursor-pointer border border-transparent hover:border-gray-200`}
+                          onClick={() => toggleCommentExpand(comment.commentId)}
+                        >
+                          {comment.content}
+                          {!isExpanded &&
+                            commentTruncatedState[comment.commentId] && (
+                              <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                            )}
+                        </p>
+                      )}
                     </div>
+
                     {currentUser.userId === comment.userId && (
-                      <button
-                        onClick={() =>
-                          onCommentDelete(comment.commentId, post.feedId)
-                        }
-                        className="text-gray-400 hover:text-red-600 ml-2 transition"
-                        aria-label="댓글 삭제"
-                      >
-                        <FaTrash className="text-sm text-red-600" />
-                      </button>
+                      <div className="flex items-center">
+                        <button
+                          onClick={() => {
+                            setEditingCommentId(comment.commentId);
+                            setEditedComment(comment.content);
+                          }}
+                          className="text-xs text-indigo-500 hover:text-indigo-700 rounded-full p-1.5 hover:bg-indigo-50 transition-all mr-1"
+                          title="수정"
+                        >
+                          <FaPen className="text-xs" />
+                        </button>
+                        <button
+                          onClick={() =>
+                            onCommentDelete(comment.commentId, post.feedId)
+                          }
+                          className="text-xs text-rose-500 hover:text-rose-700 rounded-full p-1.5 hover:bg-rose-50 transition-all"
+                          title="삭제"
+                        >
+                          <FaTrash className="text-xs" />
+                        </button>
+                      </div>
                     )}
                   </div>
                 );
