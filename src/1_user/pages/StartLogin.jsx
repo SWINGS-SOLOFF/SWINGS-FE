@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { loginRequest, googleLoginRequest } from "../api/userApi";
@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 import { useGoogleLogin } from "@react-oauth/google";
 import SakuraFall from "../components/SakuraFall";
+import SplashScreen from "../components/SplashScreen"; // ✅ 추가
 
 const fadeDrop = {
   hidden: { opacity: 0, y: -20 },
@@ -27,13 +28,19 @@ export default function StartLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  const [showSplash, setShowSplash] = useState(true); // ✅ 처음에는 Splash
   const [formData, setFormData] = useState({
     username: localStorage.getItem("savedUsername") || "",
     password: "",
   });
-
   const [saveId, setSaveId] = useState(!!localStorage.getItem("savedUsername"));
   const [errorMessage, setErrorMessage] = useState("");
+
+  // ✅ Splash 3초 후 로그인 화면 전환
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -68,7 +75,6 @@ export default function StartLogin() {
       const accessToken = await loginRequest(formData);
       login(accessToken);
       saveToken(accessToken);
-
       const decoded = jwtDecode(accessToken);
       const role = decoded.role;
 
@@ -80,6 +86,11 @@ export default function StartLogin() {
       setErrorMessage(error.message || "로그인 중 오류 발생");
     }
   };
+
+  // ✅ Splash 보여주는 중이라면 SplashScreen만 렌더링
+  if (showSplash) {
+    return <SplashScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-white to-blue-100 flex items-center justify-center relative overflow-hidden px-4">
