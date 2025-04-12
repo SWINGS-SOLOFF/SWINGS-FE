@@ -5,6 +5,7 @@ module.exports = {
       animation: {
         sakura: "sakuraFall linear infinite",
       },
+      plugins: [require("tailwind-scrollbar")({ nocompatible: true })],
       keyframes: {
         sakuraFall: {
           "0%": { transform: "translateY(0) rotate(0deg)" },

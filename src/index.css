@@ -16,15 +16,33 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ✅ 모든 플랫폼에서 스크롤은 되지만 스크롤바는 안 보이도록 설정 */
+html,
 body {
+  height: 100%;
   margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
+  padding: 0;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-gutter: none; /* 최신 크롬에서 여백 제거 */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
 }
 
+/* ✅ PWA 모드일 때 강제로 적용되는 스크롤바 숨김 클래스 */
+.pwa-scroll-hidden {
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.pwa-scroll-hidden::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* ✅ 루트 컨테이너(#root)도 스크롤바 제거 */
 #root {
   display: flex;
   flex-direction: column;
@@ -34,6 +52,20 @@ body {
   margin: 0 auto;
   text-align: left;
   padding: 0rem;
+
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#root::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  min-width: 320px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ------------------------ 버튼 및 카드 ------------------------ */
@@ -59,8 +91,6 @@ button:focus-visible {
 }
 
 /* ------------------------ 애니메이션 관련 ------------------------ */
-
-/* 벚꽃 애니메이션 정의 */
 @keyframes sakuraFall {
   0% {
     transform: translateY(-50px) rotate(0deg);
@@ -81,7 +111,6 @@ button:focus-visible {
   }
 }
 
-/* 실제 sakura 요소용 클래스 */
 .animate-sakura {
   animation-name: sakuraFall;
   animation-timing-function: linear;
@@ -122,4 +151,13 @@ button:focus-visible {
   font-size: 0.875rem;
   margin-top: 1rem;
   text-align: center;
+}
+
+/* ✅ Tailwind에서 사용할 커스텀 유틸리티 클래스 */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
