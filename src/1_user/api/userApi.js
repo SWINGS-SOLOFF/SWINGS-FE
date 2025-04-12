@@ -129,12 +129,11 @@ export const resetPassword = (username) => {
   return axios.post("/users/reset-password", { username });
 };
 
-//  Google 로그인 요청 함수 추가
-export const googleLoginRequest = async (idToken) => {
+export const googleLoginRequest = async (accessToken) => {
   const response = await axios.post("/auth/oauth/google", {
-    idToken,
+    accessToken, // ✅ key 이름 수정
   });
-  return response.data; // accessToken 또는 { email, name, isNew: true }
+  return response.data;
 };
 
 //-관리자 페이지-
