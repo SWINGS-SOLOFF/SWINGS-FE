@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import useProfileData from "../hooks/useProfileData";
 import useFeedData from "../hooks/useFeedData";
+import { processFeed } from "../utils/feedUtils";
 
 import SocialProfile from "../components/SocialProfile";
 import ImageModal from "../components/ImageModal";
@@ -13,7 +14,7 @@ import LikedUsersModal from "../components/LikedUsersModal";
 import FeedDetailModal from "../components/FeedDetailModal";
 
 import socialApi from "../api/socialApi";
-import feedApi from "../api/feedApi"; // ✅ 추가된 부분
+import feedApi from "../api/feedApi";
 
 const SocialPage = () => {
   const { userId: paramUserId } = useParams();
@@ -74,7 +75,7 @@ const SocialPage = () => {
 
   const handleShowLikedBy = async (feedId) => {
     try {
-      const users = await feedApi.getLikedUsers(feedId); // ✅ feedApi로 수정됨
+      const users = await feedApi.getLikedUsers(feedId);
       setLikedByUsers(users);
       setShowLikedByModal(true);
     } catch {
@@ -83,13 +84,13 @@ const SocialPage = () => {
   };
 
   const handleFeedClick = (feed) => {
-    setSelectedFeed(feed);
+    const processed = processFeed(feed);
+    setSelectedFeed(processed);
   };
 
   const handleFeedDelete = async (feedId) => {
     try {
       await handleDelete(feedId);
-      setFeeds((prev) => prev.filter((feed) => feed.feedId !== feedId));
       setSelectedFeed(null);
       toast.success("게시물이 삭제되었습니다.");
     } catch {
@@ -163,6 +164,13 @@ const SocialPage = () => {
           onCommentSubmit={handleCommentSubmit}
           onCommentDelete={handleCommentDelete}
           setSelectedFeed={setSelectedFeed}
+          updateFeedInState={(updatedFeed) => {
+            setFeeds((prev) =>
+              prev.map((f) =>
+                f.feedId === updatedFeed.feedId ? updatedFeed : f
+              )
+            );
+          }}
         />
       )}
 
