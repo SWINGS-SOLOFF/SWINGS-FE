@@ -43,7 +43,7 @@ export default function PointCharge() {
       {/* 뒤로가기 버튼 */}
       <button
         className="absolute left-4 top-4 text-gray-500 hover:text-black transition-colors"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/swings/points")}
       >
         <ArrowLeft size={24} />
       </button>
@@ -88,8 +88,6 @@ export default function PointCharge() {
           );
         })}
       </div>
-
-      <p className="text-gray-500 text-sm animate-pulse">💰 1코인 = 1,000원</p>
 
       {/* 결제 모달 */}
       {isModalOpen && user?.userId && (
