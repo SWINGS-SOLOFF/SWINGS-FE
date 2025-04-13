@@ -262,13 +262,11 @@ const FeedDetailModal = ({
       {" "}
       {/* 삭제 확인 모달 */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70">
-          <DeleteConfirmModal
-            visible={true}
-            onCancel={() => setShowConfirm(false)}
-            onConfirm={handleDeleteConfirm}
-          />
-        </div>
+        <DeleteConfirmModal
+          visible={true}
+          onCancel={() => setShowConfirm(false)}
+          onConfirm={handleDeleteConfirm}
+        />
       )}
       <div className="fixed inset-0 z-[9980] bg-black bg-opacity-80 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
         {showLikedByModal && (

@@ -91,6 +91,7 @@ const SocialPage = () => {
   const handleFeedDelete = async (feedId) => {
     try {
       await handleDelete(feedId);
+      setFeeds((prev) => prev.filter((p) => p.feedId !== feedId));
       setSelectedFeed(null);
       toast.success("게시물이 삭제되었습니다.");
     } catch {

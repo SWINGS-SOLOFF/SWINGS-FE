@@ -1,7 +1,7 @@
 import React from "react";
 
 const DeleteConfirmModal = ({ visible, onCancel, onConfirm }) => {
-  if (!visible) return null;
+  console.log("✅ DeleteConfirmModal 렌더링됨");
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70">
@@ -18,9 +18,10 @@ const DeleteConfirmModal = ({ visible, onCancel, onConfirm }) => {
             취소
           </button>
           <button
+            type="button"
             onClick={() => {
               console.log("✅ 삭제 버튼 클릭됨"); // 로그 추가
-              onConfirm(); // 함수 실행
+              onConfirm();
             }}
             className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
           >
