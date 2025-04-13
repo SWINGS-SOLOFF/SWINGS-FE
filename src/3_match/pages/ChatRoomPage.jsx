@@ -14,13 +14,11 @@ const ChatRoomPage = () => {
     const clientRef = useRef(null);
     const messagesEndRef = useRef(null);
 
-    // ✅ 안 읽은 메시지 읽음 처리
     const markMessagesAsRead = async (roomId, username) => {
         try {
             await axios.post("http://localhost:8090/swings/api/chat/messages/read", null, {
                 params: { roomId, username },
             });
-            console.log("✅ 읽음 처리 완료");
         } catch (err) {
             console.error("❌ 읽음 처리 실패:", err);
         }
@@ -41,7 +39,6 @@ const ChatRoomPage = () => {
                 }));
 
                 setMessages(formatted);
-
                 await markMessagesAsRead(roomId, user.username);
             } catch (err) {
                 console.error("❌ 유저 또는 메시지 로딩 실패:", err);
@@ -56,12 +53,9 @@ const ChatRoomPage = () => {
         });
 
         client.onConnect = () => {
-            console.log("✅ WebSocket 연결됨");
-
             client.subscribe(`/topic/chat/${roomId}`, (message) => {
                 const newMsg = JSON.parse(message.body);
                 newMsg.createdAt = newMsg.sentAt || new Date().toISOString();
-
                 setMessages((prev) => [...prev, newMsg]);
             });
         };
@@ -111,24 +105,31 @@ const ChatRoomPage = () => {
             <div className="flex-1 overflow-y-auto p-4">
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender === currentUser.username;
+
+                    // ✅ SYSTEM 메시지는 중앙 말풍선으로 표시
+                    if (msg.sender === "SYSTEM") {
+                        return (
+                            <div key={idx} className="flex justify-center my-4">
+                                <div className="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm shadow text-center">
+                                    {msg.content}
+                                </div>
+                            </div>
+                        );
+                    }
+
                     return (
                         <div key={idx} className={`mb-5 flex ${isMe ? "justify-end" : "justify-start"}`}>
                             <div className={`max-w-xs ${isMe ? "text-right" : "text-left"}`}>
-                                {/* ✅ 아이디 강조 */}
                                 <p className={`mb-2 text-sm font-semibold ${isMe ? "text-blue-600" : "text-gray-700"}`}>
                                     {msg.sender}
                                 </p>
-                                {/* ✅ 메시지 말풍선 */}
                                 <div
                                     className={`inline-block px-4 py-2 rounded-xl text-sm break-words ${
-                                        isMe
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-200 text-gray-800"
+                                        isMe ? "bg-blue-500 text-white" : "bg-white text-gray-800 border"
                                     }`}
                                 >
                                     {msg.content}
                                 </div>
-                                {/* ✅ 전송 시간 */}
                                 {msg.createdAt && (
                                     <p className="text-[11px] text-gray-500 mt-1">
                                         {new Date(msg.createdAt).toLocaleTimeString("ko-KR", {
@@ -141,10 +142,10 @@ const ChatRoomPage = () => {
                         </div>
                     );
                 })}
-                <div ref={messagesEndRef} /> {/* 👈 자동 스크롤 */}
+                <div ref={messagesEndRef} />
             </div>
 
-            {/* ✅ 하단 입력창 */}
+            {/* ✅ 입력창 */}
             <div className="p-4 bg-white border-t flex items-center">
                 <input
                     value={input}
