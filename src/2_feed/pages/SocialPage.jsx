@@ -91,7 +91,6 @@ const SocialPage = () => {
   const handleFeedDelete = async (feedId) => {
     try {
       await handleDelete(feedId);
-      setFeeds((prev) => prev.filter((feed) => feed.feedId !== feedId));
       setSelectedFeed(null);
       toast.success("게시물이 삭제되었습니다.");
     } catch {
@@ -165,6 +164,13 @@ const SocialPage = () => {
           onCommentSubmit={handleCommentSubmit}
           onCommentDelete={handleCommentDelete}
           setSelectedFeed={setSelectedFeed}
+          updateFeedInState={(updatedFeed) => {
+            setFeeds((prev) =>
+              prev.map((f) =>
+                f.feedId === updatedFeed.feedId ? updatedFeed : f
+              )
+            );
+          }}
         />
       )}
 

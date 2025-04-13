@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   FaTrash,
   FaUser,
   FaComment,
   FaPaperPlane,
-  FaTimes,
   FaEllipsisV,
   FaEdit,
   FaPen,
@@ -34,12 +33,14 @@ const FeedPost = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandedCommentIds, setExpandedCommentIds] = useState([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showLikesList, setShowLikesList] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedCaption, setEditedCaption] = useState(post.caption || "");
   const [editedFile, setEditedFile] = useState(null);
-  const [editingCommentId, setEditingCommentId] = useState(null); // 어떤 댓글을 수정 중인지
+  const [editingCommentId, setEditingCommentId] = useState(null);
   const [editedComment, setEditedComment] = useState("");
+  const [commentHeightMap, setCommentHeightMap] = useState({});
+  const [activeCommentDropdown, setActiveCommentDropdown] = useState(null);
 
   const navigate = useNavigate();
   const contentRef = useRef(null);
@@ -48,38 +49,47 @@ const FeedPost = ({
   const [isContentTruncated, setIsContentTruncated] = useState(false);
   const [commentTruncatedState, setCommentTruncatedState] = useState({});
 
-  const [showDropdown, setShowDropdown] = useState(false); // 드롭다운 메뉴 표시 여부
-
-  const toggleDropdown = (e) => {
-    e.stopPropagation();
-    setShowDropdown(!showDropdown);
-  };
-
-  const handleEditClick = () => {
-    setShowDropdown(false);
-    setIsEditing(true);
-  };
-
-  const handleDeleteClick = () => {
-    setShowDropdown(false);
-    setShowDeleteConfirm(true);
-  };
+  const sortedComments = useMemo(() => {
+    return [...(post.comments || [])].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+  }, [post.comments]);
 
   useEffect(() => {
-    if (contentRef.current) {
-      const isOverflowing = contentRef.current.scrollHeight > 80;
-      setIsContentTruncated(isOverflowing);
-    }
+    if (!sortedComments?.length) return;
 
-    const newTruncatedState = {};
-    Object.keys(commentRefs.current).forEach((commentId) => {
-      if (commentRefs.current[commentId]) {
-        newTruncatedState[commentId] =
-          commentRefs.current[commentId].scrollHeight > 80;
-      }
+    const ready =
+      Object.keys(commentHeightMap).length === sortedComments.length;
+
+    if (!ready) return;
+
+    const truncatedMap = {};
+    sortedComments.forEach((comment) => {
+      const height = commentHeightMap[comment.commentId] || 0;
+      truncatedMap[comment.commentId] = height > 72;
     });
-    setCommentTruncatedState(newTruncatedState);
-  }, [post.caption, post.comments]);
+
+    setCommentTruncatedState(truncatedMap);
+  }, [commentHeightMap, sortedComments]);
+
+  useEffect(() => {
+    if (!post.showComments) return;
+
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const map = {};
+        Object.keys(commentRefs.current).forEach((id) => {
+          const el = commentRefs.current[id];
+          if (el) {
+            map[id] = el.scrollHeight;
+          }
+        });
+        setCommentHeightMap(map);
+      });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [post.showComments, sortedComments]);
 
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
@@ -98,12 +108,13 @@ const FeedPost = ({
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
-    try {
-      await onCommentSubmit(post.feedId, newComment);
-      setNewComment("");
-    } catch (err) {
-      console.error("❌ 댓글 추가 실패:", err);
-    }
+    await onCommentSubmit(post.feedId, newComment);
+    setNewComment("");
+  };
+
+  const confirmDelete = () => {
+    onDelete(post.feedId);
+    setShowDeleteConfirm(false);
   };
 
   const toggleCommentExpand = (commentId) => {
@@ -114,27 +125,28 @@ const FeedPost = ({
     );
   };
 
-  const confirmDelete = () => {
-    onDelete(post.feedId);
-    setShowDeleteConfirm(false);
+  const handleEditClick = () => {
+    setShowDropdown(false);
+    setIsEditing(true);
+  };
+
+  const handleDeleteClick = () => {
+    setShowDropdown(false);
+    setShowDeleteConfirm(true);
+  };
+
+  const toggleDropdown = (e) => {
+    e.stopPropagation();
+    setShowDropdown((prev) => !prev);
   };
 
   const cancelDelete = () => {
     setShowDeleteConfirm(false);
   };
 
-  const handleLikesClick = () => {
-    onShowLikedBy && onShowLikedBy(post.feedId);
-  };
-
   const handleCommentsClick = () => {
     onToggleComments(post.feedId);
-    setShowLikesList(false); // 댓글 클릭 시 좋아요 목록 버튼 숨김
   };
-
-  const sortedComments = [...(post.comments || [])].sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
 
   // 이미지가 있는지 확인
   const hasImage = post.image || post.imageUrl;
@@ -359,7 +371,7 @@ const FeedPost = ({
                 showCount={false}
               />
               <button
-                onClick={handleLikesClick}
+                onClick={() => onShowLikedBy(post.feedId)}
                 className="ml-2 text-sm font-medium text-red-600 hover:text-red-800 transition cursor-pointer" /* 빨간색으로 변경 */
               >
                 {post.likes || 0}
@@ -438,7 +450,7 @@ const FeedPost = ({
                                 });
                                 setEditingCommentId(null);
                               } catch (err) {
-                                toast.error("댓글 수정 실패");
+                                console.error("댓글 수정 실패", err);
                               }
                             }}
                             className="text-white bg-indigo-600 hover:bg-indigo-700 rounded px-3 py-1 text-xs"
@@ -447,45 +459,69 @@ const FeedPost = ({
                           </button>
                         </div>
                       ) : (
-                        <p
+                        <div
                           ref={(el) =>
                             (commentRefs.current[comment.commentId] = el)
                           }
-                          className={`text-sm text-black font-medium leading-relaxed bg-white p-2 rounded-lg ${
-                            isExpanded ? "" : "line-clamp-3 relative"
-                          } cursor-pointer border border-transparent hover:border-gray-200`}
-                          onClick={() => toggleCommentExpand(comment.commentId)}
+                          className={`whitespace-pre-wrap break-all text-sm p-2 rounded-lg relative transition-all duration-300 ${
+                            isExpanded ? "" : "max-h-[4.5rem] overflow-hidden"
+                          } ${
+                            commentTruncatedState[comment.commentId]
+                              ? "cursor-pointer"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            commentTruncatedState[comment.commentId] &&
+                            toggleCommentExpand(comment.commentId)
+                          }
                         >
                           {comment.content}
                           {!isExpanded &&
                             commentTruncatedState[comment.commentId] && (
                               <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white to-transparent pointer-events-none" />
                             )}
-                        </p>
+                        </div>
                       )}
                     </div>
 
                     {currentUser.userId === comment.userId && (
-                      <div className="flex items-center">
-                        <button
-                          onClick={() => {
-                            setEditingCommentId(comment.commentId);
-                            setEditedComment(comment.content);
-                          }}
-                          className="text-xs text-indigo-500 hover:text-indigo-700 rounded-full p-1.5 hover:bg-indigo-50 transition-all mr-1"
-                          title="수정"
-                        >
-                          <FaPen className="text-xs" />
-                        </button>
+                      <div className="relative ml-2">
                         <button
                           onClick={() =>
-                            onCommentDelete(comment.commentId, post.feedId)
+                            setActiveCommentDropdown((prev) =>
+                              prev === comment.commentId
+                                ? null
+                                : comment.commentId
+                            )
                           }
-                          className="text-xs text-rose-500 hover:text-rose-700 rounded-full p-1.5 hover:bg-rose-50 transition-all"
-                          title="삭제"
+                          className="text-gray-400 hover:text-gray-600 w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 transition"
                         >
-                          <FaTrash className="text-xs" />
+                          <FaEllipsisV className="text-xs" />
                         </button>
+
+                        {activeCommentDropdown === comment.commentId && (
+                          <div className="absolute right-0 mt-1 w-28 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                            <button
+                              onClick={() => {
+                                setEditingCommentId(comment.commentId);
+                                setEditedComment(comment.content);
+                                setActiveCommentDropdown(null);
+                              }}
+                              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                              수정
+                            </button>
+                            <button
+                              onClick={() => {
+                                onCommentDelete(comment.commentId, post.feedId);
+                                setActiveCommentDropdown(null);
+                              }}
+                              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100"
+                            >
+                              삭제
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -502,34 +538,32 @@ const FeedPost = ({
           </div>
 
           <div className="p-4 border-t border-gray-100 bg-white">
-            <form onSubmit={handleCommentSubmit} className="flex items-center">
-              <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mr-3 shadow-sm">
-                <FaUser className="text-gray-700 text-xl" />
-              </div>
-              <div className="flex-grow relative">
+            <form onSubmit={handleCommentSubmit} className="relative w-full">
+              <div className="flex items-center relative">
                 <input
                   type="text"
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="댓글을 입력하세요..."
-                  className="w-full p-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-sm transition text-black"
+                  className="flex-grow p-3 pr-14 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-black text-sm transition text-black"
                   maxLength={300}
                 />
-                <div className="absolute right-3 bottom-1 text-xs text-gray-500">
+                <button
+                  type="submit"
+                  disabled={!newComment.trim()}
+                  className={`ml-3 ${
+                    !newComment.trim()
+                      ? "bg-gray-400"
+                      : "bg-black hover:bg-gray-800"
+                  } text-white p-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center`}
+                >
+                  <FaPaperPlane />
+                </button>
+
+                <span className="absolute right-16 text-xs text-gray-400 top-1/2 -translate-y-1/2 pointer-events-none">
                   {newComment.length}/300
-                </div>
+                </span>
               </div>
-              <button
-                type="submit"
-                disabled={!newComment.trim()}
-                className={`ml-3 ${
-                  !newComment.trim()
-                    ? "bg-gray-400"
-                    : "bg-black hover:bg-gray-800"
-                } text-white p-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center group`}
-              >
-                <FaPaperPlane />
-              </button>
             </form>
           </div>
         </div>

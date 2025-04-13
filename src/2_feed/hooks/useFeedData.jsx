@@ -1,122 +1,112 @@
 import { useState, useEffect } from "react";
 import feedApi from "../api/feedApi";
-import { processFeed } from "../utils/feedUtils";
+import { toast } from "react-toastify";
 
-const useFeedData = (userId, currentUser, setSelectedFeed = null) => {
+/**
+ * 소셜 페이지이랑 피드 페이지에서 공통으로 사용할 수 있는 피드 관련 훅
+ * - 좋아요 토글, 댓글 추가/삭제, 피드 삭제, 피드 불러오기 기능 포함
+ */
+const useFeedData = (viewedUserId, currentUser, setSelectedFeed) => {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const refreshFeeds = async () => {
-    if (!userId || !currentUser) return setLoading(false);
     try {
-      setLoading(true);
-      const fetchedFeeds = await feedApi.getUserFeeds(userId);
-      const processed = fetchedFeeds.map((feed) => processFeed(feed));
-      setPosts(processed);
-    } catch (err) {
-      console.error("❌ 피드 로딩 오류:", err);
-      setError("피드를 불러오는 데 실패했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (userId && currentUser) refreshFeeds();
-  }, [userId, currentUser]);
-
-  const updateFeedLocally = (feedId, updateFn) => {
-    setPosts((prev) =>
-      prev.map((f) => (f.feedId === feedId ? updateFn(f) : f))
-    );
-    if (setSelectedFeed) {
-      setSelectedFeed((prev) =>
-        prev && prev.feedId === feedId ? updateFn(prev) : prev
-      );
+      const feeds = await feedApi.getUserFeeds(viewedUserId);
+      setPosts(feeds);
+    } catch {
+      toast.error("피드를 불러오지 못했습니다.");
     }
   };
 
   const handleLikeToggle = async (feedId, isLiked) => {
-    const prev = posts.find((p) => p.feedId === feedId);
-    if (!prev) return;
-
-    const updatedPost = {
-      ...prev,
-      liked: !isLiked,
-      likes: isLiked ? prev.likes - 1 : prev.likes + 1,
-    };
-    updateFeedLocally(feedId, () => updatedPost);
-
     try {
-      if (isLiked) {
-        await feedApi.unlikeFeed(feedId, currentUser.userId);
-      } else {
-        await feedApi.likeFeed(feedId, currentUser.userId);
+      const updated = isLiked
+        ? await feedApi.unlikeFeed(feedId, currentUser?.userId)
+        : await feedApi.likeFeed(feedId, currentUser?.userId);
+      if (updated) {
+        setPosts((prev) =>
+          prev.map((f) => (f.feedId === feedId ? updated : f))
+        );
+        if (setSelectedFeed)
+          setSelectedFeed((prev) =>
+            prev && prev.feedId === feedId ? updated : prev
+          );
       }
-      return updatedPost;
-    } catch (err) {
-      console.error("❌ 좋아요 상태 변경 실패:", err);
-      updateFeedLocally(feedId, () => prev);
-      return null;
+    } catch {
+      toast.error("좋아요 처리 실패");
     }
   };
 
-  const handleCommentSubmit = async (feedId, commentText) => {
-    if (!commentText.trim()) return;
+  const handleDelete = async (feedId) => {
+    try {
+      console.log("🗑️ 삭제 요청 시작:", feedId);
+      await feedApi.deleteFeed(feedId);
+      console.log("✅ 삭제 성공");
+      setPosts((prev) => prev.filter((post) => post.feedId !== feedId));
+    } catch (err) {
+      console.error("❌ 게시물 삭제 실패", err);
+      toast.error("게시물 삭제 실패");
+    }
+  };
+
+  const handleCommentSubmit = async (feedId, content) => {
     try {
       const newComment = await feedApi.addComment(
         feedId,
-        currentUser.userId,
-        commentText
+        currentUser?.userId,
+        content
       );
-      updateFeedLocally(feedId, (f) => {
-        const exists = f.comments.some(
-          (c) => c.commentId === newComment.commentId
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.feedId === feedId
+            ? { ...p, comments: [...p.comments, newComment] }
+            : p
+        )
+      );
+      if (setSelectedFeed)
+        setSelectedFeed((prev) =>
+          prev && prev.feedId === feedId
+            ? { ...prev, comments: [...prev.comments, newComment] }
+            : prev
         );
-        return {
-          ...f,
-          comments: exists ? f.comments : [...f.comments, newComment],
-        };
-      });
       return newComment;
-    } catch (err) {
-      console.error("❌ 댓글 추가 실패:", err);
+    } catch {
+      toast.error("댓글 추가 실패");
     }
   };
 
   const handleCommentDelete = async (feedId, commentId) => {
     try {
       await feedApi.deleteComment(feedId, commentId);
-      updateFeedLocally(feedId, (f) => ({
-        ...f,
-        comments: f.comments.filter((c) => c.commentId !== commentId),
-      }));
-      return true;
-    } catch (err) {
-      console.error("❌ 댓글 삭제 실패:", err);
-    }
-  };
-
-  const handleDelete = async (feedId) => {
-    try {
-      await feedApi.deleteFeed(feedId);
-      setPosts((prev) => prev.filter((f) => f.feedId !== feedId));
-      if (setSelectedFeed) {
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.feedId === feedId
+            ? {
+                ...p,
+                comments: p.comments.filter((c) => c.commentId !== commentId),
+              }
+            : p
+        )
+      );
+      if (setSelectedFeed)
         setSelectedFeed((prev) =>
-          prev && prev.feedId === feedId ? null : prev
+          prev && prev.feedId === feedId
+            ? {
+                ...prev,
+                comments: prev.comments.filter(
+                  (c) => c.commentId !== commentId
+                ),
+              }
+            : prev
         );
-      }
-    } catch (err) {
-      console.error("❌ 피드 삭제 실패:", err);
+    } catch {
+      toast.error("댓글 삭제 실패");
     }
   };
 
   return {
     posts,
     setPosts,
-    loading,
-    error,
     refreshFeeds,
     handleLikeToggle,
     handleDelete,
