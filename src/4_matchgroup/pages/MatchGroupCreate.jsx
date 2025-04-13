@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createMatchGroup } from "../api/matchGroupApi";
 import { openKakaoPostcode } from "../utils/openKakaoPostcode";
-import {loadKakaoMapScript} from "../utils/loadKakaoMapScript.js";
+import { loadKakaoMapScript } from "../utils/loadKakaoMapScript";
 
 const MatchGroupCreate = () => {
     const navigate = useNavigate();
@@ -12,9 +12,9 @@ const MatchGroupCreate = () => {
     const [groupData, setGroupData] = useState({
         groupName: "",
         description: "",
-        maxParticipants: 10,
+        maxParticipants: 4,
         currentParticipants: 1,
-        ageRange: "20-40",
+        ageRange: "20-30",
         genderRatio: "1:1",
         location: "",
         latitude: null,
@@ -34,15 +34,15 @@ const MatchGroupCreate = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!groupData.groupName.trim()) return setError("방 이름을 입력하세요.");
+        if (!groupData.groupName.trim()) return setError("방 제목을 입력하세요.");
         if (!groupData.description.trim()) return setError("방 설명을 입력하세요.");
-        if (!groupData.schedule) return setError("경기 일정을 입력하세요.");
-        if (!groupData.latitude || !groupData.longitude) return setError("골프장 좌표가 없습니다.");
+        if (!groupData.schedule) return setError("일정을 선택하세요.");
+        if (!groupData.latitude || !groupData.longitude) return setError("주소 검색을 완료해주세요.");
 
         try {
             setLoading(true);
-            await createMatchGroup({ ...groupData });
-            alert("그룹이 생성되었습니다!");
+            await createMatchGroup(groupData);
+            alert("그룹 생성 완료!");
             navigate("/swings/matchgroup");
         } catch (error) {
             console.error("그룹 생성 실패:", error);
@@ -51,8 +51,6 @@ const MatchGroupCreate = () => {
             setLoading(false);
         }
     };
-
-    console.log("✅ 카카오 키 확인:", import.meta.env.VITE_KAKAO_MAP_API_KEY);
 
     const handleAddressSearch = async () => {
         try {
@@ -63,29 +61,26 @@ const MatchGroupCreate = () => {
                     location: data.roadAddress || data.address,
                 }));
             });
-        } catch (error) {
+        } catch (e) {
             alert("카카오 스크립트 로드 실패");
-            console.error(error);
+            console.error(e);
         }
     };
 
     useEffect(() => {
         if (!groupData.location) return;
 
-        const loadAndRenderMap = async () => {
+        const loadMap = async () => {
             try {
                 await loadKakaoMapScript();
-
                 const { kakao } = window;
                 if (!kakao || !kakao.maps) return;
 
                 const geocoder = new kakao.maps.services.Geocoder();
-                geocoder.addressSearch(groupData.location, function (result, status) {
+                geocoder.addressSearch(groupData.location, (result, status) => {
                     if (status === kakao.maps.services.Status.OK) {
                         const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                        const mapContainer = document.getElementById("map");
-
-                        const map = new kakao.maps.Map(mapContainer, {
+                        const map = new kakao.maps.Map(document.getElementById("map"), {
                             center: coords,
                             level: 3,
                         });
@@ -100,95 +95,84 @@ const MatchGroupCreate = () => {
                     }
                 });
             } catch (e) {
-                console.error("지도 렌더링 실패:", e);
+                console.error("지도 로드 실패:", e);
             }
         };
 
-        loadAndRenderMap();
+        loadMap();
     }, [groupData.location]);
 
     return (
-        <div className="min-h-screen bg-white px-4 py-6">
+        <div className="min-h-screen px-4 py-6 bg-white">
             <div className="max-w-md mx-auto">
-                <h2 className="text-xl font-bold text-gray-900 mb-5 text-center">그룹 만들기</h2>
-                {error && <p className="text-red-500 mb-4 text-center text-sm">{error}</p>}
+                <h2 className="text-xl font-bold text-center mb-4">⛳ 그룹 만들기</h2>
+                {error && <p className="text-sm text-red-500 mb-4 text-center">{error}</p>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {[
-                        { name: "groupName", placeholder: "방 제목", type: "text" },
-                        { name: "description", placeholder: "방 설명", type: "textarea" },
-                        { name: "schedule", placeholder: "일정", type: "datetime-local" },
-                        { name: "maxParticipants", placeholder: "최대 인원", type: "number" },
-                        { name: "currentParticipants", placeholder: "현재 인원", type: "number" },
-                        { name: "genderRatio", placeholder: "성비 (예: 1:1)", type: "text" },
-                        { name: "ageRange", placeholder: "연령대 (예: 20-40)", type: "text" },
-                    ].map((field) =>
-                        field.type === "textarea" ? (
-                            <textarea
-                                key={field.name}
-                                name={field.name}
-                                placeholder={field.placeholder}
-                                value={groupData[field.name]}
-                                onChange={handleChange}
-                                className="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-gray-400 outline-none"
-                            />
-                        ) : (
-                            <input
-                                key={field.name}
-                                type={field.type}
-                                name={field.name}
-                                placeholder={field.placeholder}
-                                value={groupData[field.name]}
-                                onChange={handleChange}
-                                className="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-gray-400 outline-none"
-                            />
-                        )
-                    )}
+                    {/* 텍스트 입력 */}
+                    <input name="groupName" placeholder="방 제목" value={groupData.groupName} onChange={handleChange}
+                           className="w-full p-3 border rounded-xl bg-gray-50" />
+                    <textarea name="description" placeholder="방 설명" value={groupData.description} onChange={handleChange}
+                              className="w-full p-3 border rounded-xl bg-gray-50" />
+                    <input name="schedule" type="datetime-local" value={groupData.schedule} onChange={handleChange}
+                           className="w-full p-3 border rounded-xl bg-gray-50" />
 
                     {/* 주소 검색 */}
                     <div className="flex gap-2">
-                        <input
-                            type="text"
-                            name="location"
-                            placeholder="골프장 장소"
-                            value={groupData.location}
-                            readOnly
-                            className="w-full p-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-gray-400 outline-none"
-                        />
-                        <button
-                            type="button"
-                            onClick={handleAddressSearch}
-                            className="whitespace-nowrap px-3 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 text-sm"
-                        >
-                            주소 검색
-                        </button>
+                        <input type="text" name="location" value={groupData.location} placeholder="골프장 주소" readOnly
+                               className="w-full p-3 border rounded-xl bg-gray-50" />
+                        <button type="button" onClick={handleAddressSearch}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm">주소 검색</button>
                     </div>
 
-                    {/* 지도 */}
+                    {/* 지도 미리보기 */}
                     {groupData.location && (
                         <div className="mt-4">
-                            <h3 className="text-sm text-gray-700 mb-2">선택한 골프장 위치</h3>
+                            <h3 className="text-sm mb-2 text-gray-700">📍 지도 미리보기</h3>
                             <div id="map" className="w-full h-60 rounded-xl border" />
                         </div>
                     )}
 
                     {/* 선택 필드 */}
                     <div className="grid grid-cols-2 gap-3">
-                        <select
-                            name="playStyle"
-                            value={groupData.playStyle}
-                            onChange={handleChange}
-                            className="p-3 border border-gray-300 rounded-xl bg-white"
-                        >
+                        <select name="genderRatio" value={groupData.genderRatio} onChange={handleChange}
+                                className="p-3 border rounded-xl bg-white">
+                            <option value="1:1">성비 1:1</option>
+                            <option value="2:1">남초 (2:1)</option>
+                            <option value="1:2">여초 (1:2)</option>
+                            <option value="상관없음">상관없음</option>
+                        </select>
+
+                        <select name="ageRange" value={groupData.ageRange} onChange={handleChange}
+                                className="p-3 border rounded-xl bg-white">
+                            <option value="10-20">10~20</option>
+                            <option value="20-30">20~30</option>
+                            <option value="30-40">30~40</option>
+                            <option value="상관없음">상관없음</option>
+                        </select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        <select name="maxParticipants" value={groupData.maxParticipants} onChange={handleChange}
+                                className="p-3 border rounded-xl bg-white">
+                            {[...Array(9)].map((_, i) => (
+                                <option key={i + 2} value={i + 2}>{i + 2}명</option>
+                            ))}
+                        </select>
+
+                        <input type="number" name="currentParticipants" value={groupData.currentParticipants} readOnly
+                               className="p-3 border rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        <select name="playStyle" value={groupData.playStyle} onChange={handleChange}
+                                className="p-3 border rounded-xl bg-white">
                             <option value="casual">캐주얼</option>
                             <option value="competitive">경쟁적</option>
                         </select>
-                        <select
-                            name="skillLevel"
-                            value={groupData.skillLevel}
-                            onChange={handleChange}
-                            className="p-3 border border-gray-300 rounded-xl bg-white"
-                        >
+
+                        <select name="skillLevel" value={groupData.skillLevel} onChange={handleChange}
+                                className="p-3 border rounded-xl bg-white">
                             <option value="초급">초급</option>
                             <option value="중급">중급</option>
                             <option value="고급">고급</option>
@@ -196,22 +180,15 @@ const MatchGroupCreate = () => {
                         </select>
                     </div>
 
-                    <select
-                        name="matchType"
-                        value={groupData.matchType}
-                        onChange={handleChange}
-                        className="w-full p-3 border border-gray-300 rounded-xl bg-white"
-                    >
+                    <select name="matchType" value={groupData.matchType} onChange={handleChange}
+                            className="w-full p-3 border rounded-xl bg-white">
                         <option value="screen">스크린</option>
                         <option value="field">필드</option>
                     </select>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition"
-                    >
-                        {loading ? "생성 중..." : "방 만들기"}
+                    <button type="submit" disabled={loading}
+                            className="w-full py-3 bg-black text-white rounded-xl font-semibold hover:bg-gray-800">
+                        {loading ? "생성 중..." : "그룹 만들기"}
                     </button>
                 </form>
             </div>
