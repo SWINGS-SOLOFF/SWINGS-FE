@@ -124,11 +124,12 @@ export const usePoint = async (amount, description = "포인트 사용") => {
   return response.data;
 };
 
-// 비밀번호 찾기 및 재설정
-export const resetPassword = (username) => {
-  return axios.post("/users/reset-password", { username });
+//비밀번호 재설정 요청
+export const resetPassword = (data) => {
+  return axios.post("/users/reset-password", data); // username + email 포함된 객체
 };
 
+//구글 로그인
 export const googleLoginRequest = async (accessToken) => {
   const response = await axios.post("/auth/oauth/google", {
     accessToken, // ✅ key 이름 수정

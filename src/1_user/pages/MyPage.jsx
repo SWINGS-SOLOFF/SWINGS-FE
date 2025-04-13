@@ -97,7 +97,7 @@ export default function MyPage() {
           </div>
         </div>
         <h2 className="text-2xl font-extrabold text-gray-800 mt-3 tracking-tight">
-          @{formData?.username}
+          {formData?.username}
         </h2>
       </div>
 

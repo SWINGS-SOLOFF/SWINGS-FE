@@ -174,7 +174,7 @@ const FeedPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-4 sm:pt-8 md:pt-12">
+    <div className="bg-white min-h-screen pt-4 sm:pt-8 md:pt-12">
       <ToastContainer position="bottom-right" />
       <CreatePostButton onClick={togglePostForm} customPosition="right-20" />
 
