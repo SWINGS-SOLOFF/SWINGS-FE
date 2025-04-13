@@ -11,7 +11,6 @@ import TossSuccess from "../pages/TossSuccess";
 import TossFail from "../pages/TossFail";
 import TossCheckout from "../pages/TossCheckout";
 
-import FindPassword from "../pages/FindPassword";
 import ProfileImage from "../pages/ProfileImage";
 import FeedPage from "../../2_feed/pages/FeedPage";
 
@@ -125,9 +124,6 @@ export default function UserRoutes() {
           </PrivateRoute>
         }
       />
-
-      {/* 비밀번호 찾기 */}
-      <Route path="/find-password" element={<FindPassword />} />
     </Routes>
   );
 }
