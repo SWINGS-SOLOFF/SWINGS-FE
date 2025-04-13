@@ -8,6 +8,7 @@ const LikeButton = ({
   onLike,
   onUnlike,
   isLoading = false,
+  showCount = true,
 }) => {
   const handleClick = () => {
     if (isLoading) return;
@@ -52,16 +53,18 @@ const LikeButton = ({
         </motion.div>
       </motion.button>
 
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className={`text-sm font-medium ${
-          liked ? "text-red-600" : "text-gray-600"
-        } transition-colors duration-300`}
-      >
-        {likeCount || 0}
-      </motion.span>
+      {showCount && (
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className={`text-sm font-medium ${
+            liked ? "text-red-600" : "text-gray-600"
+          } transition-colors duration-300`}
+        >
+          {likeCount || 0}
+        </motion.span>
+      )}
     </div>
   );
 };

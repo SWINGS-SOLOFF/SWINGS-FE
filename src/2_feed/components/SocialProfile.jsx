@@ -12,16 +12,11 @@ import {
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 import { RiMentalHealthFill } from "react-icons/ri";
-import { FiSettings } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { normalizeImageUrl } from "../utils/imageUtils";
-import TruncatedText from "./TruncatedText";
-import { toast } from "react-toastify";
-import socialApi from "../api/socialApi";
 
 import ProfileDetailModal from "./ProfileDetailModal";
-import ImageModal from "./ImageModal"; // ✅ 이미지 확대 보기
-import IntroduceEditor from "../../1_user/components/IntroduceEditor.jsx";
+import ImageModal from "./ImageModal";
 
 const SocialProfile = ({
   user,
@@ -63,7 +58,7 @@ const SocialProfile = ({
   };
 
   const golfLevelMap = {
-    beginner: "초보자",
+    beginner: "골린이",
     intermediate: "중급자",
     advanced: "고급자",
   };
@@ -158,31 +153,27 @@ const SocialProfile = ({
         <div className="flex flex-wrap gap-2 flex-1">
           {user?.activityRegion && (
             <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-              <FaMapMarkerAlt className="text-gray-500 mr-1" size={12} />
               <span className="text-black">
-                {regionMap[user.activityRegion] || user.activityRegion}
+                #{regionMap[user.activityRegion] || user.activityRegion}
               </span>
             </div>
           )}
-          {user?.golfSkill && (
+          {user?.birthDate && (
             <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-              <FaGolfBall className="text-green-500 mr-1" size={12} />
-              <span className="text-black">
-                {golfLevelMap[user.golfSkill] || user.golfSkill}
+              <span className="text-black mr-2">
+                #{`${user.birthDate.slice(2, 4)}년생`}
               </span>
             </div>
           )}
           {user?.mbti && (
             <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-              <RiMentalHealthFill className="text-purple-500 mr-1" size={12} />
-              <span className="text-black">{user.mbti}</span>
+              #<span className="text-black">{user.mbti}</span>
             </div>
           )}
-          {user?.birthDate && (
+          {user?.golfSkill && (
             <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-              <FaBirthdayCake className="text-pink-500 mr-1" size={12} />
-              <span className="text-black mr-2">
-                {`${user.birthDate.slice(0, 4)}년생`}
+              <span className="text-black">
+                #{golfLevelMap[user.golfSkill] || user.golfSkill}
               </span>
             </div>
           )}
@@ -212,7 +203,7 @@ const SocialProfile = ({
             {feeds.map((feed) => (
               <div
                 key={feed.feedId}
-                className="aspect-square relative overflow-hidden cursor-pointer group bg-white border border-gray-100"
+                className="aspect-square relative overflow-hidden cursor-pointer group border border-gray-200 bg-white"
                 onClick={() => onFeedClick(feed)}
               >
                 {feed.imageUrl ? (
@@ -228,18 +219,6 @@ const SocialProfile = ({
                     </p>
                   </div>
                 )}
-
-                {/* 하단 오버레이 (좋아요/댓글 수) */}
-                <div className="absolute bottom-0 w-full bg-black bg-opacity-40 text-white text-[11px] px-2 py-1 flex justify-between items-center">
-                  <span className="flex items-center gap-1">
-                    <FaHeart className="text-red-400" />
-                    {feed.likes ?? feed.likeCount ?? 0}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <FaComment />
-                    {feed.comments?.length ?? feed.commentCount ?? 0}
-                  </span>
-                </div>
               </div>
             ))}
           </div>

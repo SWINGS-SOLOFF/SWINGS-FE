@@ -67,7 +67,7 @@ export default function MyPage() {
   return (
     <div className="bg-gradient-to-b from-white to-[#f9f9fb] px-4 py-8 min-h-screen font-sans relative">
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/swings/social")}
         className="absolute top-4 left-4 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition z-10"
         aria-label="뒤로가기"
       >
@@ -97,7 +97,7 @@ export default function MyPage() {
           </div>
         </div>
         <h2 className="text-2xl font-extrabold text-gray-800 mt-3 tracking-tight">
-          @{formData?.username}
+          {formData?.username}
         </h2>
       </div>
 
