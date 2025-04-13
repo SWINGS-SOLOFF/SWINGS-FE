@@ -138,7 +138,7 @@ function SwipePage() {
             data.append("amount", 3);
             data.append("description", "슈퍼챗 사용");
 
-            await axios.post(`${BASE_URL}/users/me/points/use`, null, {
+            await axios.post(`${BASE_URL}/users/me/points/use`, data, {
                 params: {
                     amount: 3,
                     description: "슈퍼챗 사용",

@@ -4,6 +4,7 @@ import axios from "axios";
 
 // ✅ 백엔드 주소 전체 포함한 baseURL로 설정 (포트/컨텍스트 포함)
 const BASE_URL = "http://localhost:8090/swings";
+const token = sessionStorage.getItem("token");
 
 /**
  * 추천 유저 목록 요청
@@ -18,11 +19,18 @@ export const fetchRecommendedProfiles = (username) => {
  * POST /swings/api/likes/{fromUserId}/{toUserId}
  */
 export const sendLike = (fromUserId, toUserId, paid = false) => {
-    return axios.post(`${BASE_URL}/api/likes/likes/${fromUserId}/${toUserId}?paid=${paid}`);
+    return axios.post(`${BASE_URL}/api/likes/${fromUserId}/${toUserId}?paid=${paid}`);
 };
 
 // ✅ LikeListPage용 이름으로도 export
-export const sendLikeToUser = sendLike;
+// matchApi.js
+export const sendLikeToUser = (fromUsername, toUsername, paid = false) => {
+    return axios.post(`${BASE_URL}/api/likes/${fromUsername}/${toUsername}`, null, {
+        params: { paid },
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
 
 /**
  * 싫어요 요청
