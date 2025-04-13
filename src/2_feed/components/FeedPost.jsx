@@ -212,11 +212,9 @@ const FeedPost = ({
         )}
       </div>
 
-      <DeleteConfirmModal
-        visible={showDeleteConfirm}
-        onCancel={cancelDelete}
-        onConfirm={confirmDelete}
-      />
+      {showDeleteConfirm && (
+        <DeleteConfirmModal onCancel={cancelDelete} onConfirm={confirmDelete} />
+      )}
 
       {isEditing ? (
         <div className="p-6 bg-gray-50">
