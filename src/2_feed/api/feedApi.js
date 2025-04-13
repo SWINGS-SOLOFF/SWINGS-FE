@@ -33,6 +33,22 @@ const feedApi = {
     return response.data;
   },
 
+  updateFeed: async (feedId, { caption, file }) => {
+    const formData = new FormData();
+    formData.append("caption", caption);
+    if (file) {
+      formData.append("file", file);
+    }
+
+    const response = await axios.put(`${API_BASE}/feeds/${feedId}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  },
+
   getMainFeeds: async (userId) => {
     const response = await axios.get(`${API_BASE}/feeds/main`, {
       params: { userId },
@@ -110,6 +126,17 @@ const feedApi = {
   // 로그인 사용자 정보 조회
   getCurrentUser: async () => {
     const response = await axios.get(`${USER_API_BASE}/me`);
+    return response.data;
+  },
+
+  updateComment: async (feedId, commentId, content) => {
+    const response = await axios.patch(
+      `${API_BASE}/feeds/${feedId}/comments/${commentId}`,
+      null,
+      {
+        params: { content },
+      }
+    );
     return response.data;
   },
 };
