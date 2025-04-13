@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { AnimatePresence, motion } from "framer-motion";
 
 import useUser from "../hooks/useUser";
@@ -53,21 +51,21 @@ const FeedPage = () => {
 
   useEffect(() => {
     if (!userId) return;
+
     const init = async () => {
       try {
         const user = await feedApi.getCurrentUser();
         setCurrentUser(user);
         setPosts([]);
-        const order = ["followings", "all", "mine"].sort(
-          () => Math.random() - 0.5
-        );
+        const order = ["followings", "all", "mine"];
         setFeedOrder(order);
         setStep(0);
         await loadFeeds(order[0], user);
-      } catch {
-        toast.error("사용자 정보를 불러오는 데 실패했습니다.");
+      } catch (err) {
+        console.error("❌ 사용자 정보 로딩 실패", err);
       }
     };
+
     init();
   }, [userId]);
 
@@ -82,8 +80,7 @@ const FeedPage = () => {
         const followings = (await socialApi.getFollowings?.(user.userId)) || [];
         const filter =
           type === "followings" && followings.length > 0 ? "followings" : "all";
-
-        const sort = type === "followings" ? "latest" : "random"; // 핵심 수정
+        const sort = type === "followings" ? "latest" : "random";
 
         newFeeds = await feedApi.getFeeds(user.userId, 0, 10, {
           sort,
@@ -98,8 +95,8 @@ const FeedPage = () => {
         );
         return [...prev, ...uniqueNewFeeds];
       });
-    } catch {
-      toast.error("피드를 불러오는 데 실패했습니다.");
+    } catch (err) {
+      console.error("❌ 피드를 불러오는 데 실패했습니다.", err);
     } finally {
       setLoading(false);
     }
@@ -136,7 +133,11 @@ const FeedPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!userId) return toast.error("로그인 후 작성해주세요");
+    if (!userId) {
+      console.error("❌ 로그인 후 작성해주세요");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("userId", userId);
     formData.append("content", newPostContent);
@@ -147,9 +148,8 @@ const FeedPage = () => {
       setPosts((prev) => [newPost, ...prev]);
       reset();
       setShowNewPostForm(false);
-      toast.success("게시물이 업로드되었습니다.");
-    } catch {
-      toast.error("업로드 실패");
+    } catch (err) {
+      console.error("❌ 업로드 실패:", err);
     }
   };
 
@@ -158,14 +158,13 @@ const FeedPage = () => {
       const users = await feedApi.getLikedUsers(feedId);
       setLikedUsers(users);
       setIsLikedModalOpen(true);
-    } catch {
-      toast.error("좋아요 목록 불러오기 실패");
+    } catch (err) {
+      console.error("❌ 좋아요 목록 불러오기 실패:", err);
     }
   };
 
   return (
     <div className="bg-gray-50 min-h-screen pt-4 sm:pt-8 md:pt-12">
-      <ToastContainer position="bottom-right" />
       <CreatePostButton onClick={togglePostForm} customPosition="right-20" />
 
       {isRefreshing && (
