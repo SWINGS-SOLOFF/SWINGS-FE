@@ -3,7 +3,6 @@ import { fetchUserData, updateUserInfo, checkUsername } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
 import { removeToken } from "../utils/userUtils";
 import Select from "react-select";
-import { ArrowLeft } from "lucide-react";
 import { Dialog } from "@headlessui/react";
 
 const regionMap = {
@@ -213,15 +212,9 @@ export default function UpdateForm() {
 
   return (
     <div className="relative min-h-screen bg-white flex flex-col items-center justify-center px-4">
-      <button
-        onClick={() => navigate("/swings/mypage")}
-        className="absolute top-4 left-4 text-gray-500 hover:text-black transition-colors"
-      >
-        <ArrowLeft size={24} />
-      </button>
-
+      <br />
+      <h2 className="text-xl font-bold text-gray-800 mb-6">회원정보 수정</h2>
       <div className="w-full max-w-sm space-y-6">
-        <br />
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1">
             아이디
@@ -324,12 +317,21 @@ export default function UpdateForm() {
           onChange={(v) => setFormData({ ...formData, drinking: v })}
         />
 
-        <button
-          onClick={handleUpdate}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg mt-2"
-        >
-          수정 완료
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate("/swings/mypage")}
+            className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 rounded-lg mt-2"
+          >
+            취소
+          </button>
+          <button
+            onClick={handleUpdate}
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg mt-2"
+          >
+            수정 완료
+          </button>
+        </div>
+          <br />
       </div>
 
       <ResultModal
