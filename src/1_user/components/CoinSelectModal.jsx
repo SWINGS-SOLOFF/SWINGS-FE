@@ -1,7 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { handleTossPayment, handleKakaoPayment } from "../utils/paymentUtils";
+import { handleTossPayment } from "../utils/paymentUtils";
 
 export default function CoinSelectModal({
   isOpen,
@@ -31,16 +31,13 @@ export default function CoinSelectModal({
             <X size={20} />
           </button>
 
-          <Dialog.Title className="text-lg font-bold text-center text-[#2E384D]">
-            결제 수단 선택
-          </Dialog.Title>
-
           <p className="text-center text-sm text-gray-600">
-            <span className="font-semibold text-[#2E384D]">{coin}</span>
-            코인을 어떤 방법으로 결제할까요?
+            <span className="font-bold text-[#2E384D]">{coin}코인</span>을
+            결제하시겠습니까?
           </p>
 
-          <div className="flex flex-col gap-3 mt-4">
+          {/* ✅ 결제 버튼 하나만 */}
+          <div className="mt-6">
             <button
               onClick={() =>
                 handleTossPayment({
@@ -50,15 +47,9 @@ export default function CoinSelectModal({
                   redirectToCheckout,
                 })
               }
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg shadow-sm"
+              className="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg shadow transition"
             >
-              토스페이로 결제
-            </button>
-            <button
-              onClick={() => handleKakaoPayment(onClose)}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 rounded-lg shadow-sm"
-            >
-              카카오페이로 결제
+              결제 요청
             </button>
           </div>
         </Dialog.Panel>

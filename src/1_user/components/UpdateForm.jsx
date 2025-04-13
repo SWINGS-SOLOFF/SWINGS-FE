@@ -3,28 +3,32 @@ import { fetchUserData, updateUserInfo, checkUsername } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
 import { removeToken } from "../utils/userUtils";
 import Select from "react-select";
-import { ArrowLeft } from "lucide-react";
+import { Dialog } from "@headlessui/react";
 
-const regionOptions = [
-  "서울",
-  "부산",
-  "대구",
-  "인천",
-  "광주",
-  "대전",
-  "울산",
-  "세종",
-  "경기",
-  "강원",
-  "충북",
-  "충남",
-  "전북",
-  "전남",
-  "경북",
-  "경남",
-  "제주",
-].map((v) => ({ label: v, value: v.toUpperCase() }));
+const regionMap = {
+  서울: "SEOUL",
+  부산: "BUSAN",
+  대구: "DAEGU",
+  인천: "INCHEON",
+  광주: "GWANGJU",
+  대전: "DAEJEON",
+  울산: "ULSAN",
+  세종: "SEJONG",
+  경기: "GYEONGGI",
+  강원: "GANGWON",
+  충북: "CHUNGBUK",
+  충남: "CHUNGNAM",
+  전북: "JEONBUK",
+  전남: "JEONNAM",
+  경북: "GYEONGBUK",
+  경남: "GYEONGNAM",
+  제주: "JEJU",
+};
 
+const regionOptions = Object.keys(regionMap).map((k) => ({
+  label: k,
+  value: k,
+}));
 const mbtiOptions = [
   "ISTJ",
   "ISFJ",
@@ -43,18 +47,15 @@ const mbtiOptions = [
   "ENFJ",
   "ENTJ",
 ].map((v) => ({ label: v, value: v }));
-
 const genderOptions = [
   { label: "남성", value: "male" },
   { label: "여성", value: "female" },
 ];
-
 const golfSkillOptions = [
   { label: "초급", value: "beginner" },
   { label: "중급", value: "intermediate" },
   { label: "고급", value: "advanced" },
 ];
-
 const religionOptions = [
   { label: "무교", value: "none" },
   { label: "기독교", value: "christian" },
@@ -62,12 +63,10 @@ const religionOptions = [
   { label: "불교", value: "buddhist" },
   { label: "기타", value: "etc" },
 ];
-
 const yesNoOptions = [
   { label: "흡연함", value: "yes" },
   { label: "흡연하지 않음", value: "no" },
 ];
-
 const drinkOptions = [
   { label: "음주함", value: "yes" },
   { label: "음주하지 않음", value: "no" },
@@ -92,8 +91,11 @@ const selectStyles = {
 export default function UpdateForm() {
   const [formData, setFormData] = useState(null);
   const [originalData, setOriginalData] = useState(null);
-  const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [modal, setModal] = useState({
+    open: false,
+    success: true,
+    message: "",
+  });
   const [loading, setLoading] = useState(true);
   const [usernameChecked, setUsernameChecked] = useState(true);
   const [usernameMsg, setUsernameMsg] = useState("");
@@ -103,11 +105,17 @@ export default function UpdateForm() {
     const loadUser = async () => {
       try {
         const data = await fetchUserData();
-        setFormData(data);
-        setOriginalData(data);
-      } catch (err) {
-        console.error("유저 정보 조회 실패:", err);
-        setErrorMsg("사용자 정보를 불러올 수 없습니다.");
+        const regionKor = Object.keys(regionMap).find(
+          (k) => regionMap[k] === data.activityRegion
+        );
+        setFormData({ ...data, activityRegion: regionKor || "" });
+        setOriginalData({ ...data, activityRegion: regionKor || "" });
+      } catch {
+        setModal({
+          open: true,
+          success: false,
+          message: "사용자 정보를 불러올 수 없습니다.",
+        });
       } finally {
         setLoading(false);
       }
@@ -135,14 +143,19 @@ export default function UpdateForm() {
   };
 
   const handleUpdate = async () => {
-    if (!formData || !formData.username) {
-      setErrorMsg("사용자 정보가 없습니다.");
-      return;
-    }
-    if (formData.username !== originalData.username && !usernameChecked) {
-      setErrorMsg("아이디 중복 확인이 필요합니다.");
-      return;
-    }
+    if (!formData || !formData.username)
+      return setModal({
+        open: true,
+        success: false,
+        message: "사용자 정보가 없습니다.",
+      });
+
+    if (formData.username !== originalData.username && !usernameChecked)
+      return setModal({
+        open: true,
+        success: false,
+        message: "아이디 중복 확인이 필요합니다.",
+      });
 
     const updatedFields = {};
     for (const key in formData) {
@@ -151,10 +164,19 @@ export default function UpdateForm() {
       }
     }
 
+    if (
+      updatedFields.activityRegion &&
+      regionMap[updatedFields.activityRegion]
+    ) {
+      updatedFields.activityRegion = regionMap[updatedFields.activityRegion];
+    }
+
     if (Object.keys(updatedFields).length === 0) {
-      setErrorMsg("변경된 항목이 없습니다.");
-      setSuccessMsg("");
-      return;
+      return setModal({
+        open: true,
+        success: false,
+        message: "변경된 항목이 없습니다.",
+      });
     }
 
     try {
@@ -164,14 +186,19 @@ export default function UpdateForm() {
         removeToken();
         navigate("/swings");
       } else {
-        setSuccessMsg("✅ 회원정보가 성공적으로 수정되었습니다!");
+        setModal({
+          open: true,
+          success: true,
+          message: "✅ 회원정보가 성공적으로 수정되었습니다!",
+        });
         setOriginalData({ ...formData });
-        setErrorMsg("");
       }
     } catch (err) {
-      console.error("회원정보 수정 실패:", err);
-      setSuccessMsg("");
-      setErrorMsg("❌ 수정 중 오류가 발생했습니다.");
+      setModal({
+        open: true,
+        success: false,
+        message: "❌ 수정 중 오류가 발생했습니다.",
+      });
     }
   };
 
@@ -181,23 +208,13 @@ export default function UpdateForm() {
         로딩 중...
       </div>
     );
-  if (!formData)
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        사용자 정보를 불러올 수 없습니다.
-      </div>
-    );
+  if (!formData) return null;
 
   return (
     <div className="relative min-h-screen bg-white flex flex-col items-center justify-center px-4">
-      <button
-        onClick={() => navigate(-1)}
-        className="absolute top-4 left-4 text-gray-500 hover:text-black transition-colors"
-      >
-        <ArrowLeft size={24} />
-      </button>
+      <br />
+      <h2 className="text-xl font-bold text-gray-800 mb-6">회원정보 수정</h2>
       <div className="w-full max-w-sm space-y-6">
-        <br />
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1">
             아이디
@@ -247,7 +264,6 @@ export default function UpdateForm() {
           value={formData.phonenumber}
           onChange={(v) => setFormData({ ...formData, phonenumber: v })}
         />
-
         <LabeledSelect
           label="성별"
           options={genderOptions}
@@ -301,21 +317,33 @@ export default function UpdateForm() {
           onChange={(v) => setFormData({ ...formData, drinking: v })}
         />
 
-        <button
-          onClick={handleUpdate}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg mt-2"
-        >
-          수정 완료
-        </button>
-
-        {successMsg && (
-          <p className="text-green-600 text-sm text-center">{successMsg}</p>
-        )}
-        {errorMsg && (
-          <p className="text-red-500 text-sm text-center">{errorMsg}</p>
-        )}
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate("/swings/mypage")}
+            className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 rounded-lg mt-2"
+          >
+            취소
+          </button>
+          <button
+            onClick={handleUpdate}
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg mt-2"
+          >
+            수정 완료
+          </button>
+        </div>
+          <br />
       </div>
-      <br />
+
+      <ResultModal
+        modal={modal}
+        onClose={() => {
+          if (modal.success) {
+            navigate("/swings/mypage");
+          } else {
+            setModal({ ...modal, open: false });
+          }
+        }}
+      />
     </div>
   );
 }
@@ -354,8 +382,39 @@ function LabeledSelect({ label, options, value, onChange }) {
         value={options.find((opt) => opt.value === value)}
         onChange={(selected) => onChange(selected.value)}
         styles={selectStyles}
-        placeholder={`선택`}
+        placeholder="선택"
       />
     </div>
+  );
+}
+
+function ResultModal({ modal, onClose }) {
+  return (
+    <Dialog open={modal.open} onClose={onClose} className="relative z-50">
+      <div
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+        aria-hidden="true"
+      />
+      <div className="fixed inset-0 flex items-center justify-center px-4">
+        <Dialog.Panel className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center space-y-4">
+          <Dialog.Title
+            className={`text-lg font-semibold ${
+              modal.success ? "text-green-600" : "text-red-500"
+            }`}
+          >
+            {modal.success ? "✅ 성공" : "❌ 실패"}
+          </Dialog.Title>
+          <p className="text-gray-700 text-sm whitespace-pre-line">
+            {modal.message}
+          </p>
+          <button
+            onClick={onClose}
+            className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+          >
+            확인
+          </button>
+        </Dialog.Panel>
+      </div>
+    </Dialog>
   );
 }
