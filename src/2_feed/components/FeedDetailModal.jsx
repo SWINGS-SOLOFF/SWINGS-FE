@@ -636,8 +636,11 @@ const FeedDetailModal = ({
 
                 {/* 댓글 입력창 - 항상 하단 고정 */}
                 <div
-                  className="px-3 py-2 border-t bg-white shadow-md shrink-0"
-                  style={{ paddingBottom: "env(safe-area-inset-bottom, 16px)" }}
+                  className="px-3 pt-2 pb-6 border-t bg-white shadow-md shrink-0"
+                  style={{
+                    paddingBottom:
+                      "calc(env(safe-area-inset-bottom, 0px) + 10px)",
+                  }}
                 >
                   <form onSubmit={handleSubmit} className="flex items-center">
                     <input
@@ -645,7 +648,7 @@ const FeedDetailModal = ({
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       placeholder="댓글을 입력하세요..."
-                      className="w-full py-1.5 px-3 border border-gray-300 rounded-full text-sm text-black focus:ring-2 focus:ring-black focus:border-transparent transition"
+                      className="w-full py-2 px-3 border border-gray-300 rounded-full text-sm text-black focus:ring-2 focus:ring-black focus:border-transparent transition"
                     />
                     <button
                       type="submit"

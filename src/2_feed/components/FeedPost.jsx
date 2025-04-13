@@ -306,19 +306,18 @@ const FeedPost = ({
                   className="w-full object-cover max-h-96 transition transform group-hover:scale-105 duration-300"
                 />
               </div>
-              <div className="p-4">
+              <div className="p-4 bg-white">
                 <div
-                  ref={contentRef}
-                  className={`text-base font-medium text-gray-800 break-words whitespace-pre-wrap font-serif ${
-                    !isExpanded
-                      ? "line-clamp-1 relative cursor-pointer"
-                      : "cursor-pointer"
+                  className={`w-full min-h-40 max-w-lg mx-auto p-4 rounded-lg bg-gray-50 border border-gray-100 text-center shadow-sm cursor-pointer ${
+                    !isExpanded ? "max-h-48 overflow-hidden relative" : ""
                   }`}
                   onClick={() => setIsExpanded(!isExpanded)}
                 >
-                  {post.caption || "게시물 내용이 없습니다."}
+                  <div className="text-base font-medium text-gray-800 break-words whitespace-pre-wrap font-serif">
+                    {post.caption || "게시물 내용이 없습니다."}
+                  </div>
                   {!isExpanded && isContentTruncated && (
-                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none" />
                   )}
                 </div>
               </div>
@@ -402,7 +401,13 @@ const FeedPost = ({
                     key={comment.commentId}
                     className="flex items-start mb-4 pb-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 rounded-lg p-2 transition"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3 flex-shrink-0">
+                    <div
+                      className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3 flex-shrink-0 cursor-pointer"
+                      onClick={() =>
+                        comment.userId &&
+                        navigate(`/swings/profile/${comment.userId}`)
+                      }
+                    >
                       {comment.userProfilePic ? (
                         <img
                           src={normalizeImageUrl(comment.userProfilePic)}
@@ -461,7 +466,7 @@ const FeedPost = ({
                           ref={(el) =>
                             (commentRefs.current[comment.commentId] = el)
                           }
-                          className={`whitespace-pre-wrap break-all text-sm p-2 rounded-lg relative transition-all duration-300 ${
+                          className={`whitespace-pre-wrap break-all text-sm px-2 py-1 rounded-md relative transition-all duration-300 leading-snug ${
                             isExpanded ? "" : "max-h-[4.5rem] overflow-hidden"
                           } ${
                             commentTruncatedState[comment.commentId]
