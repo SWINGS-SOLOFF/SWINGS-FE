@@ -93,7 +93,7 @@ export default function MyPointPage() {
 
       {/* ✅ 이벤트 배너 - 말풍선처럼 작게 */}
       <section className="bg-[#fff3cd] text-[#856404] px-4 py-2.5 rounded-xl text-xs font-medium mb-6 shadow-sm flex items-center gap-2">
-        🎁 이벤트: 이번 주 30코인 이상 충전 시 추가 코인을 드려요!
+        🎁 이벤트: 이번 주 30코인 이상 충전 시 10% 더 드려요!
       </section>
 
       <hr className="my-6 border-gray-200" />
