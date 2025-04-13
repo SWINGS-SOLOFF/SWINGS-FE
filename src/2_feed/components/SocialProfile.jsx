@@ -207,7 +207,7 @@ const SocialProfile = ({
             {feeds.map((feed) => (
               <div
                 key={feed.feedId}
-                className="aspect-square relative overflow-hidden cursor-pointer group bg-white border border-gray-100"
+                className="aspect-square relative overflow-hidden cursor-pointer group border border-gray-200 bg-white"
                 onClick={() => onFeedClick(feed)}
               >
                 {feed.imageUrl ? (
@@ -223,18 +223,6 @@ const SocialProfile = ({
                     </p>
                   </div>
                 )}
-
-                {/* 하단 오버레이 (좋아요/댓글 수) */}
-                <div className="absolute bottom-0 w-full bg-black bg-opacity-40 text-white text-[11px] px-2 py-1 flex justify-between items-center">
-                  <span className="flex items-center gap-1">
-                    <FaHeart className="text-red-400" />
-                    {feed.likes ?? feed.likeCount ?? 0}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <FaComment />
-                    {feed.comments?.length ?? feed.commentCount ?? 0}
-                  </span>
-                </div>
               </div>
             ))}
           </div>

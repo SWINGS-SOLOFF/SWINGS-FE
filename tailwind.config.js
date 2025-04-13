@@ -3,7 +3,5 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [
-    require("tailwind-scrollbar-hide"), // ✅ 새로 추가한 플러그인
-  ],
+  plugins: [require("tailwind-scrollbar-hide")],
 };
