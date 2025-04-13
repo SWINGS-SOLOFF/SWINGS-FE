@@ -63,7 +63,7 @@ const SocialProfile = ({
   };
 
   const golfLevelMap = {
-    beginner: "초보자",
+    beginner: "골린이",
     intermediate: "중급자",
     advanced: "고급자",
   };
@@ -158,31 +158,27 @@ const SocialProfile = ({
         <div className="flex flex-wrap gap-2 flex-1">
           {user?.activityRegion && (
             <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-              <FaMapMarkerAlt className="text-gray-500 mr-1" size={12} />
               <span className="text-black">
-                {regionMap[user.activityRegion] || user.activityRegion}
+                #{regionMap[user.activityRegion] || user.activityRegion}
               </span>
             </div>
           )}
-          {user?.golfSkill && (
+          {user?.birthDate && (
             <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-              <FaGolfBall className="text-green-500 mr-1" size={12} />
-              <span className="text-black">
-                {golfLevelMap[user.golfSkill] || user.golfSkill}
+              <span className="text-black mr-2">
+                #{`${user.birthDate.slice(2, 4)}년생`}
               </span>
             </div>
           )}
           {user?.mbti && (
             <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-              <RiMentalHealthFill className="text-purple-500 mr-1" size={12} />
-              <span className="text-black">{user.mbti}</span>
+              #<span className="text-black">{user.mbti}</span>
             </div>
           )}
-          {user?.birthDate && (
+          {user?.golfSkill && (
             <div className="bg-gray-100 rounded-full px-3 py-1 text-xs flex items-center">
-              <FaBirthdayCake className="text-pink-500 mr-1" size={12} />
-              <span className="text-black mr-2">
-                {`${user.birthDate.slice(0, 4)}년생`}
+              <span className="text-black">
+                #{golfLevelMap[user.golfSkill] || user.golfSkill}
               </span>
             </div>
           )}

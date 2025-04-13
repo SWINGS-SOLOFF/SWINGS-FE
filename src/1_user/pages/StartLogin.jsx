@@ -7,7 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 import { useGoogleLogin } from "@react-oauth/google";
 import SakuraFall from "../components/SakuraFall";
-import SplashScreen from "../components/SplashScreen"; // ✅ 추가
+import SplashScreen from "../components/SplashScreen";
+import LoginLoadingScreen from "../components/LoginLoadingScreen";
+import FindPasswordModal from "../components/FindPasswordModal"; // ✅ 추가
 
 const fadeDrop = {
   hidden: { opacity: 0, y: -20 },
@@ -28,37 +30,57 @@ export default function StartLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [showSplash, setShowSplash] = useState(true); // ✅ 처음에는 Splash
+  const [showSplash, setShowSplash] = useState(() => {
+    return localStorage.getItem("sawSplash") !== "true";
+  });
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
   const [formData, setFormData] = useState({
     username: localStorage.getItem("savedUsername") || "",
     password: "",
   });
   const [saveId, setSaveId] = useState(!!localStorage.getItem("savedUsername"));
   const [errorMessage, setErrorMessage] = useState("");
+  const [showFindPasswordModal, setShowFindPasswordModal] = useState(false); // ✅ 추가
 
-  // ✅ Splash 3초 후 로그인 화면 전환
+  // Splash 3초 후 종료
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 3000);
-    return () => clearTimeout(timer);
-  }, []);
+    if (showSplash) {
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+        localStorage.setItem("sawSplash", "true");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSplash]);
 
+  // ✅ 로그인 후 로딩 화면 → 피드로 전환 함수
+  const proceedAfterLogin = (accessToken) => {
+    login(accessToken);
+    saveToken(accessToken);
+    const decoded = jwtDecode(accessToken);
+    if (saveId) localStorage.setItem("savedUsername", formData.username);
+    else localStorage.removeItem("savedUsername");
+
+    setIsLoggingIn(true);
+    setTimeout(() => {
+      navigate(decoded.role === "admin" ? "/swings/admin" : "/swings/feed");
+    }, 3600);
+  };
+
+  // ✅ 구글 로그인
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const accessToken = tokenResponse.access_token;
-        const result = await googleLoginRequest(accessToken);
+        const result = await googleLoginRequest(tokenResponse.access_token);
         if (result.accessToken) {
-          login(result.accessToken);
-          saveToken(result.accessToken);
-          const decoded = jwtDecode(result.accessToken);
-          navigate(decoded.role === "admin" ? "/swings/admin" : "/swings/feed");
+          proceedAfterLogin(result.accessToken);
         } else if (result.isNew) {
           navigate("/swings/signup", {
             state: { email: result.email, name: result.name },
           });
         }
       } catch (err) {
-        console.error("Google 로그인 실패", err);
         setErrorMessage("Google 로그인 실패");
       }
     },
@@ -67,30 +89,21 @@ export default function StartLogin() {
     flow: "implicit",
   });
 
+  // ✅ 일반 로그인
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
     try {
       const accessToken = await loginRequest(formData);
-      login(accessToken);
-      saveToken(accessToken);
-      const decoded = jwtDecode(accessToken);
-      const role = decoded.role;
-
-      if (saveId) localStorage.setItem("savedUsername", formData.username);
-      else localStorage.removeItem("savedUsername");
-
-      navigate(role === "admin" ? "/swings/admin" : "/swings/feed");
+      proceedAfterLogin(accessToken);
     } catch (error) {
       setErrorMessage(error.message || "로그인 중 오류 발생");
     }
   };
 
-  // ✅ Splash 보여주는 중이라면 SplashScreen만 렌더링
-  if (showSplash) {
-    return <SplashScreen />;
-  }
+  if (showSplash) return <SplashScreen />;
+  if (isLoggingIn) return <LoginLoadingScreen />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-white to-blue-100 flex items-center justify-center relative overflow-hidden px-4">
@@ -156,7 +169,6 @@ export default function StartLogin() {
               custom={4}
               variants={itemVariants}
             >
-              {/* 아이디 저장 */}
               <label className="inline-flex items-center gap-2 text-gray-700 select-none">
                 <input
                   type="checkbox"
@@ -166,11 +178,9 @@ export default function StartLogin() {
                 />
                 <span className="text-gray-500 font-semibold">아이디 저장</span>
               </label>
-
-              {/* 비밀번호 찾기 */}
               <button
                 type="button"
-                onClick={() => navigate("/swings/find-password")}
+                onClick={() => setShowFindPasswordModal(true)} // ✅ 모달 열기
                 className="text-gray-500 font-semibold text-sm hover:underline transition"
               >
                 비밀번호 찾기
@@ -181,7 +191,7 @@ export default function StartLogin() {
               type="submit"
               custom={5}
               variants={itemVariants}
-              className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 rounded-lg shadow"
+              className="w-full  bg-purple-300 hover:bg-pink-400 text-white font-semibold py-2 rounded-lg shadow"
             >
               로그인
             </motion.button>
@@ -215,14 +225,19 @@ export default function StartLogin() {
             onClick={() => navigate("/swings/signup")}
             custom={8}
             variants={itemVariants}
-            className="w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 rounded-lg"
+            className="w-full bg-gray-500 hover:bg-gray-800 text-white font-semibold py-2 rounded-lg"
           >
             회원가입
           </motion.button>
         </motion.div>
       </AnimatePresence>
 
-      {/* 에러 모달 */}
+      {/* ✅ 비밀번호 찾기 모달 */}
+      {showFindPasswordModal && (
+        <FindPasswordModal onClose={() => setShowFindPasswordModal(false)} />
+      )}
+
+      {/* 로그인 실패 알림 */}
       {errorMessage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black opacity-40 backdrop-blur-sm" />

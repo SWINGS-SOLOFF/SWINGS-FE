@@ -1,4 +1,3 @@
-// SignupStep1.jsx
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -8,11 +7,11 @@ import {
 
 export default function SignupStep1({ formData, updateData }) {
   const [usernameCheck, setUsernameCheck] = useState("");
-  // ✨ 아이디 입력 에러메시지 관리
   const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const location = useLocation();
 
-  // ✅ 구글 OAuth로부터 값 채우기
   useEffect(() => {
     prefillFromOAuthState(location, formData, updateData);
   }, [location.state, formData.email, formData.name, updateData]);
@@ -21,20 +20,56 @@ export default function SignupStep1({ formData, updateData }) {
     handleUsernameCheckLogic(formData.username, setUsernameCheck);
   };
 
-  // ✨ 아이디 입력 처리
   const handleUsernameChange = (e) => {
     const inputValue = e.target.value;
-    // 영어/숫자만 남기고 나머지는 제거
     const alphanumericOnly = inputValue.replace(/[^A-Za-z0-9]/g, "");
 
     if (inputValue.length !== alphanumericOnly.length) {
-      // 제거된 문자가 있다면 곧바로 에러 메시지 표시
       setUsernameError("아이디는 영어와 숫자만 사용 가능합니다.");
     } else {
       setUsernameError("");
     }
 
     updateData({ username: alphanumericOnly });
+  };
+
+  const validatePassword = (password) => {
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    return hasLowercase && hasNumber && hasSpecial;
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    updateData({ password: value });
+
+    if (!validatePassword(value)) {
+      setPasswordError(
+        "비밀번호는 소문자, 숫자, 특수문자를 각각 최소 1개 포함해야 합니다."
+      );
+    } else {
+      setPasswordError("");
+    }
+
+    // 비밀번호 확인값과 일치하는지도 체크
+    if (formData.confirmPassword && value !== formData.confirmPassword) {
+      setConfirmPasswordError("비밀번호가 일치하지 않습니다.");
+    } else {
+      setConfirmPasswordError("");
+    }
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const value = e.target.value;
+    updateData({ confirmPassword: value });
+
+    if (formData.password !== value) {
+      setConfirmPasswordError("비밀번호가 일치하지 않습니다.");
+    } else {
+      setConfirmPasswordError("");
+    }
   };
 
   return (
@@ -55,7 +90,6 @@ export default function SignupStep1({ formData, updateData }) {
             중복 확인
           </button>
         </div>
-        {/* ✨ usernameError가 존재하면 빨간 텍스트로 표시 */}
         {usernameError && (
           <p className="text-sm text-red-500 ml-1">{usernameError}</p>
         )}
@@ -65,20 +99,32 @@ export default function SignupStep1({ formData, updateData }) {
         <p className="text-sm text-gray-500 ml-1">{usernameCheck}</p>
       )}
 
-      <input
-        type="password"
-        placeholder="비밀번호"
-        className="w-full border p-2 rounded text-black"
-        value={formData.password || ""}
-        onChange={(e) => updateData({ password: e.target.value })}
-      />
-      <input
-        type="password"
-        placeholder="비밀번호 확인"
-        className="w-full border p-2 rounded text-black"
-        value={formData.confirmPassword || ""}
-        onChange={(e) => updateData({ confirmPassword: e.target.value })}
-      />
+      <div>
+        <input
+          type="password"
+          placeholder="비밀번호"
+          className="w-full border p-2 rounded text-black"
+          value={formData.password || ""}
+          onChange={handlePasswordChange}
+        />
+        {passwordError && (
+          <p className="text-sm text-red-500 ml-1">{passwordError}</p>
+        )}
+      </div>
+
+      <div>
+        <input
+          type="password"
+          placeholder="비밀번호 확인"
+          className="w-full border p-2 rounded text-black"
+          value={formData.confirmPassword || ""}
+          onChange={handleConfirmPasswordChange}
+        />
+        {confirmPasswordError && (
+          <p className="text-sm text-red-500 ml-1">{confirmPasswordError}</p>
+        )}
+      </div>
+
       <input
         type="text"
         placeholder="이름"
