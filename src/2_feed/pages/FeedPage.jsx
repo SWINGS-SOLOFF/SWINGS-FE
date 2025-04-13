@@ -7,6 +7,7 @@ import useUser from "../hooks/useUser";
 import useNewPostForm from "../hooks/useNewPostForm";
 import useIntersectionObserver from "../hooks/useIntersectionObserver";
 import usePullToRefresh from "../hooks/usePullToRefresh";
+import useFeedData from "../hooks/useFeedData";
 
 import CreatePostButton from "../components/CreatePostButton";
 import FeedPost from "../components/FeedPost";
@@ -23,10 +24,19 @@ const FeedPage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [likedUsers, setLikedUsers] = useState([]);
   const [isLikedModalOpen, setIsLikedModalOpen] = useState(false);
-  const [posts, setPosts] = useState([]);
   const [feedOrder, setFeedOrder] = useState([]);
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const {
+    posts,
+    setPosts,
+    refreshFeeds,
+    handleLikeToggle,
+    handleDelete,
+    handleCommentSubmit,
+    handleCommentDelete,
+  } = useFeedData(userId, currentUser, null);
 
   const formRef = useRef(null);
   const containerRef = useRef(null);
@@ -65,18 +75,29 @@ const FeedPage = () => {
     setLoading(true);
     try {
       let newFeeds = [];
+
       if (type === "mine") {
         newFeeds = await feedApi.getUserFeeds(user.userId);
       } else {
         const followings = (await socialApi.getFollowings?.(user.userId)) || [];
         const filter =
           type === "followings" && followings.length > 0 ? "followings" : "all";
+
+        const sort = type === "followings" ? "latest" : "random"; // 핵심 수정
+
         newFeeds = await feedApi.getFeeds(user.userId, 0, 10, {
-          sort: "random",
+          sort,
           filter,
         });
       }
-      setPosts((prev) => [...prev, ...newFeeds]);
+
+      setPosts((prev) => {
+        const existingIds = new Set(prev.map((p) => p.feedId));
+        const uniqueNewFeeds = newFeeds.filter(
+          (f) => !existingIds.has(f.feedId)
+        );
+        return [...prev, ...uniqueNewFeeds];
+      });
     } catch {
       toast.error("피드를 불러오는 데 실패했습니다.");
     } finally {
@@ -99,9 +120,7 @@ const FeedPage = () => {
   const { isRefreshing } = usePullToRefresh({
     onRefresh: async () => {
       if (!currentUser) return;
-      const order = ["followings", "all", "mine"].sort(
-        () => Math.random() - 0.5
-      );
+      const order = ["followings", "all", "mine"];
       setFeedOrder(order);
       setStep(0);
       setPosts([]);
@@ -132,24 +151,6 @@ const FeedPage = () => {
     } catch {
       toast.error("업로드 실패");
     }
-  };
-
-  const updatePostInState = (updatedPost) => {
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.feedId === updatedPost.feedId ? updatedPost : post
-      )
-    );
-  };
-
-  const handleLike = async (feedId) => {
-    const updated = await feedApi.likeFeed(feedId, userId);
-    if (updated) updatePostInState(updated);
-  };
-
-  const handleUnlike = async (feedId) => {
-    const updated = await feedApi.unlikeFeed(feedId, userId);
-    if (updated) updatePostInState(updated);
   };
 
   const handleShowLikedBy = async (feedId) => {
@@ -202,7 +203,7 @@ const FeedPage = () => {
 
       <div
         ref={containerRef}
-        className="w-full px-2 sm:px-4 md:px-6 lg:px-12 xl:px-24 h-full overflow-y-auto"
+        className="w-full px-4 md:px-12 h-full overflow-y-auto"
         style={{ height: "calc(100vh - 64px)" }}
       >
         <div className="space-y-4 pb-24">
@@ -219,16 +220,19 @@ const FeedPage = () => {
           )}
 
           {posts.map((post, index) => (
-            <div
+            <motion.div
               key={post.feedId}
               ref={index === posts.length - 1 ? lastPostRef : null}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.05 }}
             >
               <FeedPost
                 post={post}
                 currentUser={currentUser}
                 onImageClick={setSelectedImage}
-                onLike={handleLike}
-                onUnlike={handleUnlike}
+                onLike={() => handleLikeToggle(post.feedId, false)}
+                onUnlike={() => handleLikeToggle(post.feedId, true)}
                 onToggleComments={(feedId) => {
                   setPosts((prev) =>
                     prev.map((p) =>
@@ -238,55 +242,21 @@ const FeedPage = () => {
                     )
                   );
                 }}
-                onCommentSubmit={async (feedId, content) => {
-                  try {
-                    const newComment = await feedApi.addComment(
-                      feedId,
-                      userId,
-                      content
-                    );
-                    setPosts((prev) =>
-                      prev.map((p) =>
-                        p.feedId === feedId
-                          ? { ...p, comments: [...p.comments, newComment] }
-                          : p
-                      )
-                    );
-                  } catch {
-                    toast.error("댓글 추가 실패");
-                  }
-                }}
-                onCommentDelete={async (commentId, feedId) => {
-                  try {
-                    await feedApi.deleteComment(feedId, commentId);
-                    setPosts((prev) =>
-                      prev.map((p) =>
-                        p.feedId === feedId
-                          ? {
-                              ...p,
-                              comments: p.comments.filter(
-                                (c) => c.commentId !== commentId
-                              ),
-                            }
-                          : p
-                      )
-                    );
-                  } catch {
-                    toast.error("댓글 삭제 실패");
-                  }
-                }}
-                onDelete={async (feedId) => {
-                  try {
-                    await feedApi.deleteFeed(feedId);
-                    setPosts((prev) => prev.filter((p) => p.feedId !== feedId));
-                  } catch {
-                    toast.error("게시물 삭제 실패");
-                  }
-                }}
+                onCommentSubmit={handleCommentSubmit}
+                onCommentDelete={(commentId) =>
+                  handleCommentDelete(post.feedId, commentId)
+                }
+                onDelete={() => handleDelete(post.feedId)}
                 onShowLikedBy={handleShowLikedBy}
-                updatePostInState={updatePostInState}
+                updatePostInState={(updatedPost) =>
+                  setPosts((prev) =>
+                    prev.map((p) =>
+                      p.feedId === updatedPost.feedId ? updatedPost : p
+                    )
+                  )
+                }
               />
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
