@@ -12,16 +12,11 @@ import {
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 import { RiMentalHealthFill } from "react-icons/ri";
-import { FiSettings } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { normalizeImageUrl } from "../utils/imageUtils";
-import TruncatedText from "./TruncatedText";
-import { toast } from "react-toastify";
-import socialApi from "../api/socialApi";
 
 import ProfileDetailModal from "./ProfileDetailModal";
-import ImageModal from "./ImageModal"; // ✅ 이미지 확대 보기
-import IntroduceEditor from "../../1_user/components/IntroduceEditor.jsx";
+import ImageModal from "./ImageModal";
 
 const SocialProfile = ({
   user,
@@ -212,7 +207,7 @@ const SocialProfile = ({
             {feeds.map((feed) => (
               <div
                 key={feed.feedId}
-                className="aspect-square relative overflow-hidden cursor-pointer group bg-white border border-gray-100"
+                className="aspect-square relative overflow-hidden cursor-pointer group border border-gray-200 bg-white"
                 onClick={() => onFeedClick(feed)}
               >
                 {feed.imageUrl ? (
@@ -228,18 +223,6 @@ const SocialProfile = ({
                     </p>
                   </div>
                 )}
-
-                {/* 하단 오버레이 (좋아요/댓글 수) */}
-                <div className="absolute bottom-0 w-full bg-black bg-opacity-40 text-white text-[11px] px-2 py-1 flex justify-between items-center">
-                  <span className="flex items-center gap-1">
-                    <FaHeart className="text-red-400" />
-                    {feed.likes ?? feed.likeCount ?? 0}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <FaComment />
-                    {feed.comments?.length ?? feed.commentCount ?? 0}
-                  </span>
-                </div>
               </div>
             ))}
           </div>
