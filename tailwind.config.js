@@ -1,9 +1,18 @@
 module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        sakura: "sakuraFall linear infinite",
+      },
+
+      keyframes: {
+        sakuraFall: {
+          "0%": { transform: "translateY(0) rotate(0deg)" },
+          "100%": { transform: "translateY(100vh) rotate(360deg)" },
+        },
+      },
+    },
   },
-  plugins: [
-    require("tailwind-scrollbar-hide"), // ✅ 새로 추가한 플러그인
-  ],
+  plugins: [],
 };

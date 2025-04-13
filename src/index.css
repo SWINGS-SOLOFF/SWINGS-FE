@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------ 기본 설정 ------------------------ */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -15,26 +16,33 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
+/* ✅ 모든 플랫폼에서 스크롤은 되지만 스크롤바는 안 보이도록 설정 */
+html,
 body {
+  height: 100%;
   margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
   padding: 0;
-  background-color: white;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-gutter: none; /* 최신 크롬에서 여백 제거 */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
 }
 
+/* ✅ PWA 모드일 때 강제로 적용되는 스크롤바 숨김 클래스 */
+.pwa-scroll-hidden {
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.pwa-scroll-hidden::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* ✅ 루트 컨테이너(#root)도 스크롤바 제거 */
 #root {
   display: flex;
   flex-direction: column;
@@ -42,43 +50,25 @@ body {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
+  text-align: left;
   padding: 0rem;
+
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#root::-webkit-scrollbar {
+  display: none;
 }
 
-main {
-  flex-grow: 1;
-}
-
-h1 {
-  font-size: 2rem;
-  line-height: 1.2;
-}
-
-@media (min-width: 640px) {
-  h1 {
-    font-size: 2.5rem;
-  }
-}
-
-@media (min-width: 768px) {
-  h1 {
-    font-size: 3rem;
-  }
-}
-
-/* button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
+body {
+  min-width: 320px;
   background-color: white;
-  cursor: pointer;
-  transition: border-color 0.25s;
-  width: 100%;
-  max-width: 300px;
-} */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------------------------ 버튼 및 카드 ------------------------ */
 button:hover {
   border-color: #646cff;
 }
@@ -89,25 +79,45 @@ button:focus-visible {
 
 .card {
   padding: 2em;
-  width: 100%;
   max-width: 600px;
   margin: 0 auto;
   background-color: white;
   border-radius: 1rem;
 }
-
 @media (max-width: 640px) {
   .card {
     padding: 1.5em;
   }
 }
-#root {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0rem;
-  text-align: left;
+
+/* ------------------------ 애니메이션 관련 ------------------------ */
+@keyframes sakuraFall {
+  0% {
+    transform: translateY(-50px) rotate(0deg);
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  70% {
+    opacity: 0.4;
+  }
+  85% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
 }
 
+.animate-sakura {
+  animation-name: sakuraFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* ------------------------ 기타 ------------------------ */
 .logo {
   height: 4em;
   padding: 1em;
@@ -141,4 +151,13 @@ button:focus-visible {
   font-size: 0.875rem;
   margin-top: 1rem;
   text-align: center;
+}
+
+/* ✅ Tailwind에서 사용할 커스텀 유틸리티 클래스 */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
