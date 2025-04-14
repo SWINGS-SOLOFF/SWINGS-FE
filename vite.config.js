@@ -12,11 +12,8 @@ export default defineConfig({
       srcDir: "src",
       filename: "sw.js",
       registerType: "autoUpdate",
-<<<<<<< Updated upstream
       includeAssets: ["pwa3-192x192.png", "pwa3-512x512.png"],
-=======
       injectRegister:"auto",
->>>>>>> Stashed changes
       manifest: {
         name: "SWINGS",
         short_name: "SWINGS",
@@ -26,7 +23,6 @@ export default defineConfig({
         display: "standalone",
         background_color: "#ffffff",
         icons: [
-<<<<<<< Updated upstream
           {
             src: "/pwa3-192x192.png",
             sizes: "192x192",
@@ -37,10 +33,6 @@ export default defineConfig({
             sizes: "512x512",
             type: "image/png",
           },
-=======
-          { src: "/pwa-192x192.png", sizes: "192x192", type: "image/png" },
-          { src: "/pwa-512x512.png", sizes: "512x512", type: "image/png" },
->>>>>>> Stashed changes
         ],
       },
       devOptions: {
