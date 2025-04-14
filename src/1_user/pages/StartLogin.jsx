@@ -5,12 +5,12 @@ import { loginRequest, googleLoginRequest } from "../api/userApi";
 import { saveToken } from "../utils/userUtils";
 import { motion, AnimatePresence } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
-<<<<<<< Updated upstream
 import { useGoogleLogin } from "@react-oauth/google";
 import SakuraFall from "../components/SakuraFall";
 import SplashScreen from "../components/SplashScreen";
 import LoginLoadingScreen from "../components/LoginLoadingScreen";
-import FindPasswordModal from "../components/FindPasswordModal"; // ✅ 추가
+import FindPasswordModal from "../components/FindPasswordModal";
+import {registerPushToken} from "../../5_notification/utils/registerPushToken.js";
 
 const fadeDrop = {
   hidden: { opacity: 0, y: -20 },
@@ -26,10 +26,6 @@ const itemVariants = {
     transition: { delay: i * 0.1 },
   }),
 };
-=======
-import { GoogleLogin } from "@react-oauth/google";
-import {registerPushToken} from "../../5_notification/utils/registerPushToken.js";
->>>>>>> Stashed changes
 
 export default function StartLogin() {
   const navigate = useNavigate();
@@ -101,9 +97,7 @@ export default function StartLogin() {
 
     try {
       const accessToken = await loginRequest(formData);
-<<<<<<< Updated upstream
       proceedAfterLogin(accessToken);
-=======
       login(accessToken);
       saveToken(accessToken);
 
@@ -118,7 +112,6 @@ export default function StartLogin() {
 
       alert("로그인 성공!");
       navigate(role === "admin" ? "/swings/admin" : "/swings/feed");
->>>>>>> Stashed changes
     } catch (error) {
       setErrorMessage(error.message || "로그인 중 오류 발생");
     }
