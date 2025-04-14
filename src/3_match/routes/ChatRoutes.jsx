@@ -3,7 +3,6 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import ChatListPage from "../pages/ChatListPage";
 import ChatRoomPage from "../pages/ChatRoomPage";
-import SentLikeListPage from "../pages/SentLikeListPage";
 import LikeListPage from "../pages/LikeListPage";
 
 /**
@@ -15,7 +14,6 @@ const ChatRoutes = () => {
         <Routes>
             <Route path="" element={<ChatListPage />} /> {/* /swings/chat */}
             <Route path=":roomId" element={<ChatRoomPage />} /> {/* /swings/chat/:roomId */}
-            <Route path="sent" element={<SentLikeListPage />} />
             <Route path="likes/:userId" element={<LikeListPage />} />
 
         </Routes>
