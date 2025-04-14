@@ -12,7 +12,7 @@ const SwipeCard = ({ profile, onSwipe }) => {
     const image = defaultImg1;
 
     const handleSwipe = (direction) => {
-        onSwipe(direction);
+        onSwipe(direction, profile); // ✅ profile도 같이 넘김
     };
 
     return (
