@@ -1,22 +1,26 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import axios from "axios";
+import axios from "../../1_user/api/axiosInstance";
 import { fetchChatMessages } from "../api/chatRoomApi";
 import { fetchUserData } from "../../1_user/api/userApi";
+import { MoreVertical } from "lucide-react";
+import ConfirmModal from "../components/ConfirmModal";
 
 const ChatRoomPage = () => {
     const { roomId } = useParams();
+    const navigate = useNavigate();
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [currentUser, setCurrentUser] = useState(null);
+    const [showLeaveModal, setShowLeaveModal] = useState(false); // 나가기 모달
     const clientRef = useRef(null);
     const messagesEndRef = useRef(null);
 
     const markMessagesAsRead = async (roomId, username) => {
         try {
-            await axios.post("http://localhost:8090/swings/api/chat/messages/read", null, {
+            await axios.post("/api/chat/messages/read", null, {
                 params: { roomId, username },
             });
         } catch (err) {
@@ -91,6 +95,29 @@ const ChatRoomPage = () => {
         setInput("");
     };
 
+    const leaveChatRoom = async () => {
+        if (!currentUser) return;
+        try {
+            await axios.post("/api/chat/leave", null, {
+                params: { roomId, username: currentUser.username },
+            });
+
+            // SYSTEM 메시지 전송
+            clientRef.current?.publish({
+                destination: "/app/chat/message",
+                body: JSON.stringify({
+                    roomId,
+                    sender: "SYSTEM",
+                    content: `${currentUser.username}님이 나가셨습니다.`,
+                }),
+            });
+
+            navigate("/swings/chat");
+        } catch (err) {
+            console.error("❌ 채팅방 나가기 실패", err);
+        }
+    };
+
     if (!currentUser) {
         return (
             <div className="min-h-screen flex items-center justify-center text-gray-500">
@@ -101,12 +128,19 @@ const ChatRoomPage = () => {
 
     return (
         <div className="flex flex-col h-screen bg-gray-100">
+            {/* ✅ 상단바 */}
+            <div className="fixed top-0 left-0 w-full h-14 bg-white px-4 flex justify-between items-center shadow z-50">
+                <h1 className="text-lg font-bold">채팅방</h1>
+                <button onClick={() => setShowLeaveModal(true)}>
+                    <MoreVertical size={20} />
+                </button>
+            </div>
+
             {/* ✅ 메시지 목록 */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="absolute top-14 bottom-24 overflow-y-auto w-full p-4">
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender === currentUser.username;
 
-                    // ✅ SYSTEM 메시지는 중앙 말풍선으로 표시
                     if (msg.sender === "SYSTEM") {
                         return (
                             <div key={idx} className="flex justify-center my-4">
@@ -146,7 +180,7 @@ const ChatRoomPage = () => {
             </div>
 
             {/* ✅ 입력창 */}
-            <div className="p-4 bg-white border-t flex items-center">
+            <div className="absolute bottom-12 left-0 w-full p-4 bg-white border-t flex items-center mb-2">
                 <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -161,6 +195,20 @@ const ChatRoomPage = () => {
                     전송
                 </button>
             </div>
+
+            {/* ✅ 나가기 모달 */}
+            {showLeaveModal && (
+                <ConfirmModal
+                    message="채팅방을 나가시겠어요?"
+                    cancelLabel="취소"
+                    confirmLabel="나가기"
+                    onConfirm={() => {
+                        setShowLeaveModal(false);
+                        leaveChatRoom();
+                    }}
+                    onCancel={() => setShowLeaveModal(false)}
+                />
+            )}
         </div>
     );
 };

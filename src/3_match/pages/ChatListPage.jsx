@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../1_user/api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { fetchUserData } from "../../1_user/api/userApi";
 import { motion } from "framer-motion";
 
-const BASE_URL = "http://localhost:8090/swings";
 
 const ChatListPage = () => {
     const [chatRooms, setChatRooms] = useState([]);
@@ -18,7 +17,7 @@ const ChatListPage = () => {
                 const userData = await fetchUserData();
                 setCurrentUser(userData);
 
-                const res = await axios.get(`${BASE_URL}/api/chat/rooms?userId=${userData.username}`);
+                const res = await axios.get(`/api/chat/rooms?userId=${userData.username}`);
                 const parsed = typeof res.data === "string" ? JSON.parse(res.data) : res.data;
                 setChatRooms(parsed);
             } catch (err) {
