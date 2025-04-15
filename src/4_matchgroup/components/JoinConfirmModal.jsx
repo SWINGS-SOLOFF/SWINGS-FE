@@ -1,8 +1,13 @@
-import { UsersIcon, MapPinIcon, CalendarIcon } from "lucide-react";
+import { UsersIcon, MapPinIcon, CalendarIcon, Venus, Mars } from "lucide-react";
 import BaseModal from "./ui/BaseModal";
 
+// JoinConfirmModal 컴포넌트
 const JoinConfirmModal = ({ isOpen, group, participants, onClose, onConfirm }) => {
     if (!isOpen || !group) return null;
+
+    // 성별 카운트 계산
+    const femaleCount = participants.filter(p => p.gender === "FEMALE").length;
+    const maleCount = participants.filter(p => p.gender === "MALE").length;
 
     return (
         <BaseModal onClose={onClose} title={`${group.groupName}`}>
@@ -24,6 +29,18 @@ const JoinConfirmModal = ({ isOpen, group, participants, onClose, onConfirm }) =
                 <div className="flex items-center gap-2">
                     <UsersIcon className="h-4 w-4 text-purple-500" />
                     <span><strong>인원:</strong> {participants.length}/{group.maxParticipants}</span>
+                </div>
+            </div>
+
+            {/* 성별 모집 현황 */}
+            <div className="flex gap-4 justify-center text-sm text-gray-600 mb-4">
+                <div className="flex items-center gap-1">
+                    <Venus className="w-4 h-4 text-pink-500" />
+                    <span>여성: {femaleCount}명</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <Mars className="w-4 h-4 text-blue-500" />
+                    <span>남성: {maleCount}명</span>
                 </div>
             </div>
 

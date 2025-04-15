@@ -1,58 +1,60 @@
 import { useEffect, useState } from "react";
-import { getAllMatchGroups } from "../api/matchGroupApi.js";
 import { useParams } from "react-router-dom";
-import MatchGroupCard from "../components/MatchGroupCard.jsx";
+import { getAllMatchGroups, getCurrentUser } from "../api/matchGroupApi";
+import MatchGroupCard from "../components/MatchGroupCard";
+import { motion } from "framer-motion";
 
 const MatchGroupList = () => {
-    const [groups, setGroups] = useState([]);
-    const [filteredGroups, setFilteredGroups] = useState([]);
-
     const { category } = useParams();
 
-    // 필터 상태
+    const [tab, setTab] = useState("all");
+    const [groups, setGroups] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [filteredGroups, setFilteredGroups] = useState([]);
+
     const [region, setRegion] = useState("전체");
-    const [genderRatio, setGenderRatio] = useState("전체");
     const [selectedDate, setSelectedDate] = useState("");
 
     const regionOptions = ["전체", "서울", "경기", "부산", "대구", "대전", "광주"];
-    const genderOptions = ["전체", "1:1", "2:1", "3:1"];
 
+    // 1. 유저 + 전체 그룹 가져오기
     useEffect(() => {
-        const fetchGroups = async () => {
+        const fetchData = async () => {
             try {
-                const data = await getAllMatchGroups(category);
-                if (!Array.isArray(data)) {
-                    console.error("응답이 배열 형식이 아닙니다:", data);
-                    setGroups([]);
-                    return;
-                }
+                const user = await getCurrentUser();
+                setCurrentUser(user);
 
-                const filteredByCategory = category
+                const data = await getAllMatchGroups(category);
+                const validGroups = category
                     ? data.filter((g) => g.matchType === category)
                     : data;
 
-                setGroups(filteredByCategory);
+                setGroups(validGroups);
             } catch (error) {
-                console.error("그룹 목록 불러오기 오류:", error);
+                console.error("데이터 로딩 오류:", error);
                 setGroups([]);
             }
         };
-
-        fetchGroups();
+        fetchData();
     }, [category]);
 
-    // 필터 적용
+    // 2. 탭 + 필터 반영
     useEffect(() => {
         let filtered = [...groups];
 
+        // 탭: 내 그룹만
+        if (tab === "my" && currentUser) {
+            filtered = filtered.filter((g) =>
+                g.participants?.some((p) => p.userId === currentUser.userId)
+            );
+        }
+
+        // 지역 필터
         if (region !== "전체") {
             filtered = filtered.filter((g) => g.location?.includes(region));
         }
 
-        if (genderRatio !== "전체") {
-            filtered = filtered.filter((g) => g.genderRatio === genderRatio);
-        }
-
+        // 날짜 필터
         if (selectedDate) {
             filtered = filtered.filter((g) =>
                 g.schedule?.startsWith(selectedDate)
@@ -60,57 +62,92 @@ const MatchGroupList = () => {
         }
 
         setFilteredGroups(filtered);
-    }, [groups, region, genderRatio, selectedDate]);
+    }, [groups, tab, region, selectedDate, currentUser]);
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 },
+        },
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0 },
+    };
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-6">
-            <h1 className="text-2xl font-bold text-green-700 mb-4 text-center">
-                {category === "screen" ? "스크린 골프 매칭" : "필드 골프 매칭"}
+            <h1 className="text-2xl font-bold text-center mb-4">
+                {category === "screen" ? "스크린 골프 그룹" : "필드 골프 그룹"}
             </h1>
 
-            {/* 필터 UI */}
-            <div className="flex flex-wrap gap-4 mb-6 justify-center items-center">
-                <select
-                    className="p-2 border rounded"
-                    value={region}
-                    onChange={(e) => setRegion(e.target.value)}
+            {/* 탭 버튼 */}
+            <div className="bg-gray-100 p-1 rounded-xl flex w-full max-w-md mx-auto mb-6 shadow-inner">
+                <button
+                    className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                        tab === "all"
+                            ? "bg-white text-black shadow-sm"
+                            : "text-gray-500 hover:text-black"
+                    }`}
+                    onClick={() => setTab("all")}
                 >
-                    {regionOptions.map((r) => (
-                        <option key={r} value={r}>
-                            {r}
-                        </option>
-                    ))}
-                </select>
-
-                <select
-                    className="p-2 border rounded"
-                    value={genderRatio}
-                    onChange={(e) => setGenderRatio(e.target.value)}
+                    전체 그룹
+                </button>
+                <button
+                    className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                        tab === "my"
+                            ? "bg-white text-black shadow-sm"
+                            : "text-gray-500 hover:text-black"
+                    }`}
+                    onClick={() => setTab("my")}
                 >
-                    {genderOptions.map((g) => (
-                        <option key={g} value={g}>
-                            성비: {g}
-                        </option>
-                    ))}
-                </select>
-
-                <input
-                    type="date"
-                    className="p-2 border rounded"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                />
+                    나의 그룹
+                </button>
             </div>
+
+
+
+            {/* 필터 */}
+            <select
+                className="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+            >
+                {regionOptions.map((r) => (
+                    <option key={r} value={r}>
+                        {r}
+                    </option>
+                ))}
+            </select>
+
+            <select
+                className="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+            >
+                <option value="">일정</option>
+            </select>
+
+
 
             {/* 그룹 목록 */}
             {filteredGroups.length === 0 ? (
-                <p className="text-gray-500 text-center">조건에 맞는 그룹이 없습니다.</p>
+                <p className="text-center text-gray-500">조건에 맞는 그룹이 없습니다.</p>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {filteredGroups.map((group, index) => (
-                        <MatchGroupCard key={group.matchGroupId || index} group={group} />
+                <motion.div
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    {filteredGroups.map((group) => (
+                        <motion.div key={group.matchGroupId} variants={itemVariants}>
+                            <MatchGroupCard group={group} isMine={tab === "my"} />
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
             )}
         </div>
     );

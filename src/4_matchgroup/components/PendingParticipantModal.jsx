@@ -1,6 +1,6 @@
 import BaseModal from "./ui/BaseModal";
 import { useNavigate } from "react-router-dom";
-import PendingUserList from "./participant/PendingUserList.jsx";
+import PendingUserList from "./PendingUserList.jsx";
 
 const PendingParticipantModal = ({
                                      isOpen,

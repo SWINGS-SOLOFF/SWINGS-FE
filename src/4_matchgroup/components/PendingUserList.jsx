@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ParticipantDetailModal from "./ParticipantDetailModal";
+import ParticipantDetailModal from "./ParticipantDetailModal.jsx";
 
 const PendingUserList = ({
                              pending,

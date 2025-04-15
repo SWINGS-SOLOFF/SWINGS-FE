@@ -11,7 +11,6 @@ import {
 } from "./ui/Card.jsx";
 import { Badge } from "./ui/Badge.jsx";
 import JoinConfirmModal from "./JoinConfirmModal.jsx";
-import GroupButton from "./ui/GroupButton.jsx";
 import { getCurrentUser } from "../api/matchGroupApi.js";
 import { getParticipantsByGroupId } from "../api/matchParticipantApi.js";
 import useMatchGroupActions from "../hooks/useMatchGroupActions";
@@ -23,19 +22,14 @@ export default function MatchGroupCard({ group }) {
     const [currentUser, setCurrentUser] = useState(null);
 
     const isFull = group.currentParticipants >= group.maxParticipants;
-
     const { handleJoin } = useMatchGroupActions(null, currentUser);
 
-    useEffect(() => {
-        if (showJoinModal && group?.matchGroupId) {
-            getParticipantsByGroupId(group.matchGroupId).then((data) => {
-                const approved = data.filter((p) => p.participantStatus === "ACCEPTED");
-                setParticipants(approved);
-            });
+    const femaleCount = participants.filter((p) => p.gender === "FEMALE").length;
+    const maleCount = participants.filter((p) => p.gender === "MALE").length;
 
-            getCurrentUser().then(setCurrentUser);
-        }
-    }, [showJoinModal, group?.matchGroupId]);
+    const genderLimitReached =
+        (currentUser?.gender === "FEMALE" && femaleCount >= group.femaleLimit) ||
+        (currentUser?.gender === "MALE" && maleCount >= group.maleLimit);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -47,6 +41,17 @@ export default function MatchGroupCard({ group }) {
             minute: "2-digit",
         }).format(date);
     };
+
+    useEffect(() => {
+        if (group?.matchGroupId) {
+            getParticipantsByGroupId(group.matchGroupId).then((data) => {
+                const approved = data.filter((p) => p.participantStatus === "ACCEPTED");
+                setParticipants(approved);
+            });
+
+            getCurrentUser().then(setCurrentUser);
+        }
+    }, [group?.matchGroupId]);
 
     return (
         <>
@@ -81,8 +86,8 @@ export default function MatchGroupCard({ group }) {
                         <div className="flex items-center gap-2">
                             <UsersIcon className="h-4 w-4 text-golf-green-600" />
                             <span>
-                {group.currentParticipants}/{group.maxParticipants}명
-              </span>
+                                {participants.length}/{group.maxParticipants}명
+                            </span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="font-semibold text-golf-green-700">방장:</span>
@@ -92,7 +97,6 @@ export default function MatchGroupCard({ group }) {
                 </CardContent>
 
                 <CardFooter className="pt-4 flex gap-2">
-                    {/* 그룹 상세 보기 버튼 */}
                     <Link
                         to={`/swings/matchgroup/${group.matchType}/${group.matchGroupId}`}
                         className="w-1/2"
@@ -102,15 +106,21 @@ export default function MatchGroupCard({ group }) {
                         </button>
                     </Link>
 
-                    {/* 게임 대기방 입장 버튼 */}
-                    <Link
-                        to={`/swings/matchgroup/waitingroom/${group.matchGroupId}`}
-                        className="w-1/2"
+                    <button
+                        className={`w-1/2 py-2 rounded-xl text-sm transition ${
+                            isFull || genderLimitReached
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-blue-500 text-white hover:bg-blue-600"
+                        }`}
+                        onClick={() => setShowJoinModal(true)}
+                        disabled={isFull || genderLimitReached}
                     >
-                        <button className="w-full py-2 bg-green-600 text-white rounded-xl text-sm hover:bg-green-700">
-                            대기방 입장
-                        </button>
-                    </Link>
+                        {isFull
+                            ? "모집 완료"
+                            : genderLimitReached
+                                ? "성비 제한으로 신청 불가"
+                                : "참가 신청"}
+                    </button>
                 </CardFooter>
             </Card>
 
@@ -120,6 +130,11 @@ export default function MatchGroupCard({ group }) {
                 group={group}
                 participants={participants}
                 onConfirm={async () => {
+                    if (genderLimitReached) {
+                        alert("성비 제한으로 인해 참가할 수 없습니다.");
+                        return;
+                    }
+
                     try {
                         await handleJoin(group.matchGroupId, currentUser?.userId);
                         alert("참가 신청 완료!");

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { CalendarIcon, MapPinIcon, UsersIcon, Venus, Mars } from "lucide-react";
 import { getCurrentUser, getMatchGroupById } from "../api/matchGroupApi";
 import { getParticipantsByGroupId } from "../api/matchParticipantApi";
 import PendingParticipantModal from "../components/PendingParticipantModal";
@@ -9,6 +10,7 @@ import JoinConfirmModal from "../components/JoinConfirmModal.jsx";
 
 const MatchGroupDetail = () => {
     const { matchGroupId } = useParams();
+    const navigate = useNavigate();
 
     const [group, setGroup] = useState(null);
     const [participants, setParticipants] = useState([]);
@@ -63,6 +65,13 @@ const MatchGroupDetail = () => {
         setShowJoinModal(false);
     };
 
+    const femaleCount = participants.filter((p) => p.gender === "female").length;
+    const maleCount = participants.filter((p) => p.gender === "").length;
+
+    const genderLimitReached =
+        currentUser?.gender === "male" && maleCount >= group?.maleLimit ||
+        currentUser?.gender === "female" && femaleCount >= group?.femaleLimit;
+
     if (loading) return <p className="text-center">⏳ 로딩 중...</p>;
     if (!group) return <p className="text-center text-red-500">❌ 그룹 정보를 불러올 수 없습니다.</p>;
 
@@ -70,14 +79,23 @@ const MatchGroupDetail = () => {
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
             <h1 className="text-2xl font-bold mb-2">{group.groupName}</h1>
             <p className="text-gray-600 mb-2">{group.description}</p>
-            <p className="text-gray-500">📍 장소: {group.location}</p>
+            <p className="text-gray-500"> 장소: {group.location}</p>
             <p className="text-gray-500">
-                ⏰ 일정: {new Date(group.schedule).toLocaleString()}
+                일정: {new Date(group.schedule).toLocaleString()}
             </p>
             <p className="text-gray-500">
-                👥 모집 현황: {participants.length}/{group.maxParticipants}명
+                모집 현황: {participants.length}/{group.maxParticipants}명
             </p>
-            <p className="text-sm font-bold text-blue-500">⭐ 방장: {group.hostUsername}</p>
+            <p className="text-gray-500 flex items-center gap-4">
+                <span className="flex items-center gap-1">
+                    <Venus className="w-4 h-4 text-pink-500" />
+                    여자 {femaleCount}/{group.femaleLimit}
+                </span>
+                <span className="flex items-center gap-1">
+                    <Mars className="w-4 h-4 text-blue-500" />
+                    남자 {maleCount}/{group.maleLimit}
+                </span>
+            </p>
             <p className="text-sm font-semibold text-gray-500">
                 상태:{" "}
                 <span
@@ -85,19 +103,25 @@ const MatchGroupDetail = () => {
                         group.status === "모집중" ? "bg-green-500" : "bg-gray-500"
                     }`}
                 >
-          {group.status}
-        </span>
+                    {group.status}
+                </span>
             </p>
 
             {!isParticipant ? (
                 <button
                     onClick={() => setShowJoinModal(true)}
                     className={`mt-4 w-full px-4 py-2 text-white rounded-lg shadow-md transition ${
-                        isFull ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+                        isFull || genderLimitReached
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-blue-500 hover:bg-blue-600"
                     }`}
-                    disabled={isFull}
+                    disabled={isFull || genderLimitReached}
                 >
-                    {isFull ? "모집 완료됨" : "참가 신청"}
+                    {isFull
+                        ? "모집 완료됨"
+                        : genderLimitReached
+                            ? "성비 제한으로 신청 불가"
+                            : "참가 신청"}
                 </button>
             ) : (
                 <button
@@ -134,7 +158,7 @@ const MatchGroupDetail = () => {
             )}
 
             <div className="mt-6">
-                <h2 className="text-lg font-semibold">👥 참가자 목록</h2>
+                <h2 className="text-lg font-semibold">참가자 목록</h2>
                 {participants.length === 0 ? (
                     <p className="text-gray-500">아직 참가자가 없습니다.</p>
                 ) : (
@@ -144,18 +168,22 @@ const MatchGroupDetail = () => {
                                 key={participant.userId}
                                 className="flex justify-between items-center bg-gray-100 p-2 rounded"
                             >
-                <span>
-                  {participant.username}
-                    {participant.userId === group.hostId && (
-                        <span className="ml-2 text-xs px-2 py-0.5 bg-yellow-400 text-white rounded-full">
-                      방장
-                    </span>
-                    )}
-                </span>
+                                <span>
+                                    {participant.username}
+                                    {participant.userId === group.hostId && (
+                                        <span className="ml-2 text-xs px-2 py-0.5 bg-yellow-400 text-white rounded-full">
+                                            ⭐ 방장
+                                        </span>
+                                    )}
+                                </span>
                                 {isHost && participant.userId !== currentUser?.userId && (
                                     <button
                                         onClick={() =>
-                                            handleRemoveParticipant(group.matchGroupId, participant.userId, currentUser.userId)
+                                            handleRemoveParticipant(
+                                                group.matchGroupId,
+                                                participant.userId,
+                                                currentUser.userId
+                                            )
                                         }
                                         className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
                                     >
