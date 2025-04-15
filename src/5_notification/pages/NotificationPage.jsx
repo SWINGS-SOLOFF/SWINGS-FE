@@ -1,13 +1,16 @@
 import { useNotification } from "../context/NotificationContext";
 import { useEffect } from "react";
-import {deleteNotification, getAllNotifications, markAsRead} from "../api/NotificationApi";
+import {
+    deleteNotification,
+    getAllNotifications,
+    markAsRead,
+} from "../api/NotificationApi";
 
 const NotificationPage = () => {
     const {
         notifications,
         setNotifications,
         setInitialNotifications,
-        addNotification,
     } = useNotification();
 
     // 전체 알림 조회
@@ -21,7 +24,7 @@ const NotificationPage = () => {
                 }
 
                 const data = await getAllNotifications(username);
-                setInitialNotifications(data); // 전체 알림 초기화
+                setInitialNotifications(data);
             } catch (error) {
                 console.error("알림 불러오기 실패", error);
             }
@@ -30,7 +33,7 @@ const NotificationPage = () => {
         fetchNotifications();
     }, []);
 
-    // 알림 읽음 처리
+    // 읽음 처리
     const handleMarkAsRead = async (id) => {
         try {
             await markAsRead(id);
@@ -44,7 +47,7 @@ const NotificationPage = () => {
         }
     };
 
-    // 알림 삭제
+    // 삭제 처리
     const handleDelete = async (id) => {
         try {
             await deleteNotification(id);
@@ -57,28 +60,34 @@ const NotificationPage = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6">
-            <h2 className="text-2xl font-bold mb-4">전체 알림</h2>
-            {notifications.length === 0 ? (
-                <p className="text-gray-500">아직 알림이 없습니다.</p>
-            ) : (
-                <ul className="space-y-2">
-                    {notifications.map((n, index) => (
-                        <li key={index} className="bg-white p-4 shadow rounded border-l-4 border-blue-500">
-                            <p className="text-sm text-gray-700">{n.message}</p>
-                            <p className="text-xs text-gray-400">유형: {n.type}</p>
+        <main className="pt-16 pb-24 px-4 max-w-xl mx-auto">
+            <h1 className="text-xl font-bold text-[#2E384D] mb-4">📢 전체 알림</h1>
 
-                            <div className="flex justify-end space-x-2 mt-2 text-xs">
+            {notifications.length === 0 ? (
+                <p className="text-gray-500 text-sm">아직 알림이 없습니다.</p>
+            ) : (
+                <ul className="space-y-3">
+                    {notifications.map((n, i) => (
+                        <li
+                            key={i}
+                            className={`p-4 rounded-xl border shadow-sm ${
+                                !n.read ? "bg-blue-50" : "bg-white"
+                            }`}
+                        >
+                            <div className="text-sm text-gray-800 mb-1">{n.message}</div>
+                            <div className="text-xs text-gray-500">유형: {n.type}</div>
+
+                            <div className="flex justify-end gap-4 mt-2 text-xs">
                                 {!n.read && (
                                     <button
-                                        className="text-blue-600"
+                                        className="text-blue-600 font-medium"
                                         onClick={() => handleMarkAsRead(n.notificationId)}
                                     >
                                         읽음 처리
                                     </button>
                                 )}
                                 <button
-                                    className="text-red-500"
+                                    className="text-red-500 font-medium"
                                     onClick={() => handleDelete(n.notificationId)}
                                 >
                                     삭제
@@ -88,7 +97,7 @@ const NotificationPage = () => {
                     ))}
                 </ul>
             )}
-        </div>
+        </main>
     );
 };
 

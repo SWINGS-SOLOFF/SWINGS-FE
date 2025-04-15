@@ -3,8 +3,8 @@ import BaseModal from "./ui/BaseModal";
 import { getParticipantsByGroupId } from "../api/matchParticipantApi";
 import useMatchGroupActions from "../hooks/useMatchGroupActions";
 import { getCurrentUser } from "../api/matchGroupApi";
-import PendingUserList from "./participant/PendingUserList.jsx";
-import AcceptedUserList from "./participant/AcceptedUserList.jsx";
+import PendingUserList from "./PendingUserList.jsx";
+import AcceptedUserList from "./AcceptedUserList.jsx";
 
 export default function GroupManageModal({ matchGroupId, onClose }) {
     const [participants, setParticipants] = useState([]);

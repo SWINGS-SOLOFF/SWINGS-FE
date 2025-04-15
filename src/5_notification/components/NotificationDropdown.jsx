@@ -27,13 +27,6 @@ export default function NotificationDropdown() {
                     ))}
                 </ul>
             )}
-
-            <button
-                onClick={() => navigate("/swings/notification")}
-                className="w-full px-4 py-2 text-blue-600 text-sm font-semibold hover:bg-gray-100"
-            >
-                전체 알림 보기 →
-            </button>
         </div>
     );
 }

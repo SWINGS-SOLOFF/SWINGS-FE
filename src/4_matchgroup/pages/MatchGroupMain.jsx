@@ -17,9 +17,9 @@ import MyParticipationModal from "../components/MyParticipationModal";
 export default function MatchGroupMain() {
   const navigate = useNavigate();
 
-  const [isModalOpen, setIsModalOpen] = useState(false); // 이용 안내
-  const [isCreateOpen, setIsCreateOpen] = useState(false); // 방 만들기 & 참가 내역
-  const [showMyModal, setShowMyModal] = useState(false); // 참가 내역 전용
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [showMyModal, setShowMyModal] = useState(false);
   const [currentBanner, setCurrentBanner] = useState(0);
 
   const banners = [banner1, banner2];
