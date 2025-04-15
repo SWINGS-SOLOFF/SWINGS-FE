@@ -34,3 +34,6 @@ dist/*
 dev-dist/*
 **/sw.js
 **/workbox-*.js
+
+# Firebase key
+src/main/resources/firebase/firebase-service-account.json

@@ -8,8 +8,12 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.js",
       registerType: "autoUpdate",
       includeAssets: ["pwa3-192x192.png", "pwa3-512x512.png"],
+      injectRegister:"auto",
       manifest: {
         name: "SWINGS",
         short_name: "SWINGS",
@@ -32,27 +36,18 @@ export default defineConfig({
         ],
       },
       devOptions: {
-        enabled: true, // ✅ 개발 중 캐시 비활성화
+        enabled: true,
+        type: "module",
+        suppressWarnings: true,
       },
     }),
   ],
-  define: {
-    global: "globalThis",
-  },
-  css: {
-    postcss: "./postcss.config.js",
-  },
+  define: { global: "globalThis" },
+  css: { postcss: "./postcss.config.js" },
   optimizeDeps: {
     esbuildOptions: {
-      define: {
-        global: "globalThis",
-      },
-      plugins: [
-        NodeGlobalsPolyfillPlugin({
-          process: true,
-          buffer: true,
-        }),
-      ],
+      define: { global: "globalThis" },
+      plugins: [NodeGlobalsPolyfillPlugin({ process: true, buffer: true })],
     },
   },
   build: {

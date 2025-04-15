@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { CalendarIcon, MapPinIcon, UsersIcon } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/Card.jsx";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "./ui/Card.jsx";
 import { Badge } from "./ui/Badge.jsx";
 import JoinConfirmModal from "./JoinConfirmModal.jsx";
 import GroupButton from "./ui/GroupButton.jsx";
@@ -17,7 +24,6 @@ export default function MatchGroupCard({ group }) {
 
     const isFull = group.currentParticipants >= group.maxParticipants;
 
-    // 훅 초기화 (group = null, reload = 없음)
     const { handleJoin } = useMatchGroupActions(null, currentUser);
 
     useEffect(() => {
@@ -27,7 +33,6 @@ export default function MatchGroupCard({ group }) {
                 setParticipants(approved);
             });
 
-            // 유저 정보도 함께 불러오기
             getCurrentUser().then(setCurrentUser);
         }
     }, [showJoinModal, group?.matchGroupId]);
@@ -61,7 +66,7 @@ export default function MatchGroupCard({ group }) {
                     <CardDescription className="text-sm text-gray-500 line-clamp-2">
                         {group.description}
                     </CardDescription>
-                </CardHeader>x`
+                </CardHeader>
 
                 <CardContent className="pt-2 pb-0">
                     <div className="flex flex-col gap-2 text-sm text-muted-foreground">
@@ -75,7 +80,9 @@ export default function MatchGroupCard({ group }) {
                         </div>
                         <div className="flex items-center gap-2">
                             <UsersIcon className="h-4 w-4 text-golf-green-600" />
-                            <span>{group.currentParticipants}/{group.maxParticipants}명</span>
+                            <span>
+                {group.currentParticipants}/{group.maxParticipants}명
+              </span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="font-semibold text-golf-green-700">방장:</span>
@@ -84,18 +91,28 @@ export default function MatchGroupCard({ group }) {
                     </div>
                 </CardContent>
 
-                <CardFooter className="pt-3">
-                    <GroupButton
-                        onClick={() => setShowJoinModal(true)}
-                        disabled={isFull}
-                        variant={isFull ? "outline" : "default"}
-                        className="w-full text-base py-2 rounded-xl transition duration-200"
+                <CardFooter className="pt-4 flex gap-2">
+                    {/* 그룹 상세 보기 버튼 */}
+                    <Link
+                        to={`/swings/matchgroup/${group.matchType}/${group.matchGroupId}`}
+                        className="w-1/2"
                     >
-                        {isFull ? "모집 완료" : "그룹 상세 보기"}
-                    </GroupButton>
+                        <button className="w-full py-2 border rounded-xl text-sm hover:bg-gray-100">
+                            그룹 상세 보기
+                        </button>
+                    </Link>
+
+                    {/* 게임 대기방 입장 버튼 */}
+                    <Link
+                        to={`/swings/matchgroup/waitingroom/${group.matchGroupId}`}
+                        className="w-1/2"
+                    >
+                        <button className="w-full py-2 bg-green-600 text-white rounded-xl text-sm hover:bg-green-700">
+                            대기방 입장
+                        </button>
+                    </Link>
                 </CardFooter>
             </Card>
-
 
             <JoinConfirmModal
                 isOpen={showJoinModal}
@@ -104,9 +121,9 @@ export default function MatchGroupCard({ group }) {
                 participants={participants}
                 onConfirm={async () => {
                     try {
-                        await handleJoin(group.matchGroupId, currentUser?.userId); // ✅ 훅 사용
+                        await handleJoin(group.matchGroupId, currentUser?.userId);
                         alert("참가 신청 완료!");
-                        navigate(`/matchgroup/${group.matchGroupId}`);
+                        navigate(`/swings/matchgroup/`);
                     } catch (error) {
                         console.error("신청 중 오류:", error);
                         alert("신청에 실패했습니다.");
