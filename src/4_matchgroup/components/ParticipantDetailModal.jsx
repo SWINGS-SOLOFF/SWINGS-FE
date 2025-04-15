@@ -1,4 +1,4 @@
-import BaseModal from "../ui/BaseModal";
+import BaseModal from "./ui/BaseModal.jsx";
 
 const ParticipantDetailModal = ({ isOpen, onClose, participant }) => {
     if (!isOpen || !participant) return null;
