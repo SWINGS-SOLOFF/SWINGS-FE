@@ -10,7 +10,6 @@ export const registerFCM = async (username) => {
     }
 
     const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
-    console.log("🔑 VAPID 키 확인:", vapidKey);
 
     try {
         // 1. 알림 권한 요청
@@ -22,7 +21,6 @@ export const registerFCM = async (username) => {
 
         // 2. Service Worker 등록
         const registration = await navigator.serviceWorker.register("/sw.js");
-        console.log("✅ 등록된 Service Worker:", registration);
 
         // 3. FCM 토큰 발급
         const token = await getToken(messaging, {
@@ -46,7 +44,6 @@ export const registerFCM = async (username) => {
         });
 
         const result = await response.text();
-        console.log("✅ 서버 응답:", result);
     } catch (err) {
         console.error("❌ FCM 등록 실패:", err.message);
         console.error(err);
