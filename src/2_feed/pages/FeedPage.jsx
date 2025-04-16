@@ -108,11 +108,20 @@ const FeedPage = () => {
 
     setLoading(true);
     try {
+      const prevPostsLength = posts.length;
+
       await loadFeeds(feedOrder[step], currentUser);
+
+      // 🔧 현재 단계에서 불러온 피드가 없다면 다음 단계로 강제로 넘김
+      const isSameLength = posts.length === prevPostsLength;
+      if (isSameLength && step < feedOrder.length - 1) {
+        setStep((prev) => prev + 1);
+        await loadFeeds(feedOrder[step + 1], currentUser);
+      }
     } catch (err) {
       console.error("피드 로딩 실패:", err);
     } finally {
-      setStep((prev) => prev + 1);
+      setStep((prev) => prev + 1); // 이건 무조건 마지막에 올려야 중복 로딩 방지됨
       setLoading(false);
     }
   };

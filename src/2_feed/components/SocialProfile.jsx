@@ -1,18 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { getProfileImageUrl } from "../../1_user/api/userApi";
-import {
-  FaPhotoVideo,
-  FaHeart,
-  FaComment,
-  FaMapMarkerAlt,
-  FaGolfBall,
-  FaBirthdayCake,
-  FaSearch,
-} from "react-icons/fa";
+import { FaPhotoVideo } from "react-icons/fa";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
-
+import { createChatRoom } from "../../3_match/api/matchApi";
 import axios from "../../1_user/api/axiosInstance";
-import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { normalizeImageUrl } from "../utils/imageUtils";
 import { useNavigate } from "react-router-dom";
@@ -25,17 +16,14 @@ const SocialProfile = ({
   user,
   userStats,
   userIntroduce,
-  setIntroduce,
   isCurrentUser = false,
   isFollowing = false,
   onFollowToggle,
   onShowFollowers,
   onShowFollowing,
-  onGoToSettings,
   feeds = [],
   onRequestCharge = () => {},
   onFeedClick = () => {},
-  refreshProfileData,
   currentUser,
 }) => {
   const [showProfileDetail, setShowProfileDetail] = useState(false);
@@ -44,7 +32,9 @@ const SocialProfile = ({
   const [showSuperChatModal, setShowSuperChatModal] = useState(false);
   const [showChargeModal, setShowChargeModal] = useState(false);
   const [hasChat, setHasChat] = useState(false);
+  const [roomId, setRoomId] = useState(null);
   const navigate = useNavigate();
+  const [loadingChat, setLoadingChat] = useState(false);
 
   const regionMap = {
     SEOUL: "서울",
@@ -82,32 +72,57 @@ const SocialProfile = ({
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 
-      const res = await axios.post("/api/chat/room", null, {
-        params: {
-          user1: currentUser.username,
-          user2: user.username,
-          isSuperChat: true,
-        },
-      });
-
-      const roomId = res.data?.roomId;
-      toast.success("💬 슈퍼챗으로 채팅방이 개설되었습니다!");
-
-      if (roomId) {
+      const res = await createChatRoom(
+        currentUser.username,
+        user.username,
+        false
+      );
+      const newRoomId = res.data?.roomId;
+      if (newRoomId) {
+        setRoomId(newRoomId);
         setHasChat(true);
-        navigate(`/swings/chat/${roomId}`);
+        toast.success("💬 슈퍼챗으로 채팅방이 개설되었습니다!");
+        navigate(`/swings/chat/${newRoomId}`);
       }
-    } catch (error) {
-      const msg = error?.response?.data?.message || "";
-      if (error.response?.status === 400 || msg.includes("포인트가 부족")) {
+    } catch (err) {
+      const msg = err?.response?.data?.message;
+      if (msg?.includes("포인트")) {
         setShowChargeModal(true);
       } else {
-        toast.error("❌ 슈퍼챗 채팅방 생성 실패");
+        toast.error("슈퍼챗 실패");
       }
     } finally {
       setShowSuperChatModal(false);
     }
   };
+
+  useEffect(() => {
+    if (!currentUser || !user || currentUser.username === user.username) return;
+
+    const fetchRoom = async () => {
+      if (!currentUser || !user) return;
+      setLoadingChat(true);
+      try {
+        const res = await createChatRoom(
+          currentUser.username,
+          user.username,
+          false
+        );
+
+        const id = res.data?.roomId;
+        if (id) {
+          setRoomId(id);
+          setHasChat(true);
+        }
+      } catch (e) {
+        console.error("채팅방 확인 실패", e);
+      } finally {
+        setLoadingChat(false);
+      }
+    };
+
+    fetchRoom();
+  }, [currentUser, user]);
 
   return (
     <div className="relative max-w-4xl mx-auto bg-white shadow-md rounded-xl overflow-hidden">
@@ -191,7 +206,7 @@ const SocialProfile = ({
           {hasChat ? (
             <button
               className="flex-1 py-1.5 rounded-md bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition"
-              onClick={() => navigate(`/swings/chat/${user.username}`)}
+              onClick={() => navigate(`/swings/chat/${roomId}`)}
             >
               메시지 💬
             </button>
