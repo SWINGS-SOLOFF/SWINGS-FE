@@ -1,6 +1,7 @@
 import React from "react";
 import { PenSquare } from "lucide-react";
 
+// 게시물 작성 버튼
 const CreatePostButton = ({ onClick }) => {
   return (
     <button
