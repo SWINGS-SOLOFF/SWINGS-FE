@@ -156,6 +156,7 @@ const SocialPage = () => {
         isCurrentUser={currentUser?.userId === viewedUserId}
         currentUser={currentUser}
         onSuperChatClick={() => setShowSuperChatModal(true)}
+        onRequestCharge={() => navigate("/swings/points")}
         isFollowing={isFollowing}
         onFollowToggle={async () => {
           if (
@@ -224,7 +225,7 @@ const SocialPage = () => {
           message={`슈퍼챗은 3코인을 사용합니다.\n사용하시겠어요?`}
           confirmLabel="사용하기"
           cancelLabel="취소"
-          onConfirm={confirmSuperChat}
+          onConfirm={handleSuperChatConfirm}
           onCancel={() => setShowSuperChatModal(false)}
         />
       )}
@@ -232,12 +233,9 @@ const SocialPage = () => {
       {showChargeModal && (
         <ConfirmModal
           message={`포인트가 부족합니다.\n충전하러 가시겠어요?`}
-          confirmLabel="충전하러 가기"
-          cancelLabel="돌아가기"
-          onConfirm={() => {
-            setShowChargeModal(false);
-            navigate("/swings/points");
-          }}
+          confirmLabel="충전소로 가기"
+          cancelLabel="닫기"
+          onConfirm={onRequestCharge}
           onCancel={() => setShowChargeModal(false)}
         />
       )}
