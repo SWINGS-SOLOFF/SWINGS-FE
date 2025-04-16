@@ -4,6 +4,7 @@ const API_BASE = "http://localhost:8090/swings";
 const USER_API_BASE = "http://localhost:8090/swings/users";
 
 const feedApi = {
+  // 필터 및 정렬 옵션에 따라 피드 리스트 조회
   getFeeds: async (
     userId,
     page,
@@ -21,11 +22,7 @@ const feedApi = {
     return response.data;
   },
 
-  getUserFeeds: async (userId) => {
-    const response = await axios.get(`${API_BASE}/feeds/user/${userId}`);
-    return response.data;
-  },
-
+  // 새 피드 업로드 (이미지 포함 가능)
   uploadFeed: async (formData) => {
     const response = await axios.post(`${API_BASE}/feeds/upload`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -33,6 +30,7 @@ const feedApi = {
     return response.data;
   },
 
+  // 기존 피드 수정 (내용 및 이미지)
   updateFeed: async (feedId, { caption, file }) => {
     const formData = new FormData();
     formData.append("caption", caption);
@@ -49,6 +47,7 @@ const feedApi = {
     return response.data;
   },
 
+  // 메인 피드 구성 (팔로우 최신 → 전체 랜덤 → 본인)
   getMainFeeds: async (userId) => {
     const response = await axios.get(`${API_BASE}/feeds/main`, {
       params: { userId },
@@ -94,6 +93,12 @@ const feedApi = {
     return response.data;
   },
 
+  // 좋아요한 사용자 목록
+  getLikedUsers: async (feedId) => {
+    const response = await axios.get(`${API_BASE}/feeds/${feedId}/liked-users`);
+    return response.data;
+  },
+
   // 댓글 작성
   addComment: async (feedId, userId, content) => {
     if (!userId) throw new Error("로그인이 필요합니다.");
@@ -117,18 +122,7 @@ const feedApi = {
     await axios.delete(`${API_BASE}/feeds/${feedId}/comments/${commentId}`);
   },
 
-  // 좋아요한 사용자 목록
-  getLikedUsers: async (feedId) => {
-    const response = await axios.get(`${API_BASE}/feeds/${feedId}/liked-users`);
-    return response.data;
-  },
-
-  // 로그인 사용자 정보 조회
-  getCurrentUser: async () => {
-    const response = await axios.get(`${USER_API_BASE}/me`);
-    return response.data;
-  },
-
+  // 댓글 내용 수정
   updateComment: async (feedId, commentId, content) => {
     const response = await axios.patch(
       `${API_BASE}/feeds/${feedId}/comments/${commentId}`,
@@ -137,6 +131,18 @@ const feedApi = {
         params: { content },
       }
     );
+    return response.data;
+  },
+
+  // 특정 유저의 피드 목록 조회
+  getUserFeeds: async (userId) => {
+    const response = await axios.get(`${API_BASE}/feeds/user/${userId}`);
+    return response.data;
+  },
+
+  // 로그인 사용자 정보 조회
+  getCurrentUser: async () => {
+    const response = await axios.get(`${USER_API_BASE}/me`);
     return response.data;
   },
 };
