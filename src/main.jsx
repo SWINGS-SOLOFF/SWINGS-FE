@@ -5,7 +5,7 @@ import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./1_user/context/AuthContext.jsx";
 import { NotificationProvider } from "./5_notification/context/NotificationProvider.jsx";
-import { GoogleOAuthProvider } from "@react-oauth/google"; // ✅ 구글 로그인용
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import {registerFCM} from "./utils/fcmRegister.js";
 
 // ✅ DOMContentLoaded 이후에 클래스 적용
