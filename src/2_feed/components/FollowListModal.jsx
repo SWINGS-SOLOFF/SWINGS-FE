@@ -1,8 +1,12 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FaUserFriends, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { normalizeImageUrl } from "../utils/imageUtils";
 
 const FollowListModal = ({ users, onClose, title }) => {
+  const navigate = useNavigate();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -38,12 +42,14 @@ const FollowListModal = ({ users, onClose, title }) => {
               {users.map((user) => (
                 <li
                   key={user.userId || user.id}
-                  className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg transition"
+                  className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg transition cursor-pointer"
+                  onClick={() => {
+                    onClose();
+                    navigate(`/swings/profile/${user.userId || user.id}`);
+                  }}
                 >
                   <img
-                    src={
-                      user.avatarUrl || user.userImg || "/default-profile.jpg"
-                    }
+                    src={normalizeImageUrl(user.userImg)}
                     alt="프로필"
                     className="w-10 h-10 rounded-full object-cover border-2 border-black"
                   />
@@ -51,7 +57,6 @@ const FollowListModal = ({ users, onClose, title }) => {
                     <p className="font-semibold text-gray-800">
                       {user.username || user.name}
                     </p>
-                    <p className="text-xs text-gray-500">골퍼</p>
                   </div>
                 </li>
               ))}
