@@ -120,13 +120,13 @@ export default function MatchGroupMain() {
 
         {/* 방 만들기 + 참가내역 모달 */}
         {isCreateOpen && (
-            <Modal onClose={() => setIsCreateOpen(false)} title="방 만들기 & 참가 내역">
+            <Modal onClose={() => setIsCreateOpen(false)} title="그룹 관리">
               <div className="flex flex-col gap-4">
                 <button
                     onClick={() => navigate("/swings/matchgroup/create")}
                     className="w-full py-3 px-4 rounded-xl border text-left hover:bg-gray-50 transition text-black"
                 >
-                  🏠 방 만들기
+                  그룹 만들기
                 </button>
                 <button
                     onClick={() => {
@@ -135,7 +135,7 @@ export default function MatchGroupMain() {
                     }}
                     className="w-full py-3 px-4 rounded-xl border text-left hover:bg-gray-50 transition text-black"
                 >
-                  📋 참가 내역 보기
+                  참가 내역 보기
                 </button>
               </div>
             </Modal>
@@ -144,7 +144,7 @@ export default function MatchGroupMain() {
         {/* 플로팅 버튼 */}
         <button
             onClick={() => setIsCreateOpen(true)}
-            className="fixed bottom-24 right-6 bg-gray-900 hover:bg-gray-800 text-white p-4 rounded-full shadow-lg z-50"
+            className="fixed bottom-24 right-6 bg-gray-900 hover:bg-gray-800 text-white p-3 rounded-full shadow-lg z-50"
         >
           <PlusIcon className="h-6 w-6" />
         </button>
