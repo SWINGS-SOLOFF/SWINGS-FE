@@ -1,23 +1,24 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getAllMatchGroups, getCurrentUser } from "../api/matchGroupApi";
 import MatchGroupCard from "../components/MatchGroupCard";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react"; // ← 아이콘 추가
 
 const MatchGroupList = () => {
     const { category } = useParams();
+    const navigate = useNavigate();
 
     const [tab, setTab] = useState("all");
     const [groups, setGroups] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
     const [filteredGroups, setFilteredGroups] = useState([]);
-
     const [region, setRegion] = useState("전체");
     const [selectedDate, setSelectedDate] = useState("");
 
     const regionOptions = ["전체", "서울", "경기", "부산", "대구", "대전", "광주"];
 
-    // 1. 유저 + 전체 그룹 가져오기
+    // 1. 그룹 가져오기
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -78,9 +79,19 @@ const MatchGroupList = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="relative max-w-6xl mx-auto px-4 py-6">
+            {/* ← 뒤로가기 버튼 (좌측 상단 고정) */}
+            <div className="absolute top-4 left-4">
+                <button
+                    onClick={() => navigate("/swings/matchgroup")}
+                    className="absolute top-4 left-1 text-gray-700 hover:text-blue-600 transition-all"
+                >
+                    <ArrowLeft size={25} />
+                </button>
+            </div>
+
             <h1 className="text-2xl font-bold text-center mb-4">
-                {category === "screen" ? "스크린 골프 그룹" : "필드 골프 그룹"}
+                {category === "screen" ? "스크린 골프" : "필드 골프"}
             </h1>
 
             {/* 탭 버튼 */}
@@ -107,11 +118,9 @@ const MatchGroupList = () => {
                 </button>
             </div>
 
-
-
             {/* 필터 */}
             <select
-                className="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+                className="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition mr-2"
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
             >
@@ -128,16 +137,15 @@ const MatchGroupList = () => {
                 onChange={(e) => setSelectedDate(e.target.value)}
             >
                 <option value="">일정</option>
+                {/* 실제 날짜 옵션은 동적으로 만들어도 좋아요 */}
             </select>
-
-
 
             {/* 그룹 목록 */}
             {filteredGroups.length === 0 ? (
                 <p className="text-center text-gray-500">조건에 맞는 그룹이 없습니다.</p>
             ) : (
                 <motion.div
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6"
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"

@@ -6,23 +6,21 @@ import BaseModal from "./ui/BaseModal";
 import useMatchGroupActions from "../hooks/useMatchGroupActions";
 import GroupManageModal from "./GroupManageModal.jsx";
 
-// 참가 상태 탭 정의
-const TABS = ["ACCEPTED", "PENDING", "REJECTED"];
+const TABS = ["JOINED", "APPLIED", "HOSTED"];
 const TAB_LABELS = {
-    ACCEPTED: "참가 그룹",
-    PENDING: "신청 그룹",
-    REJECTED: "나의 그룹",
+    JOINED: "참여 그룹",
+    APPLIED: "신청 그룹",
+    HOSTED: "내가 만든 그룹",
 };
 
 export default function MyParticipationModal({ isOpen, onClose }) {
     const navigate = useNavigate();
-    const [tab, setTab] = useState("ACCEPTED");
+    const [tab, setTab] = useState("JOINED");
     const [currentUser, setCurrentUser] = useState(null);
     const [groups, setGroups] = useState([]);
     const [selectedGroupId, setSelectedGroupId] = useState(null);
     const [showManageModal, setShowManageModal] = useState(false);
 
-    // 공통 참가 취소 기능 (사용자 기준)
     const { handleLeave } = useMatchGroupActions(null, currentUser);
 
     useEffect(() => {
@@ -33,14 +31,30 @@ export default function MyParticipationModal({ isOpen, onClose }) {
                 const user = await getCurrentUser();
                 setCurrentUser(user);
 
-                const response = await axiosInstance.post("/matchParticipant/my", {
-                    userId: user.userId,
-                    participantStatus: tab,
-                });
+                if (!user || !user.userId) {
+                    console.warn("❗ 사용자 정보가 유효하지 않습니다.");
+                    return;
+                }
+
+                let response;
+                if (tab === "JOINED") {
+                    response = await axiosInstance.post("/matchParticipant/my", {
+                        userId: user.userId,
+                        participantStatus: "ACCEPTED",
+                    });
+                } else if (tab === "APPLIED") {
+                    response = await axiosInstance.post("/matchParticipant/my", {
+                        userId: user.userId,
+                        participantStatus: "PENDING",
+                    });
+                } else if (tab === "HOSTED") {
+                    // ✅ 경로 수정: matchGroup → matchgroup (소문자)
+                    response = await axiosInstance.get(`/matchgroup/host/${user.userId}`);
+                }
 
                 setGroups(response.data);
             } catch (error) {
-                console.error("내 참가 목록 조회 실패:", error);
+                console.error("⚠️ 참가 그룹 조회 실패:", error);
             }
         };
 
@@ -60,17 +74,14 @@ export default function MyParticipationModal({ isOpen, onClose }) {
     if (!isOpen) return null;
 
     return (
-        <BaseModal onClose={onClose} title=" 그룹 관리 " maxWidth="max-w-2xl">
-            {/* 탭 선택 */}
-            <div className="flex justify-center border-b mb-4">
+        <BaseModal onClose={onClose} title="그룹 관리" maxWidth="max-w-2xl">
+            <div className="grid grid-cols-3 bg-gray-100 rounded-full p-1 mb-4">
                 {TABS.map((key) => (
                     <button
                         key={key}
                         onClick={() => setTab(key)}
-                        className={`relative px-4 py-2 text-sm font-medium text-gray-600 transition ${
-                            tab === key
-                                ? "text-blue-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-blue-600"
-                                : "hover:text-gray-800"
+                        className={`text-sm font-medium py-2 rounded-full transition-all ${
+                            tab === key ? "bg-white shadow text-black" : "text-gray-500"
                         }`}
                     >
                         {TAB_LABELS[key]}
@@ -78,52 +89,50 @@ export default function MyParticipationModal({ isOpen, onClose }) {
                 ))}
             </div>
 
-            {/* 참가 리스트 */}
             {groups.length === 0 ? (
-                <p className="text-gray-500 text-center">표시할 그룹이 없습니다.</p>
+                <p className="text-gray-400 text-sm text-center mt-10">
+                    표시할 그룹이 없습니다.
+                </p>
             ) : (
-                <ul className="space-y-3 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin">
+                <ul className="space-y-3 max-h-[350px] overflow-y-auto px-1 pb-1 scrollbar-thin">
                     {groups.map((g) => (
                         <li
-                            key={g.matchParticipantId}
-                            className="bg-white p-4 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border"
+                            key={g.matchParticipantId || g.matchGroupId}
+                            className="bg-white rounded-2xl shadow-md p-4 space-y-2 border border-gray-100"
                         >
                             <div className="text-sm text-gray-800">
-                                <p className="font-semibold mb-1">그룹 ID: {g.matchGroupId}</p>
-                                <p className="text-gray-500">참여일: {new Date(g.joinAt).toLocaleString()}</p>
+                                <p className="font-semibold">🏌️ {g.groupName || `그룹 ID: ${g.matchGroupId}`}</p>
                             </div>
 
-                            <div className="flex flex-wrap gap-2">
-                                {tab === "PENDING" && (
+                            <div className="flex gap-2">
+                                {tab === "APPLIED" && (
                                     <button
                                         onClick={() => handleCancel(g.matchGroupId)}
-                                        className="px-3 py-1 bg-red-500 text-white rounded-md text-sm hover:bg-red-600 transition"
+                                        className="flex-1 py-1 rounded-md bg-red-500 text-white text-sm hover:bg-red-600 transition"
                                     >
                                         참가 취소
                                     </button>
                                 )}
 
-                                {tab === "ACCEPTED" && (
-                                    <>
-                                        <button
-                                            onClick={() => navigate(`/matchgroup/${g.matchGroupId}`)}
-                                            className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 transition"
-                                        >
-                                            상세 보기
-                                        </button>
+                                {tab === "JOINED" && (
+                                    <button
+                                        onClick={() => navigate(`/matchgroup/${g.matchGroupId}`)}
+                                        className="flex-1 py-1 rounded-md bg-blue-500 text-white text-sm hover:bg-blue-600 transition"
+                                    >
+                                        상세 보기
+                                    </button>
+                                )}
 
-                                        {Number(g.hostId) === Number(currentUser?.userId) && (
-                                            <button
-                                                onClick={() => {
-                                                    setSelectedGroupId(g.matchGroupId);
-                                                    setShowManageModal(true);
-                                                }}
-                                                className="px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600 transition"
-                                            >
-                                                참가자 관리
-                                            </button>
-                                        )}
-                                    </>
+                                {tab === "HOSTED" && (
+                                    <button
+                                        onClick={() => {
+                                            setSelectedGroupId(g.matchGroupId);
+                                            setShowManageModal(true);
+                                        }}
+                                        className="flex-1 py-1 rounded-md bg-yellow-400 text-white text-sm hover:bg-yellow-500 transition"
+                                    >
+                                        참가자 관리
+                                    </button>
                                 )}
                             </div>
                         </li>
@@ -131,16 +140,6 @@ export default function MyParticipationModal({ isOpen, onClose }) {
                 </ul>
             )}
 
-            <div className="mt-6 text-center">
-                <button
-                    onClick={onClose}
-                    className="w-full sm:w-auto px-6 py-2 bg-gray-500 text-white rounded-lg text-sm hover:bg-gray-600 transition"
-                >
-                    닫기
-                </button>
-            </div>
-
-            {/* 다음 단계: 관리 모달 표시 자리 */}
             {showManageModal && selectedGroupId && (
                 <GroupManageModal
                     matchGroupId={selectedGroupId}

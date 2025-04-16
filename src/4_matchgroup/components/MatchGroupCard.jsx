@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CalendarIcon, MapPinIcon, UsersIcon } from "lucide-react";
 import {
     Card,
@@ -12,20 +12,30 @@ import {
 import { Badge } from "./ui/Badge.jsx";
 import JoinConfirmModal from "./JoinConfirmModal.jsx";
 import { getCurrentUser } from "../api/matchGroupApi.js";
-import { getParticipantsByGroupId } from "../api/matchParticipantApi.js";
 import useMatchGroupActions from "../hooks/useMatchGroupActions";
 
 export default function MatchGroupCard({ group }) {
     const navigate = useNavigate();
     const [showJoinModal, setShowJoinModal] = useState(false);
-    const [participants, setParticipants] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
-
-    const isFull = group.currentParticipants >= group.maxParticipants;
     const { handleJoin } = useMatchGroupActions(null, currentUser);
 
+    const participants = group?.participants || [];
     const femaleCount = participants.filter((p) => p.gender === "FEMALE").length;
     const maleCount = participants.filter((p) => p.gender === "MALE").length;
+
+    const isFull = participants.length >= group.maxParticipants;
+    const [isParticipant, setIsParticipant] = useState(false);
+
+    useEffect(() => {
+        getCurrentUser().then((user) => {
+            setCurrentUser(user);
+            const matched = participants.some(
+                (p) => p.userId === user.userId && p.participantStatus === "ACCEPTED"
+            );
+            setIsParticipant(matched);
+        });
+    }, [group]);
 
     const genderLimitReached =
         (currentUser?.gender === "FEMALE" && femaleCount >= group.femaleLimit) ||
@@ -41,17 +51,6 @@ export default function MatchGroupCard({ group }) {
             minute: "2-digit",
         }).format(date);
     };
-
-    useEffect(() => {
-        if (group?.matchGroupId) {
-            getParticipantsByGroupId(group.matchGroupId).then((data) => {
-                const approved = data.filter((p) => p.participantStatus === "ACCEPTED");
-                setParticipants(approved);
-            });
-
-            getCurrentUser().then(setCurrentUser);
-        }
-    }, [group?.matchGroupId]);
 
     return (
         <>
@@ -86,8 +85,8 @@ export default function MatchGroupCard({ group }) {
                         <div className="flex items-center gap-2">
                             <UsersIcon className="h-4 w-4 text-golf-green-600" />
                             <span>
-                                {participants.length}/{group.maxParticipants}명
-                            </span>
+                {participants.length}/{group.maxParticipants}명
+              </span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="font-semibold text-golf-green-700">방장:</span>
@@ -96,34 +95,37 @@ export default function MatchGroupCard({ group }) {
                     </div>
                 </CardContent>
 
-                <CardFooter className="pt-4 flex gap-2">
-                    <Link
-                        to={`/swings/matchgroup/${group.matchType}/${group.matchGroupId}`}
-                        className="w-1/2"
-                    >
-                        <button className="w-full py-2 border rounded-xl text-sm hover:bg-gray-100">
-                            그룹 상세 보기
+                <CardFooter className="pt-4">
+                    {isParticipant ? (
+                        <button
+                            onClick={() =>
+                                navigate(`/swings/matchgroup/waitingroom/${group.matchGroupId}`)
+                            }
+                            className="w-full py-2 bg-black text-white rounded-xl text-sm hover:bg-gray-800 transition"
+                        >
+                            그룹 입장
                         </button>
-                    </Link>
-
-                    <button
-                        className={`w-1/2 py-2 rounded-xl text-sm transition ${
-                            isFull || genderLimitReached
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-blue-500 text-white hover:bg-blue-600"
-                        }`}
-                        onClick={() => setShowJoinModal(true)}
-                        disabled={isFull || genderLimitReached}
-                    >
-                        {isFull
-                            ? "모집 완료"
-                            : genderLimitReached
-                                ? "성비 제한으로 신청 불가"
-                                : "참가 신청"}
-                    </button>
+                    ) : (
+                        <button
+                            className={`w-full py-2 rounded-xl text-sm transition ${
+                                isFull || genderLimitReached
+                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    : "bg-blue-500 text-white hover:bg-blue-600"
+                            }`}
+                            onClick={() => setShowJoinModal(true)}
+                            disabled={isFull || genderLimitReached}
+                        >
+                            {isFull
+                                ? "모집 완료"
+                                : genderLimitReached
+                                    ? "성비 제한"
+                                    : "참가 신청"}
+                        </button>
+                    )}
                 </CardFooter>
             </Card>
 
+            {/* 참가 신청 모달 */}
             <JoinConfirmModal
                 isOpen={showJoinModal}
                 onClose={() => setShowJoinModal(false)}

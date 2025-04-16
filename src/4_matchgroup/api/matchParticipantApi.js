@@ -13,6 +13,17 @@ export const getParticipantsByGroupId = async (matchGroupId) => {
   }
 };
 
+// 내가 만든 그룹 조회
+export const getGroupsByHostId = async (userId) => {
+    try {
+        const response = await axiosInstance.get(`/matchgroup/host/${user.userId}`);
+        return response.data;
+    } catch (error) {
+        console.error("방장이 만든 그룹 조회 중 오류 발생:", error);
+        return [];
+    }
+};
+
 // 참가 신청
 export const joinMatch = async (matchGroupId, userId) => {
     try {
