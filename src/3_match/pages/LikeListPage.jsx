@@ -15,7 +15,7 @@ import {
     createChatRoom,
 } from "../api/matchApi";
 import ConfirmModal from "../components/ConfirmModal";
-import { fetchUserData } from "../../1_user/api/userApi";
+import { fetchUserData,getProfileImageUrl } from "../../1_user/api/userApi";
 
 // ✅ 4. 이미지 등 asset
 import defaultImg from "../../assets/default-profile.png";
@@ -190,7 +190,7 @@ export default function LikeListPage() {
                                     onClick={() => navigate(`/swings/profile/${user.username}`)}
                                 >
                                     <img
-                                        src={user.userImg && user.userImg !== "" ? user.userImg : defaultImg}
+                                        src={user.userImg ? getProfileImageUrl(user.userImg) : defaultImg}
                                         alt="프로필"
                                         className="w-12 h-12 rounded-full object-cover border"
                                     />

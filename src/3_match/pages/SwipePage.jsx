@@ -85,12 +85,14 @@ function SwipePage() {
             data.append("amount", 3);
             data.append("description", "슈퍼챗 사용");
 
+            // ✅ 포인트 차감 시도
             await axios.post("/users/me/points/use", data, {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
             });
 
+            // ✅ 채팅방 생성 (슈퍼챗으로)
             await axios.post("/api/chat/room", null, {
                 params: {
                     user1: currentUser.username,
@@ -101,13 +103,23 @@ function SwipePage() {
 
             toast.success("💎 슈퍼챗으로 바로 채팅방이 생성되었습니다!");
             fetchRecommendedUser(currentUser.username);
+
         } catch (error) {
-            if (error.response?.status === 400) setShowChargeModal(true);
-            else toast.error("슈퍼챗 도중 오류 발생");
+            const msg = error.response?.data?.message || "";
+            const status = error.response?.status;
+
+            // ✅ 메시지 기준으로 포인트 부족 판단
+            if (status === 400 || msg.includes("포인트가 부족")) {
+                setShowChargeModal(true);
+            } else {
+                toast.error("슈퍼챗 도중 오류 발생");
+                console.error("🔥 슈퍼챗 오류:", error);
+            }
         } finally {
             setShowSuperChatModal(false);
         }
     };
+
 
     if (!currentUser) {
         return (
