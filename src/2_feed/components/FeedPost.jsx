@@ -152,7 +152,7 @@ const FeedPost = ({
   const hasImage = post.image || post.imageUrl;
 
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 transition-all duration-300 ease-in-out hover:shadow-xl relative">
+    <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 transition-all duration-300 ease-in-out hover:shadow-xl relative z-10">
       <div className="flex items-center justify-between px-4 py-2 text-sm bg-white border-b border-gray-100">
         <div
           className="flex items-center gap-2 cursor-pointer"
@@ -170,7 +170,7 @@ const FeedPost = ({
             )}
           </div>
           <div className="flex flex-col">
-            <span className="text-gray-700 text-sm font-medium">
+            <span className="text-gray-700 text-sm font-medium font-pretendard">
               {post.username || "사용자"}
             </span>
             <span className="text-xs text-gray-400">
@@ -308,22 +308,24 @@ const FeedPost = ({
                   className="w-full object-cover max-h-96 transition transform group-hover:scale-105 duration-300"
                 />
               </div>
-              <div className="p-4">
-                <div
-                  ref={contentRef}
-                  className={`text-base font-medium text-gray-800 break-words whitespace-pre-wrap font-serif ${
-                    !isExpanded
-                      ? "line-clamp-1 relative cursor-pointer"
-                      : "cursor-pointer"
-                  }`}
-                  onClick={() => setIsExpanded(!isExpanded)}
-                >
-                  {post.caption || "게시물 내용이 없습니다."}
-                  {!isExpanded && isContentTruncated && (
-                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-                  )}
+              {post.caption?.trim() && (
+                <div className="p-4">
+                  <div
+                    ref={contentRef}
+                    className={`text-base font-medium text-gray-800 break-words whitespace-pre-wrap font-pretendard ${
+                      !isExpanded
+                        ? "line-clamp-1 relative cursor-pointer"
+                        : "cursor-pointer"
+                    }`}
+                    onClick={() => setIsExpanded(!isExpanded)}
+                  >
+                    {post.caption}
+                    {!isExpanded && isContentTruncated && (
+                      <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </>
           )}
 
@@ -339,7 +341,8 @@ const FeedPost = ({
                   }`}
                   onClick={() => setIsExpanded(!isExpanded)}
                 >
-                  <div className="text-base font-medium text-gray-800 break-words whitespace-pre-wrap font-serif">
+                  <div className="text-base font-medium text-gray-800 break-words whitespace-pre-wrap font-pretendard">
+                    {" "}
                     {post.caption || "게시물 내용이 없습니다."}
                   </div>
                   {!isExpanded && isContentTruncated && (
