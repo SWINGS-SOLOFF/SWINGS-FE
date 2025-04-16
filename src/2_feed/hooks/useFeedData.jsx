@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import feedApi from "../api/feedApi";
-import { toast } from "react-toastify";
 
 /**
  * 소셜 페이지이랑 피드 페이지에서 공통으로 사용할 수 있는 피드 관련 훅
@@ -10,11 +9,12 @@ const useFeedData = (viewedUserId, currentUser, setSelectedFeed) => {
   const [posts, setPosts] = useState([]);
 
   const refreshFeeds = async () => {
+    if (!viewedUserId) return;
     try {
       const feeds = await feedApi.getUserFeeds(viewedUserId);
       setPosts(feeds);
     } catch {
-      toast.error("피드를 불러오지 못했습니다.");
+      console.error("피드를 불러오지 못했습니다.");
     }
   };
 
@@ -23,6 +23,7 @@ const useFeedData = (viewedUserId, currentUser, setSelectedFeed) => {
       const updated = isLiked
         ? await feedApi.unlikeFeed(feedId, currentUser?.userId)
         : await feedApi.likeFeed(feedId, currentUser?.userId);
+
       if (updated) {
         setPosts((prev) =>
           prev.map((f) => (f.feedId === feedId ? updated : f))
@@ -33,7 +34,7 @@ const useFeedData = (viewedUserId, currentUser, setSelectedFeed) => {
           );
       }
     } catch {
-      toast.error("좋아요 처리 실패");
+      console.error("좋아요 처리 실패");
     }
   };
 
@@ -45,7 +46,7 @@ const useFeedData = (viewedUserId, currentUser, setSelectedFeed) => {
       setPosts((prev) => prev.filter((post) => post.feedId !== feedId));
     } catch (err) {
       console.error("❌ 게시물 삭제 실패", err);
-      toast.error("게시물 삭제 실패");
+      console.error("게시물 삭제 실패");
     }
   };
 
@@ -71,7 +72,7 @@ const useFeedData = (viewedUserId, currentUser, setSelectedFeed) => {
         );
       return newComment;
     } catch {
-      toast.error("댓글 추가 실패");
+      console.error("댓글 추가 실패");
     }
   };
 
@@ -100,7 +101,7 @@ const useFeedData = (viewedUserId, currentUser, setSelectedFeed) => {
             : prev
         );
     } catch {
-      toast.error("댓글 삭제 실패");
+      console.error("댓글 삭제 실패");
     }
   };
 

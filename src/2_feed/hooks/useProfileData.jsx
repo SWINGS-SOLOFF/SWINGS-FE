@@ -13,6 +13,9 @@ export const useProfileData = (userId, currentUser) => {
 
   const fetchProfileData = async () => {
     if (!userId || !currentUser) {
+      {
+        userId, currentUser;
+      }
       setLoading(false);
       return;
     }

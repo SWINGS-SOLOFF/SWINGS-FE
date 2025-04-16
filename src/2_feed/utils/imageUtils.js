@@ -6,5 +6,5 @@ export const normalizeImageUrl = (url) => {
 
   if (url.startsWith("/")) return `${window.location.origin}${url}`;
 
-  return `http://localhost:8090/swings/uploads/${url}`;
+  return `http://localhost:8090/swings/uploads/${encodeURIComponent(url)}`;
 };
