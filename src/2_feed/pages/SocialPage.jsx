@@ -55,16 +55,18 @@ const SocialPage = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const user = await socialApi.getCurrentUser();
-        setCurrentUser(user);
-        if (!paramUserId) setViewedUserId(user.userId);
-      } catch {
-        toast.error("사용자 정보를 불러오지 못했습니다.");
-      }
+      const user = await socialApi.getCurrentUser();
+      setCurrentUser(user);
     };
     fetchUser();
-  }, [paramUserId]);
+  }, []);
+
+  useEffect(() => {
+    if (paramUserId || currentUser) {
+      const idToView = paramUserId ? Number(paramUserId) : currentUser?.userId;
+      setViewedUserId(idToView);
+    }
+  }, [paramUserId, currentUser]);
 
   useEffect(() => {
     if (currentUser) {
@@ -114,14 +116,14 @@ const SocialPage = () => {
           try {
             if (isFollowing) {
               await socialApi.unfollowUser(currentUser.userId, viewedUserId);
-              toast.success("언팔로우 완료");
+              console.success("언팔로우 완료");
             } else {
               await socialApi.followUser(currentUser.userId, viewedUserId);
-              toast.success("팔로우 완료");
+              console.success("팔로우 완료");
             }
             refreshProfileData();
           } catch {
-            toast.error("팔로우 처리에 실패했습니다.");
+            console.error("팔로우 처리에 실패했습니다.");
           }
         }}
         onShowFollowers={() => setShowFollowersList(true)}
