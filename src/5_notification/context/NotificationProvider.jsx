@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { NotificationContext } from "./NotificationContext";
 import { connectSocket, disconnectSocket } from "../utils/socket";
 import NotificationToast from "../components/NotificationToast";
-import {getAllNotifications} from "../api/NotificationApi.js";
+import { getAllNotifications } from "../api/NotificationApi.js";
+import { useAuth } from "../../1_user/context/AuthContext";
 
 export const NotificationProvider = ({ children }) => {
+    const { token } = useAuth();
     const [notifications, setNotifications] = useState([]);
     const [toastMessage, setToastMessage] = useState(null);
 
@@ -17,56 +19,52 @@ export const NotificationProvider = ({ children }) => {
         setNotifications(initialData);
     };
 
-    // 안 읽은 알림 개수 계산
     const unreadCount = notifications.filter((n) => n.read === false).length;
 
-
     useEffect(() => {
-        const token = sessionStorage.getItem("token"); // sessionStorage에서 가져옴
         if (!token) {
-            console.warn("⚠️ 세션스토리지에 토큰이 없어 알림 연결 생략됩니다.");
+            console.log("⛔ 토큰 없음 - 알림 연결 생략");
             return;
         }
 
-        // JWT에서 username 파싱
         try {
             const base64Payload = token.split(".")[1];
             const decodedPayload = atob(base64Payload);
             const payload = JSON.parse(decodedPayload);
             const username = payload.username || payload.sub;
 
-            if (username) {
-                localStorage.setItem("username", username); // WebSocket 구독을 위해 저장
-                
-                // 알림 초기 데이터 불러오기
-                const fetchInitialNotifications = async () => {
-                    try {
-                        const data = await getAllNotifications(username);
-                        setInitialNotifications(data);
-                    } catch (e) {
-                        console.error("초기 알림 불러오기 실패:", e);
-                    }
-                };
-
-                fetchInitialNotifications();
+            if (!username) {
+                console.warn("❌ username 파싱 실패 - 알림 연결 생략");
+                return;
             }
+
+            localStorage.setItem("username", username);
+
+            const fetchInitialNotifications = async () => {
+                try {
+                    const data = await getAllNotifications(username);
+                    setInitialNotifications(data);
+                } catch (e) {
+                    console.error("📭 초기 알림 불러오기 실패:", e);
+                }
+            };
+
+            fetchInitialNotifications();
+
+            connectSocket((notification) => {
+                console.log("📨 실시간 알림 수신:", notification);
+                addNotification(notification);
+            });
         } catch (error) {
             console.error("❌ JWT 파싱 오류:", error);
-            return;
         }
-
-        const handleNewNotification = (notification) => {
-            console.log("📨 새 알림 도착:", notification);
-            addNotification(notification);
-        };
-
-        connectSocket(handleNewNotification);
 
         return () => {
             disconnectSocket();
         };
-    }, []);
+    }, [token]); // ✅ 토큰 생겼을 때만 실행
 
+    // 로그아웃 감지용
     useEffect(() => {
         const handleStorageChange = (e) => {
             if (e.key === "username" && e.newValue === null) {
@@ -77,7 +75,6 @@ export const NotificationProvider = ({ children }) => {
         window.addEventListener("storage", handleStorageChange);
         return () => window.removeEventListener("storage", handleStorageChange);
     }, []);
-
 
     return (
         <NotificationContext.Provider
