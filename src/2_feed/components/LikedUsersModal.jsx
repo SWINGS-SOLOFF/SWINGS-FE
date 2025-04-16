@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { FaHeart, FaTimes, FaUser } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { normalizeImageUrl } from "../utils/imageUtils";
 
 const LikedUsersModal = ({ users, onClose }) => {
   const navigate = useNavigate();
@@ -21,6 +22,10 @@ const LikedUsersModal = ({ users, onClose }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
+
+  useEffect(() => {
+    console.log("✅ 좋아요 유저 목록 users:", users);
+  }, [users]);
 
   return (
     <div className="liked-users-modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
@@ -73,11 +78,17 @@ const LikedUsersModal = ({ users, onClose }) => {
                 >
                   <div className="flex items-center p-2">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-100 to-pink-100 dark:from-blue-900 dark:to-pink-900 flex items-center justify-center mr-3 overflow-hidden border-2 border-white dark:border-gray-700 shadow-sm group-hover:border-pink-200 dark:group-hover:border-pink-800 transition-all">
-                      {user.avatarUrl ? (
+                      {user.avatarUrl || user.userProfilePic ? (
                         <img
-                          src={user.avatarUrl}
+                          src={normalizeImageUrl(
+                            user.avatarUrl || user.userProfilePic
+                          )}
                           alt={user.username}
                           className="w-full h-full object-cover rounded-full"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/default-profile.jpg";
+                          }}
                         />
                       ) : (
                         <FaUser className="text-gray-500 dark:text-gray-400" />

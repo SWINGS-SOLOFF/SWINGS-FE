@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { AnimatePresence, motion } from "framer-motion";
 
 import useUser from "../hooks/useUser";
@@ -65,7 +63,7 @@ const FeedPage = () => {
         setStep(0);
         await loadFeeds(order[0], user);
       } catch {
-        toast.error("사용자 정보를 불러오는 데 실패했습니다.");
+        console.error("사용자 정보를 불러오는 데 실패했습니다.");
       }
     };
     init();
@@ -99,7 +97,7 @@ const FeedPage = () => {
         return [...prev, ...uniqueNewFeeds];
       });
     } catch {
-      toast.error("피드를 불러오는 데 실패했습니다.");
+      console.error("피드를 불러오는 데 실패했습니다.");
     } finally {
       setLoading(false);
     }
@@ -107,8 +105,16 @@ const FeedPage = () => {
 
   const loadMoreFeeds = async () => {
     if (loading || !currentUser || step >= feedOrder.length) return;
-    await loadFeeds(feedOrder[step], currentUser);
-    setStep((prev) => prev + 1);
+
+    setLoading(true);
+    try {
+      await loadFeeds(feedOrder[step], currentUser);
+    } catch (err) {
+      console.error("피드 로딩 실패:", err);
+    } finally {
+      setStep((prev) => prev + 1);
+      setLoading(false);
+    }
   };
 
   useIntersectionObserver({
@@ -136,20 +142,24 @@ const FeedPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!userId) return toast.error("로그인 후 작성해주세요");
+    if (!userId) return console.error("로그인 후 작성해주세요");
+
     const formData = new FormData();
     formData.append("userId", userId);
     formData.append("content", newPostContent);
-    if (newPostImage) formData.append("file", newPostImage);
+
+    if (selectedImage) {
+      formData.append("file", selectedImage); // 🔥 핵심 포인트
+    }
 
     try {
       const newPost = await feedApi.uploadFeed(formData);
       setPosts((prev) => [newPost, ...prev]);
       reset();
+      setSelectedImage(null);
       setShowNewPostForm(false);
-      toast.success("게시물이 업로드되었습니다.");
     } catch {
-      toast.error("업로드 실패");
+      console.error("업로드 실패");
     }
   };
 
@@ -159,13 +169,12 @@ const FeedPage = () => {
       setLikedUsers(users);
       setIsLikedModalOpen(true);
     } catch {
-      toast.error("좋아요 목록 불러오기 실패");
+      console.error("좋아요 목록 불러오기 실패");
     }
   };
 
   return (
     <div className="bg-white min-h-screen pt-4 sm:pt-8 md:pt-12">
-      <ToastContainer position="bottom-right" />
       <CreatePostButton onClick={togglePostForm} customPosition="right-20" />
 
       {isRefreshing && (
@@ -195,6 +204,8 @@ const FeedPage = () => {
                   setShowNewPostForm(false);
                   reset();
                 }}
+                selectedImage={selectedImage}
+                setSelectedImage={setSelectedImage}
               />
             </div>
           </motion.div>
