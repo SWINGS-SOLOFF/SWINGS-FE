@@ -25,15 +25,23 @@ export default function MatchGroupCard({ group }) {
     const maleCount = participants.filter((p) => p.gender === "MALE").length;
 
     const isFull = participants.length >= group.maxParticipants;
+
     const [isParticipant, setIsParticipant] = useState(false);
+    const [isPending, setIsPending] = useState(false);
 
     useEffect(() => {
         getCurrentUser().then((user) => {
             setCurrentUser(user);
-            const matched = participants.some(
+
+            const accepted = participants.some(
                 (p) => p.userId === user.userId && p.participantStatus === "ACCEPTED"
             );
-            setIsParticipant(matched);
+            const pending = participants.some(
+                (p) => p.userId === user.userId && p.participantStatus === "PENDING"
+            );
+
+            setIsParticipant(accepted);
+            setIsPending(pending);
         });
     }, [group]);
 
@@ -85,8 +93,8 @@ export default function MatchGroupCard({ group }) {
                         <div className="flex items-center gap-2">
                             <UsersIcon className="h-4 w-4 text-golf-green-600" />
                             <span>
-                {participants.length}/{group.maxParticipants}명
-              </span>
+                                {participants.length}/{group.maxParticipants}명
+                            </span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="font-semibold text-golf-green-700">방장:</span>
@@ -104,6 +112,13 @@ export default function MatchGroupCard({ group }) {
                             className="w-full py-2 bg-black text-white rounded-xl text-sm hover:bg-gray-800 transition"
                         >
                             그룹 입장
+                        </button>
+                    ) : isPending ? (
+                        <button
+                            disabled
+                            className="w-full py-2 bg-gray-300 text-gray-500 rounded-xl text-sm cursor-not-allowed"
+                        >
+                            참가 수락 대기 중
                         </button>
                     ) : (
                         <button
