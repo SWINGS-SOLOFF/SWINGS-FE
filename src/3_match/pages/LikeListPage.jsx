@@ -1,22 +1,27 @@
+// ✅ 1. React 관련
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+// ✅ 2. 외부 라이브러리
+import { motion } from "framer-motion";
+import { ThumbsUp, ThumbsUpIcon } from "lucide-react";
+import { Toaster, toast } from "react-hot-toast";
+import axios from "../../1_user/api/axiosInstance";
+
+// ✅ 3. 내부 API, 컴포넌트
 import {
     getSentAndReceivedLikes,
     sendLikeToUser,
     createChatRoom,
 } from "../api/matchApi";
-import { useParams, useNavigate } from "react-router-dom";
-import { ThumbsUp, ThumbsUpIcon } from "lucide-react";
-import { motion } from "framer-motion";
-import defaultImg from "../../assets/default-profile.png";
-import { Toaster, toast } from "react-hot-toast";
 import ConfirmModal from "../components/ConfirmModal";
-import axios from "axios";
+import { fetchUserData } from "../../1_user/api/userApi";
 
-const BASE_URL = "http://localhost:8090/swings";
-const token = sessionStorage.getItem("token");
+// ✅ 4. 이미지 등 asset
+import defaultImg from "../../assets/default-profile.png";
 
 export default function LikeListPage() {
-    const { userId } = useParams();
+    const [currentUser, setCurrentUser] = useState(null);
     const [tab, setTab] = useState("sent");
     const [sentLikes, setSentLikes] = useState([]);
     const [receivedLikes, setReceivedLikes] = useState([]);
@@ -27,12 +32,26 @@ export default function LikeListPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchData();
-    }, [userId]);
+        const loadUser = async () => {
+            try {
+                const user = await fetchUserData();
+                setCurrentUser(user);
+            } catch (err) {
+                console.error("❌ 유저 정보 불러오기 실패:", err);
+            }
+        };
+        loadUser();
+    }, []);
 
-    const fetchData = async () => {
+    useEffect(() => {
+        if (currentUser?.username) {
+            fetchData(currentUser.username);
+        }
+    }, [currentUser]);
+
+    const fetchData = async (username) => {
         try {
-            const res = await getSentAndReceivedLikes(userId);
+            const res = await getSentAndReceivedLikes(username);
             setSentLikes(res.sentLikes || []);
             setReceivedLikes(res.receivedLikes || []);
         } catch (err) {
@@ -41,46 +60,50 @@ export default function LikeListPage() {
     };
 
     const handleSendLike = async (targetUsername) => {
-        setSelectedUser(targetUsername);
-
         try {
-            const res = await axios.get(`${BASE_URL}/api/likes/count/${userId}`);
+            const res = await axios.get(`/api/likes/count/${currentUser.username}`);
             const remaining = res.data;
 
             if (remaining <= 0) {
-                setShowConfirmModal(true); // 무료 좋아요 없음 → 모달로 물어봄
+                setSelectedUser(targetUsername);  // ✅ 딱 여기까지만
+                setShowConfirmModal(true);        // ✅ 모달 띄우기
             } else {
-                await sendLikeToUser(userId, targetUsername, false);
-                await createChatRoom(userId, targetUsername, false);
+                await sendLikeToUser(currentUser.username, targetUsername, false); // 무료면 즉시 전송
+                await createChatRoom(currentUser.username, targetUsername, false);
                 toast.success("💓 호감 표시 완료 💓");
                 toast.success("💬 채팅방이 생성되었습니다");
-                fetchData();
+                fetchData(currentUser.username);
             }
         } catch (err) {
             console.error("❌ 좋아요 보내기 또는 채팅방 생성 실패", err);
         }
     };
 
+
     const confirmPaidLike = async () => {
         try {
             const data = new URLSearchParams();
             data.append("amount", 1);
-            data.append("description", "좋아요 유료 사용");
+            data.append("description", "좋아요 유료 사용"); // ✅ 기록용 메세지
 
-            await axios.post(`${BASE_URL}/users/me/points/use`, data, {
+            // ✅ 프론트에서 포인트 차감은 여전히 유지
+            await axios.post(`/users/me/points/use`, data, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
                     "Content-Type": "application/x-www-form-urlencoded"
                 }
             });
 
-            await sendLikeToUser(userId, selectedUser, true);
-            await createChatRoom(userId, selectedUser, false);
+            // ✅ 좋아요 요청만 보내고, 포인트 차감은 안 함 (백엔드에선 차감 코드 삭제했어야 함!)
+            await sendLikeToUser(currentUser.username, selectedUser, true);
+
+            // ✅ 채팅방 생성
+            await createChatRoom(currentUser.username, selectedUser, false);
+
             toast.success("💓 유료 좋아요 완료!");
-            fetchData();
+            fetchData(currentUser.username);
         } catch (err) {
             if (err.response?.status === 400) {
-                setShowChargeModal(true); // 포인트 부족
+                setShowChargeModal(true);
             } else {
                 toast.error("유료 좋아요 실패");
                 console.error(err);
@@ -90,7 +113,12 @@ export default function LikeListPage() {
         }
     };
 
+
     const activeList = tab === "sent" ? sentLikes : receivedLikes;
+
+    if (!currentUser) {
+        return <div className="min-h-screen flex items-center justify-center text-gray-500">유저 정보 불러오는 중...</div>;
+    }
 
     return (
         <div className="flex flex-col h-full min-h-screen bg-white text-gray-900 px-4 py-6">
@@ -124,9 +152,7 @@ export default function LikeListPage() {
             <div className="flex justify-center gap-4 mb-6">
                 <button
                     className={`px-4 py-2 rounded-full transition-all duration-200 ${
-                        tab === "sent"
-                            ? "bg-pink-500 text-white border-2 border-blue-400"
-                            : "bg-gray-200 text-gray-700"
+                        tab === "sent" ? "bg-pink-500 text-white border-2 border-blue-400" : "bg-gray-200 text-gray-700"
                     }`}
                     onClick={() => setTab("sent")}
                 >
@@ -134,9 +160,7 @@ export default function LikeListPage() {
                 </button>
                 <button
                     className={`px-4 py-2 rounded-full transition-all duration-200 ${
-                        tab === "received"
-                            ? "bg-yellow-400 text-white border-2 border-blue-400"
-                            : "bg-gray-200 text-gray-700"
+                        tab === "received" ? "bg-yellow-400 text-white border-2 border-blue-400" : "bg-gray-200 text-gray-700"
                     }`}
                     onClick={() => setTab("received")}
                 >
@@ -181,7 +205,7 @@ export default function LikeListPage() {
                                 <div className="flex items-center gap-2">
                                     {tab === "received" && !isMutual && (
                                         <button
-                                            disabled={loading}
+                                            disabled={!currentUser || loading}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleSendLike(user.username);
