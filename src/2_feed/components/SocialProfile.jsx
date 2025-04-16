@@ -11,7 +11,8 @@ import {
 } from "react-icons/fa";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
-import { RiMentalHealthFill } from "react-icons/ri";
+import axios from "../../1_user/api/axiosInstance";
+import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { normalizeImageUrl } from "../utils/imageUtils";
 
@@ -32,6 +33,7 @@ const SocialProfile = ({
   feeds = [],
   onFeedClick = () => {},
   refreshProfileData,
+  currentUser,
 }) => {
   const [showProfileDetail, setShowProfileDetail] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false); // ✅ 이미지 모달 상태
@@ -61,6 +63,38 @@ const SocialProfile = ({
     beginner: "골린이",
     intermediate: "중급자",
     advanced: "고급자",
+  };
+
+  const handleSuperChat = async () => {
+    try {
+      const data = new URLSearchParams();
+      data.append("amount", 3);
+      data.append("description", "슈퍼챗으로 채팅방 개설");
+
+      // 포인트 차감
+      await axios.post("/users/me/points/use", data, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
+      // 채팅방 생성
+      await axios.post("/api/chat/room", null, {
+        params: {
+          user1: currentUser.username,
+          user2: user.username,
+          isSuperChat: true,
+        },
+      });
+
+      toast.success("💬 슈퍼챗으로 채팅방이 개설되었습니다!");
+    } catch (error) {
+      if (error.response?.status === 400) {
+        toast.error("❌ 포인트 부족! 충전이 필요합니다.");
+      } else {
+        toast.error("❌ 슈퍼챗 채팅방 생성 실패");
+      }
+    }
   };
 
   return (
@@ -141,8 +175,11 @@ const SocialProfile = ({
           >
             {isFollowing ? "팔로잉" : "팔로우"}
           </button>
-          <button className="flex-1 py-1.5 rounded-md bg-gray-100 text-black text-sm font-medium hover:bg-gray-200 transition">
-            메시지
+          <button
+            className="flex-1 py-1.5 rounded-md bg-yellow-400 text-white text-sm font-medium hover:bg-yellow-500 transition"
+            onClick={handleSuperChat}
+          >
+            슈퍼챗 💎
           </button>
         </div>
       )}

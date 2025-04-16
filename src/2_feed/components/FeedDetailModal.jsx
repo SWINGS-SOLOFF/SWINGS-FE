@@ -7,7 +7,6 @@ import {
   FaHeart,
   FaRegHeart,
   FaComment,
-  FaPen,
   FaEllipsisV,
   FaEdit,
 } from "react-icons/fa";
@@ -25,12 +24,14 @@ const FeedDetailModal = ({
   onClose,
   onLikeToggle,
   onDelete,
+  onRequestDelete,
   onShowLikedBy,
   onCommentSubmit,
   onCommentDelete,
   setSelectedFeed,
   updateFeedInState,
 }) => {
+  // 상태값 정의
   const [newComment, setNewComment] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,14 +47,15 @@ const FeedDetailModal = ({
   const [editedCaption, setEditedCaption] = useState(feed.caption || "");
   const [editedFile, setEditedFile] = useState(null);
   const [showPostDropdown, setShowPostDropdown] = useState(false);
+  const [isCaptionLong, setIsCaptionLong] = useState(false);
 
   const modalRef = useRef(null);
   const commentInputRef = useRef(null);
   const commentsContainerRef = useRef(null);
   const captionRef = useRef(null);
-  const [isCaptionLong, setIsCaptionLong] = useState(false);
   const [localFeed, setLocalFeed] = useState(processFeed(feed));
 
+  // 작성자 정보 불러오기
   useEffect(() => {
     const fetchAuthor = async () => {
       if (feed?.userId) {
@@ -68,6 +70,7 @@ const FeedDetailModal = ({
     fetchAuthor();
   }, [feed?.userId]);
 
+  // 캡션 줄 수 판단
   useEffect(() => {
     if (captionRef.current) {
       const lineHeight = parseInt(
@@ -79,6 +82,7 @@ const FeedDetailModal = ({
     }
   }, [feed?.caption]);
 
+  // 외부 클릭 또는 ESC키로 닫기
   useEffect(() => {
     const handleClickOutside = (event) => {
       const isOutsideModal =
@@ -109,6 +113,7 @@ const FeedDetailModal = ({
     };
   }, [onClose, showLikedByModal]);
 
+  // 댓글 영역 자동 스크롤
   useEffect(() => {
     if (commentsContainerRef.current) {
       commentsContainerRef.current.scrollTop =
@@ -116,6 +121,7 @@ const FeedDetailModal = ({
     }
   }, [feed?.comments?.length]);
 
+  // 피드 상태 초기화 및 정렬
   useEffect(() => {
     if (feed) {
       const processed = processFeed(feed);
@@ -131,6 +137,7 @@ const FeedDetailModal = ({
     }
   }, [feed]);
 
+  // 좋아요 처리
   const handleLikeToggle = async () => {
     if (!currentUser || !localFeed) return;
     const nextLiked = !localFeed.liked;
@@ -151,6 +158,7 @@ const FeedDetailModal = ({
     }
   };
 
+  // 게시물 수정 제출
   const handlePostEditSubmit = async () => {
     const formData = new FormData();
     formData.append("caption", editedCaption);
@@ -183,6 +191,7 @@ const FeedDetailModal = ({
     }
   };
 
+  // 댓글 확장/축소
   const toggleCommentExpand = (commentId) => {
     setExpandedCommentIds((prev) =>
       prev.includes(commentId)
@@ -191,6 +200,7 @@ const FeedDetailModal = ({
     );
   };
 
+  // 댓글 작성
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim() || isSubmitting || !feed) return;
@@ -219,6 +229,7 @@ const FeedDetailModal = ({
     }
   };
 
+  // 댓글 삭제
   const handleDeleteComment = async (commentId) => {
     if (!feed) return;
     try {
@@ -228,6 +239,7 @@ const FeedDetailModal = ({
     }
   };
 
+  // 게시물 삭제 확인 처리
   const handleDeleteConfirm = async () => {
     console.log("🚀 handleDeleteConfirm 실행됨");
     if (!feed?.feedId) {
@@ -244,6 +256,7 @@ const FeedDetailModal = ({
     }
   };
 
+  // 시간 차이 표시 포맷 함수
   const formatTimeAgo = (dateStr) => {
     const date = new Date(dateStr);
     const now = new Date();
@@ -272,7 +285,7 @@ const FeedDetailModal = ({
       )}
       <div className="fixed inset-0 z-[9980] bg-black bg-opacity-80 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
         {showLikedByModal && (
-          <div className="liked-users-modal z-60">
+          <div className="liked-users-modal fixed inset-0 z-[10000] flex items-center justify-center">
             <LikedUsersModal
               users={likedByUsers}
               onClose={() => setShowLikedByModal(false)}
@@ -354,7 +367,7 @@ const FeedDetailModal = ({
                         <button
                           onClick={() => {
                             console.log("🧪 삭제 버튼 클릭됨");
-                            setShowConfirm(true);
+                            onRequestDelete(feed.feedId);
                           }}
                           className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                         >
@@ -639,7 +652,10 @@ const FeedDetailModal = ({
                 {/* 댓글 입력창 - 항상 하단 고정 */}
                 <div
                   className="px-3 py-2 border-t bg-white shadow-md shrink-0"
-                  style={{ paddingBottom: "env(safe-area-inset-bottom, 16px)" }}
+                  style={{
+                    paddingBottom:
+                      "calc(env(safe-area-inset-bottom, 0px) + 8px)",
+                  }}
                 >
                   <form onSubmit={handleSubmit} className="flex items-center">
                     <input

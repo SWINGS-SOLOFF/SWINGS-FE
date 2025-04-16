@@ -1,9 +1,11 @@
 import React from "react";
+import { createPortal } from "react-dom";
 
+// 게시물 삭제 확인 모달 컴포넌트
 const DeleteConfirmModal = ({ visible, onCancel, onConfirm }) => {
   if (!visible) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70">
       <div className="bg-white rounded-xl shadow-xl p-6 max-w-xs w-full text-center space-y-4 mx-4">
         <h3 className="text-xl font-bold text-gray-900">게시물 삭제</h3>
@@ -18,17 +20,15 @@ const DeleteConfirmModal = ({ visible, onCancel, onConfirm }) => {
             취소
           </button>
           <button
-            onClick={() => {
-              console.log("✅ 삭제 버튼 클릭됨"); // 로그 추가
-              onConfirm(); // 함수 실행
-            }}
+            onClick={onConfirm}
             className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
           >
             삭제
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

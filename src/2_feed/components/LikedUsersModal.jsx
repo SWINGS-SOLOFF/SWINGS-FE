@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { FaHeart, FaTimes, FaUser } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -27,8 +28,8 @@ const LikedUsersModal = ({ users, onClose }) => {
     console.log("✅ 좋아요 유저 목록 users:", users);
   }, [users]);
 
-  return (
-    <div className="liked-users-modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+  const modalContent = (
+    <div className="liked-users-modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
       <motion.div
         ref={modalRef}
         initial={{ opacity: 0, y: 20 }}
@@ -70,44 +71,58 @@ const LikedUsersModal = ({ users, onClose }) => {
             </div>
           ) : (
             <ul className="grid grid-cols-2 gap-2">
-              {users.map((user) => (
-                <li
-                  key={user.userId}
-                  onClick={() => handleUserClick(user.userId)}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition rounded-xl cursor-pointer group"
-                >
-                  <div className="flex items-center p-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-100 to-pink-100 dark:from-blue-900 dark:to-pink-900 flex items-center justify-center mr-3 overflow-hidden border-2 border-white dark:border-gray-700 shadow-sm group-hover:border-pink-200 dark:group-hover:border-pink-800 transition-all">
-                      {user.avatarUrl || user.userProfilePic ? (
-                        <img
-                          src={normalizeImageUrl(
-                            user.avatarUrl || user.userProfilePic
-                          )}
-                          alt={user.username}
-                          className="w-full h-full object-cover rounded-full"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "/default-profile.jpg";
-                          }}
-                        />
-                      ) : (
-                        <FaUser className="text-gray-500 dark:text-gray-400" />
-                      )}
+              {users.map((user) => {
+                console.log("🧪 유저 이미지 확인:", {
+                  userId: user.userId,
+                  username: user.username,
+                  avatarUrl: user.avatarUrl,
+                  userProfilePic: user.userProfilePic,
+                });
+
+                return (
+                  <li
+                    key={user.userId}
+                    onClick={() => handleUserClick(user.userId)}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition rounded-xl cursor-pointer group"
+                  >
+                    <div className="flex items-center p-2">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-100 to-pink-100 dark:from-blue-900 dark:to-pink-900 flex items-center justify-center mr-3 overflow-hidden border-2 border-white dark:border-gray-700 shadow-sm group-hover:border-pink-200 dark:group-hover:border-pink-800 transition-all">
+                        {user.avatarUrl ||
+                        user.userProfilePic ||
+                        user.userImg ? (
+                          <img
+                            src={normalizeImageUrl(
+                              user.avatarUrl ||
+                                user.userProfilePic ||
+                                user.userImg
+                            )}
+                            alt={user.username}
+                            className="w-full h-full object-cover rounded-full"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "/default-profile.jpg";
+                            }}
+                          />
+                        ) : (
+                          <FaUser className="text-gray-500 dark:text-gray-400" />
+                        )}
+                      </div>
+                      <div className="overflow-hidden">
+                        <h3 className="font-medium text-gray-800 dark:text-white text-sm truncate">
+                          {user.username}
+                        </h3>
+                      </div>
                     </div>
-                    <div className="overflow-hidden">
-                      <h3 className="font-medium text-gray-800 dark:text-white text-sm truncate">
-                        {user.username}
-                      </h3>
-                    </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
       </motion.div>
     </div>
   );
+  return createPortal(modalContent, document.body);
 };
 
 export default LikedUsersModal;
