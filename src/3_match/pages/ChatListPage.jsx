@@ -2,10 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "../../1_user/api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { fetchUserData } from "../../1_user/api/userApi";
+import { fetchUserData, getProfileImageUrl } from "../../1_user/api/userApi";
 import { motion } from "framer-motion";
-import { getProfileImageUrl } from "../../1_user/api/userApi";
-
 
 const ChatListPage = () => {
     const [chatRooms, setChatRooms] = useState([]);
@@ -45,12 +43,19 @@ const ChatListPage = () => {
                     <p className="text-center py-10 text-gray-400 animate-pulse">채팅방이 없습니다</p>
                 ) : (
                     chatRooms.map((room, idx) => {
-                        const targetUsername = room.user1 === currentUser.username ? room.user2 : room.user1;
+                        // ✅ 이제 백엔드에서 바로 넘어온 값 사용!
+                        const targetUsername = room.targetUsername;
+                        const targetImg = room.targetImg;
+                        const targetName = room.targetName;
+
                         const lastMessageTime = room.lastMessageTime
                             ? dayjs(room.lastMessageTime).format("HH:mm")
                             : "";
                         const unread = room.unreadCount || 0;
-                        const profileImgUrl = `/images/${targetUsername}.png`; // 기본 구조 (추후 S3 연동 가능)
+
+                        const profileImgUrl = targetImg
+                            ? getProfileImageUrl(targetImg)
+                            : "/images/default-profile.png";
 
                         return (
                             <motion.div
@@ -62,7 +67,6 @@ const ChatListPage = () => {
                                 onClick={() => navigate(`/swings/chat/${room.roomId}`)}
                             >
                                 <div className="flex items-center gap-4">
-                                    {/* ✅ 프로필 이미지 */}
                                     <img
                                         src={profileImgUrl}
                                         onError={(e) => {
@@ -74,24 +78,22 @@ const ChatListPage = () => {
                                     />
 
                                     <div className="flex-1">
-                                        {/* ✅ 이름 + 아이디 + 시간 */}
                                         <div className="flex justify-between items-center">
                                             <p className="font-semibold text-gray-800">
-                                                {room.targetName || "알 수 없음"}{" "}
+                                                {targetName || "알 수 없음"}{" "}
                                                 <span className="text-xs text-gray-500 ml-1">@{targetUsername}</span>
                                             </p>
                                             <span className="text-xs text-gray-400">{lastMessageTime}</span>
                                         </div>
 
-                                        {/* ✅ 메시지 + 안읽은 메시지 뱃지 */}
                                         <div className="flex justify-between items-center">
                                             <p className="text-sm text-gray-600 truncate max-w-[200px]">
                                                 {room.lastMessage || "아직 메시지가 없습니다."}
                                             </p>
                                             {unread > 0 && (
                                                 <span className="bg-red-500 text-white text-[11px] font-bold rounded-full px-2 ml-2">
-                                                    {unread}
-                                                </span>
+                                {unread}
+                            </span>
                                             )}
                                         </div>
                                     </div>
@@ -99,10 +101,11 @@ const ChatListPage = () => {
                             </motion.div>
                         );
                     })
+
                 )}
             </div>
 
-            {/* ✅ 좋아요 전체 보기 버튼 */}
+            {/* 좋아요 전체 보기 버튼 */}
             <button
                 onClick={() => navigate(`/swings/chat/likes/${currentUser?.username}`)}
                 className="fixed bottom-24 right-6 px-5 py-3 rounded-full bg-pink-500 text-white text-sm font-bold shadow-xl hover:bg-pink-600 transition-all z-50"
