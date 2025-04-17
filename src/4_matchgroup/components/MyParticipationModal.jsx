@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-import { getCurrentUser } from "../api/matchGroupApi";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../1_user/api/axiosInstance.js";
 import BaseModal from "./ui/BaseModal";
 import useMatchGroupActions from "../hooks/useMatchGroupActions";
 import GroupManageModal from "./GroupManageModal.jsx";
+import useMyParticipationGroups from "../hooks/useMyParticipationGroups"; // ✅ 추가
 
 const TABS = ["JOINED", "APPLIED", "HOSTED"];
 const TAB_LABELS = {
@@ -16,50 +15,11 @@ const TAB_LABELS = {
 export default function MyParticipationModal({ isOpen, onClose }) {
     const navigate = useNavigate();
     const [tab, setTab] = useState("JOINED");
-    const [currentUser, setCurrentUser] = useState(null);
-    const [groups, setGroups] = useState([]);
     const [selectedGroupId, setSelectedGroupId] = useState(null);
     const [showManageModal, setShowManageModal] = useState(false);
 
+    const { currentUser, groups, setGroups } = useMyParticipationGroups(isOpen, tab);
     const { handleLeave } = useMatchGroupActions(null, currentUser);
-
-    useEffect(() => {
-        if (!isOpen) return;
-
-        const fetchGroups = async () => {
-            try {
-                const user = await getCurrentUser();
-                setCurrentUser(user);
-
-                if (!user || !user.userId) {
-                    console.warn("❗ 사용자 정보가 유효하지 않습니다.");
-                    return;
-                }
-
-                let response;
-                if (tab === "JOINED") {
-                    response = await axiosInstance.post("/matchParticipant/my", {
-                        userId: user.userId,
-                        participantStatus: "ACCEPTED",
-                    });
-                } else if (tab === "APPLIED") {
-                    response = await axiosInstance.post("/matchParticipant/my", {
-                        userId: user.userId,
-                        participantStatus: "PENDING",
-                    });
-                } else if (tab === "HOSTED") {
-                    // ✅ 경로 수정: matchGroup → matchgroup (소문자)
-                    response = await axiosInstance.get(`/matchgroup/host/${user.userId}`);
-                }
-
-                setGroups(response.data);
-            } catch (error) {
-                console.error("⚠️ 참가 그룹 조회 실패:", error);
-            }
-        };
-
-        fetchGroups();
-    }, [isOpen, tab]);
 
     const handleCancel = async (matchGroupId) => {
         try {
