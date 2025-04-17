@@ -83,7 +83,7 @@ export default function SignupContainer() {
   const CurrentStep = steps[step];
 
   return (
-    <div className="min-h-screen bg-white flex flex-col justify-center items-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-white to-blue-100 flex flex-col justify-center items-center px-4">
       <button
         className="absolute top-4 left-4 text-sm text-gray-400 hover:text-gray-600"
         onClick={() => navigate("/swings")}
