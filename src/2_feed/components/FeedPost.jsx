@@ -6,7 +6,7 @@ import {
   FaPaperPlane,
   FaEllipsisV,
   FaEdit,
-  FaPen,
+  FaCheck,
 } from "react-icons/fa";
 import { normalizeImageUrl } from "../utils/imageUtils";
 import { useNavigate } from "react-router-dom";
@@ -20,7 +20,6 @@ const FeedPost = ({
   onUnlike,
   currentUser,
   onDelete,
-  onEdit,
   onToggleComments,
   onCommentDelete,
   onCommentSubmit,
@@ -260,7 +259,7 @@ const FeedPost = ({
                         : normalizeImageUrl(post.image || post.imageUrl)
                     }
                     alt="미리보기"
-                    className="w-full max-h-96 object-cover"
+                    className="w-full max-h-64 object-contain bg-gray-100"
                   />
                 </div>
               )}
@@ -297,7 +296,7 @@ const FeedPost = ({
           {(post.image || post.imageUrl) && (
             <>
               <div
-                className="w-full overflow-hidden cursor-pointer relative group"
+                className="w-full md:w-1/2 bg-white max-h-[80vh] overflow-hidden flex justify-center items-center"
                 onClick={() =>
                   onImageClick(normalizeImageUrl(post.image || post.imageUrl))
                 }
@@ -305,7 +304,7 @@ const FeedPost = ({
                 <img
                   src={normalizeImageUrl(post.image || post.imageUrl)}
                   alt="게시물 이미지"
-                  className="w-full object-cover max-h-96 transition transform group-hover:scale-105 duration-300"
+                  className="object-contain w-full h-full"
                 />
               </div>
               {post.caption?.trim() && (
@@ -334,19 +333,23 @@ const FeedPost = ({
               <div className="w-full">
                 <div
                   ref={contentRef}
-                  className={`w-full min-h-40 max-w-lg mx-auto p-8 rounded-lg bg-gray-50 border border-gray-100 text-center shadow-sm ${
+                  className={`w-full min-h-40 max-w-lg mx-auto p-8 rounded-lg bg-white text-center shadow-sm transition-all duration-300 ${
+                    !isExpanded && !isContentTruncated
+                      ? "flex items-center justify-center"
+                      : ""
+                  } ${
                     !isExpanded
-                      ? "max-h-48 overflow-hidden relative cursor-pointer"
+                      ? "max-h-48 overflow-hidden cursor-pointer"
                       : "cursor-pointer"
                   }`}
                   onClick={() => setIsExpanded(!isExpanded)}
                 >
                   <div className="text-base font-medium text-gray-800 break-words whitespace-pre-wrap font-pretendard">
-                    {" "}
                     {post.caption || "게시물 내용이 없습니다."}
                   </div>
+
                   {!isExpanded && isContentTruncated && (
-                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
                   )}
                 </div>
               </div>
@@ -375,7 +378,7 @@ const FeedPost = ({
               />
               <button
                 onClick={() => onShowLikedBy(post.feedId)}
-                className="ml-2 text-sm font-medium text-red-600 hover:text-red-800 transition cursor-pointer" /* 빨간색으로 변경 */
+                className="text-sm font-medium text-red-600 hover:text-red-800 transition cursor-pointer" /* 빨간색으로 변경 */
               >
                 {post.likes || 0}
               </button>
@@ -456,9 +459,9 @@ const FeedPost = ({
                                 console.error("댓글 수정 실패", err);
                               }
                             }}
-                            className="text-white bg-indigo-600 hover:bg-indigo-700 rounded px-3 py-1 text-xs"
+                            className="bg-pink-600 hover:bg-pink-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base flex items-center justify-center transition"
                           >
-                            저장
+                            <FaCheck className="text-white" />
                           </button>
                         </div>
                       ) : (

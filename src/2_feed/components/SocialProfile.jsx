@@ -1,20 +1,13 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { getProfileImageUrl } from "../../1_user/api/userApi";
-import {
-  FaPhotoVideo,
-  FaHeart,
-  FaComment,
-  FaMapMarkerAlt,
-  FaGolfBall,
-  FaBirthdayCake,
-  FaSearch,
-} from "react-icons/fa";
+import { FaPhotoVideo } from "react-icons/fa";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
-
+import { createChatRoom } from "../../3_match/api/matchApi";
 import axios from "../../1_user/api/axiosInstance";
-import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { normalizeImageUrl } from "../utils/imageUtils";
+import { useNavigate } from "react-router-dom";
+import ConfirmModal from "../../3_match/components/ConfirmModal";
 
 import ProfileDetailModal from "./ProfileDetailModal";
 import ImageModal from "./ImageModal";
@@ -23,21 +16,25 @@ const SocialProfile = ({
   user,
   userStats,
   userIntroduce,
-  setIntroduce,
   isCurrentUser = false,
   isFollowing = false,
   onFollowToggle,
   onShowFollowers,
   onShowFollowing,
-  onGoToSettings,
   feeds = [],
+  onRequestCharge = () => {},
   onFeedClick = () => {},
-  refreshProfileData,
   currentUser,
 }) => {
   const [showProfileDetail, setShowProfileDetail] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false); // ✅ 이미지 모달 상태
   const postsRef = useRef(null);
+  const [showSuperChatModal, setShowSuperChatModal] = useState(false);
+  const [showChargeModal, setShowChargeModal] = useState(false);
+  const [hasChat, setHasChat] = useState(false);
+  const [roomId, setRoomId] = useState(null);
+  const navigate = useNavigate();
+  const [loadingChat, setLoadingChat] = useState(false);
 
   const regionMap = {
     SEOUL: "서울",
@@ -65,40 +62,71 @@ const SocialProfile = ({
     advanced: "고급자",
   };
 
-  const handleSuperChat = async () => {
+  const handleSuperChatConfirm = async () => {
     try {
       const data = new URLSearchParams();
       data.append("amount", 3);
       data.append("description", "슈퍼챗으로 채팅방 개설");
 
-      // 포인트 차감
       await axios.post("/users/me/points/use", data, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 
-      // 채팅방 생성
-      await axios.post("/api/chat/room", null, {
-        params: {
-          user1: currentUser.username,
-          user2: user.username,
-          isSuperChat: true,
-        },
-      });
-
-      toast.success("💬 슈퍼챗으로 채팅방이 개설되었습니다!");
-    } catch (error) {
-      if (error.response?.status === 400) {
-        toast.error("❌ 포인트 부족! 충전이 필요합니다.");
-      } else {
-        toast.error("❌ 슈퍼챗 채팅방 생성 실패");
+      const res = await createChatRoom(
+        currentUser.username,
+        user.username,
+        false
+      );
+      const newRoomId = res.data?.roomId;
+      if (newRoomId) {
+        setRoomId(newRoomId);
+        setHasChat(true);
+        toast.success("💬 슈퍼챗으로 채팅방이 개설되었습니다!");
+        navigate(`/swings/chat/${newRoomId}`);
       }
+    } catch (err) {
+      const msg = err?.response?.data?.message;
+      if (msg?.includes("포인트")) {
+        setShowChargeModal(true);
+      } else {
+        toast.error("슈퍼챗 실패");
+      }
+    } finally {
+      setShowSuperChatModal(false);
     }
   };
 
+  useEffect(() => {
+    if (!currentUser || !user || currentUser.username === user.username) return;
+
+    const fetchRoom = async () => {
+      if (!currentUser || !user) return;
+      setLoadingChat(true);
+      try {
+        const res = await createChatRoom(
+          currentUser.username,
+          user.username,
+          false
+        );
+
+        const id = res.data?.roomId;
+        if (id) {
+          setRoomId(id);
+          setHasChat(true);
+        }
+      } catch (e) {
+        console.error("채팅방 확인 실패", e);
+      } finally {
+        setLoadingChat(false);
+      }
+    };
+
+    fetchRoom();
+  }, [currentUser, user]);
+
   return (
-    <div className="relative max-w-4xl mx-auto bg-white shadow-md rounded-xl overflow-hidden">
+    <div className="relative max-w-4xl mx-auto bg-white rounded-xl overflow-hidden">
+      {" "}
       <div className="p-4">
         <div className="flex mb-6">
           <div className="mr-6 flex flex-col items-center">
@@ -125,7 +153,8 @@ const SocialProfile = ({
             </span>
           </div>
 
-          <div className="flex-1 flex items-center">
+          <div className="flex-1 flex items-start pt-5">
+            {" "}
             <div className="grid grid-cols-3 w-full text-center">
               <div className="flex flex-col">
                 <span className="font-bold text-black">
@@ -162,7 +191,6 @@ const SocialProfile = ({
           </p>
         </div>
       </div>
-
       {!isCurrentUser && (
         <div className="flex space-x-2 mb-4 px-4">
           <button
@@ -175,17 +203,27 @@ const SocialProfile = ({
           >
             {isFollowing ? "팔로잉" : "팔로우"}
           </button>
-          <button
-            className="flex-1 py-1.5 rounded-md bg-yellow-400 text-white text-sm font-medium hover:bg-yellow-500 transition"
-            onClick={handleSuperChat}
-          >
-            슈퍼챗 💎
-          </button>
+
+          {hasChat ? (
+            <button
+              className="flex-1 py-1.5 rounded-md bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition"
+              onClick={() => navigate(`/swings/chat/${roomId}`)}
+            >
+              메시지 💬
+            </button>
+          ) : (
+            <button
+              className="flex-1 py-1.5 rounded-md bg-yellow-400 text-white text-sm font-medium hover:bg-yellow-500 transition"
+              onClick={() => setShowSuperChatModal(true)}
+            >
+              슈퍼챗 💎
+            </button>
+          )}
         </div>
       )}
-
       {/* ✅ 지역 / MBTI / 골프 / 출생연도 + 오른쪽 끝 상세보기 버튼 */}
-      <div className="flex justify-between items-center px-4 mb-4 border-t border-gray-100 pt-2">
+      <div className="flex justify-between items-center px-4 mb-2 border-t border-gray-100 pt-2">
+        {" "}
         {/* ⬅️ 왼쪽 태그들 */}
         <div className="flex flex-wrap gap-2 flex-1">
           {user?.activityRegion && (
@@ -215,7 +253,6 @@ const SocialProfile = ({
             </div>
           )}
         </div>
-
         {/* ➡️ 오른쪽 상세보기 버튼 */}
         <button
           onClick={() => setShowProfileDetail(true)}
@@ -225,22 +262,20 @@ const SocialProfile = ({
           <HiOutlineDotsHorizontal size={18} />
         </button>
       </div>
-
       <hr />
-      <br />
-
-      <div ref={postsRef} className="px-4 pb-6">
+      <div ref={postsRef} className="px-1 pb-6 mt-1">
+        {" "}
         {feeds.length === 0 ? (
           <div className="text-center text-black py-12">
             <FaPhotoVideo className="text-gray-300 text-4xl mx-auto mb-3" />
             <p className="text-gray-500">아직 게시된 콘텐츠가 없습니다.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-1">
+          <div className="grid grid-cols-3 gap-[2px]">
             {feeds.map((feed) => (
               <div
                 key={feed.feedId}
-                className="aspect-square relative overflow-hidden cursor-pointer group border border-gray-200 bg-white"
+                className="aspect-square relative overflow-hidden cursor-pointer group border border-gray-300 bg-white"
                 onClick={() => onFeedClick(feed)}
               >
                 {feed.imageUrl ? (
@@ -261,7 +296,26 @@ const SocialProfile = ({
           </div>
         )}
       </div>
-
+      {/* 슈퍼챗 사용 확인 모달 */}
+      {showSuperChatModal && (
+        <ConfirmModal
+          message={`슈퍼챗은 3코인을 사용합니다.\n사용하시겠어요?`}
+          confirmLabel="사용하기"
+          cancelLabel="취소"
+          onConfirm={handleSuperChatConfirm}
+          onCancel={() => setShowSuperChatModal(false)}
+        />
+      )}
+      {/* 포인트 부족 시 충전 유도 모달 */}
+      {showChargeModal && (
+        <ConfirmModal
+          message={`포인트가 부족합니다.\n충전하러 가시겠어요?`}
+          confirmLabel="충전소로 가기"
+          cancelLabel="닫기"
+          onConfirm={onRequestCharge} // 이건 SocialPage에서 navigate("/swings/points")로 넘겨줌
+          onCancel={() => setShowChargeModal(false)}
+        />
+      )}
       {/* ✅ 이미지 크게 보기 */}
       {showImageModal && (
         <ImageModal
@@ -269,7 +323,6 @@ const SocialProfile = ({
           onClose={() => setShowImageModal(false)}
         />
       )}
-
       {/* ✅ 프로필 상세 모달 */}
       <AnimatePresence>
         {showProfileDetail && (

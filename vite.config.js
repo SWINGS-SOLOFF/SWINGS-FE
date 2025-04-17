@@ -13,7 +13,7 @@ export default defineConfig({
       filename: "sw.js",
       registerType: "autoUpdate",
       includeAssets: ["pwa3-192x192.png", "pwa3-512x512.png"],
-      injectRegister:"auto",
+      injectRegister: "auto",
       manifest: {
         name: "SWINGS",
         short_name: "SWINGS",
