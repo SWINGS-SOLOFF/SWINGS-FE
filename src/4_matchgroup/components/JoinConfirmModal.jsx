@@ -6,8 +6,8 @@ const JoinConfirmModal = ({ isOpen, group, participants, onClose, onConfirm }) =
     if (!isOpen || !group) return null;
 
     // 성별 카운트 계산
-    const femaleCount = participants.filter(p => p.gender === "FEMALE").length;
-    const maleCount = participants.filter(p => p.gender === "MALE").length;
+    const femaleCount = participants.filter(p => p.gender === "female").length;
+    const maleCount = participants.filter(p => p.gender === "male").length;
 
     return (
         <BaseModal onClose={onClose} title={`${group.groupName}`}>
