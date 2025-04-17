@@ -9,6 +9,7 @@ import {
   FaComment,
   FaEllipsisV,
   FaEdit,
+  FaCheck,
 } from "react-icons/fa";
 import LikedUsersModal from "./LikedUsersModal";
 import feedApi from "../api/feedApi";
@@ -283,7 +284,7 @@ const FeedDetailModal = ({
           />
         </div>
       )}
-      <div className="fixed inset-0 z-[9980] bg-black bg-opacity-80 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+      <div className="fixed inset-0 z-[9980] bg-transparent flex items-center justify-center p-4 overflow-y-auto">
         {showLikedByModal && (
           <div className="liked-users-modal fixed inset-0 z-[10000] flex items-center justify-center">
             <LikedUsersModal
@@ -294,7 +295,7 @@ const FeedDetailModal = ({
         )}
         <div
           ref={modalRef}
-          className="relative bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col md:flex-row"
+          className="relative bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col md:flex-row border border-gray-300"
         >
           <button
             onClick={onClose}
@@ -313,7 +314,7 @@ const FeedDetailModal = ({
               <img
                 src={feed.imageUrl}
                 alt="게시물 이미지"
-                className="object-cover w-full h-full"
+                className="w-full h-full object-contain bg-white"
               />
             </div>
           )}
@@ -614,9 +615,9 @@ const FeedDetailModal = ({
                                       console.error("댓글 수정 실패", err);
                                     }
                                   }}
-                                  className="text-white bg-indigo-600 hover:bg-indigo-700 rounded px-2 py-1 text-xs"
+                                  className="bg-pink-600 hover:bg-pink-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base flex items-center justify-center transition"
                                 >
-                                  저장
+                                  <FaCheck className="text-white" />
                                 </button>
                               </div>
                             ) : (

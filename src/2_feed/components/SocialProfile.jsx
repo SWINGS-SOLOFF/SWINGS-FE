@@ -125,7 +125,8 @@ const SocialProfile = ({
   }, [currentUser, user]);
 
   return (
-    <div className="relative max-w-4xl mx-auto bg-white shadow-md rounded-xl overflow-hidden">
+    <div className="relative max-w-4xl mx-auto bg-white rounded-xl overflow-hidden">
+      {" "}
       <div className="p-4">
         <div className="flex mb-6">
           <div className="mr-6 flex flex-col items-center">
@@ -152,7 +153,8 @@ const SocialProfile = ({
             </span>
           </div>
 
-          <div className="flex-1 flex items-center">
+          <div className="flex-1 flex items-start pt-5">
+            {" "}
             <div className="grid grid-cols-3 w-full text-center">
               <div className="flex flex-col">
                 <span className="font-bold text-black">
@@ -189,7 +191,6 @@ const SocialProfile = ({
           </p>
         </div>
       </div>
-
       {!isCurrentUser && (
         <div className="flex space-x-2 mb-4 px-4">
           <button
@@ -220,9 +221,9 @@ const SocialProfile = ({
           )}
         </div>
       )}
-
       {/* ✅ 지역 / MBTI / 골프 / 출생연도 + 오른쪽 끝 상세보기 버튼 */}
-      <div className="flex justify-between items-center px-4 mb-4 border-t border-gray-100 pt-2">
+      <div className="flex justify-between items-center px-4 mb-2 border-t border-gray-100 pt-2">
+        {" "}
         {/* ⬅️ 왼쪽 태그들 */}
         <div className="flex flex-wrap gap-2 flex-1">
           {user?.activityRegion && (
@@ -252,7 +253,6 @@ const SocialProfile = ({
             </div>
           )}
         </div>
-
         {/* ➡️ 오른쪽 상세보기 버튼 */}
         <button
           onClick={() => setShowProfileDetail(true)}
@@ -262,22 +262,20 @@ const SocialProfile = ({
           <HiOutlineDotsHorizontal size={18} />
         </button>
       </div>
-
       <hr />
-      <br />
-
-      <div ref={postsRef} className="px-4 pb-6">
+      <div ref={postsRef} className="px-1 pb-6 mt-1">
+        {" "}
         {feeds.length === 0 ? (
           <div className="text-center text-black py-12">
             <FaPhotoVideo className="text-gray-300 text-4xl mx-auto mb-3" />
             <p className="text-gray-500">아직 게시된 콘텐츠가 없습니다.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-1">
+          <div className="grid grid-cols-3 gap-[2px]">
             {feeds.map((feed) => (
               <div
                 key={feed.feedId}
-                className="aspect-square relative overflow-hidden cursor-pointer group border border-gray-200 bg-white"
+                className="aspect-square relative overflow-hidden cursor-pointer group border border-gray-300 bg-white"
                 onClick={() => onFeedClick(feed)}
               >
                 {feed.imageUrl ? (
@@ -298,7 +296,6 @@ const SocialProfile = ({
           </div>
         )}
       </div>
-
       {/* 슈퍼챗 사용 확인 모달 */}
       {showSuperChatModal && (
         <ConfirmModal
@@ -309,7 +306,6 @@ const SocialProfile = ({
           onCancel={() => setShowSuperChatModal(false)}
         />
       )}
-
       {/* 포인트 부족 시 충전 유도 모달 */}
       {showChargeModal && (
         <ConfirmModal
@@ -320,7 +316,6 @@ const SocialProfile = ({
           onCancel={() => setShowChargeModal(false)}
         />
       )}
-
       {/* ✅ 이미지 크게 보기 */}
       {showImageModal && (
         <ImageModal
@@ -328,7 +323,6 @@ const SocialProfile = ({
           onClose={() => setShowImageModal(false)}
         />
       )}
-
       {/* ✅ 프로필 상세 모달 */}
       <AnimatePresence>
         {showProfileDetail && (
