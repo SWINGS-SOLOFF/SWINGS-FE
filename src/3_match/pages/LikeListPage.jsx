@@ -147,20 +147,18 @@ export default function LikeListPage() {
                 />
             )}
 
-            <h1 className="text-2xl font-bold text-center mb-6">좋아요 목록</h1>
-
             <div className="flex justify-center gap-4 mb-6">
                 <button
-                    className={`px-4 py-2 rounded-full transition-all duration-200 ${
-                        tab === "sent" ? "bg-pink-500 text-white border-2 border-blue-400" : "bg-gray-200 text-gray-700"
+                    className={`px-4 py-2 rounded-xl transition-all font-bold outline-none focus:outline-none duration-200 ${
+                        tab === "sent" ? "bg-custom-pink text-white" : "bg-gray-200 text-gray-700"
                     }`}
                     onClick={() => setTab("sent")}
                 >
                     보낸 좋아요
                 </button>
                 <button
-                    className={`px-4 py-2 rounded-full transition-all duration-200 ${
-                        tab === "received" ? "bg-yellow-400 text-white border-2 border-blue-400" : "bg-gray-200 text-gray-700"
+                    className={`px-4 py-2 rounded-xl transition-all outline-none focus:outline-none font-bold duration-200 ${
+                        tab === "received" ? "bg-yellow-400 text-white " : "bg-gray-200 text-gray-700"
                     }`}
                     onClick={() => setTab("received")}
                 >
@@ -210,13 +208,13 @@ export default function LikeListPage() {
                                                 e.stopPropagation();
                                                 handleSendLike(user.username);
                                             }}
-                                            className="text-sm bg-pink-500 text-white px-3 py-1 rounded-full hover:bg-pink-600"
+                                            className="text-sm bg-custom-pink text-white px-3 py-1 rounded-xl "
                                         >
                                             좋아요 보내기
                                         </button>
                                     )}
                                     {isMutual ? (
-                                        <ThumbsUp className="text-pink-500 fill-pink-500 w-5 h-5" />
+                                        <ThumbsUp className="text-custom-pink fill-custom-pink w-5 h-5" />
                                     ) : (
                                         <ThumbsUpIcon className="text-gray-300 w-5 h-5" />
                                     )}

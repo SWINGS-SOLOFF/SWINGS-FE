@@ -32,7 +32,7 @@ export default function CoinSelectModal({
           </button>
 
           <p className="text-center text-sm text-gray-600">
-            <span className="font-bold text-[#2E384D]">{coin}코인</span>을
+            <span className="font-bold text-[#2E384D]">{coin}하트</span>을
             결제하시겠습니까?
           </p>
 
