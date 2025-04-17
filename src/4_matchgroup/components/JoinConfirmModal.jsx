@@ -1,13 +1,37 @@
+import { useState } from "react";
 import { UsersIcon, MapPinIcon, CalendarIcon, Venus, Mars } from "lucide-react";
 import BaseModal from "./ui/BaseModal";
+import { canUserJoinGroup } from "../api/matchParticipantApi";
 
-// JoinConfirmModal 컴포넌트
 const JoinConfirmModal = ({ isOpen, group, participants, onClose, onConfirm }) => {
+    const [loading, setLoading] = useState(false);
+
     if (!isOpen || !group) return null;
 
-    // 성별 카운트 계산
-    const femaleCount = participants.filter(p => p.gender === "female").length;
-    const maleCount = participants.filter(p => p.gender === "male").length;
+    // 성별 카운트
+    const femaleCount = participants.filter(p => p.gender === "FEMALE").length;
+    const maleCount = participants.filter(p => p.gender === "MALE").length;
+
+    const handleConfirm = async () => {
+        setLoading(true);
+
+        try {
+            const canJoin = await canUserJoinGroup(group.matchGroupId, group.currentUserId); // ✅ 백엔드 조건 검사
+
+            if (!canJoin) {
+                alert("참가할 수 없는 그룹입니다. (모집 종료, 성비 제한 또는 정원 초과)");
+                setLoading(false);
+                return;
+            }
+
+            await onConfirm(); // 실제 참가 처리 (부모에서 정의됨)
+        } catch (error) {
+            console.error("참가 요청 중 오류:", error);
+            alert("참가 신청 중 오류가 발생했습니다.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <BaseModal onClose={onClose} title={`${group.groupName}`}>
@@ -32,7 +56,7 @@ const JoinConfirmModal = ({ isOpen, group, participants, onClose, onConfirm }) =
                 </div>
             </div>
 
-            {/* 성별 모집 현황 */}
+            {/* 성별 현황 */}
             <div className="flex gap-4 justify-center text-sm text-gray-600 mb-4">
                 <div className="flex items-center gap-1">
                     <Venus className="w-4 h-4 text-pink-500" />
@@ -58,15 +82,20 @@ const JoinConfirmModal = ({ isOpen, group, participants, onClose, onConfirm }) =
                 )}
             </div>
 
+            {/* 버튼 영역 */}
             <div className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-2">
                 <button
-                    onClick={() => {
-                        console.log("✅ 참여하기 버튼 클릭됨");
-                        onConfirm();
-                    }}
-                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+                    onClick={handleConfirm}
+                    disabled={loading}
+                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-60"
                 >
-                    참여하기
+                    {loading ? "신청 중..." : "참여하기"}
+                </button>
+                <button
+                    onClick={onClose}
+                    className="w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-800 rounded-lg text-sm hover:bg-gray-400"
+                >
+                    취소
                 </button>
             </div>
         </BaseModal>
