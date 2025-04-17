@@ -12,9 +12,39 @@ export default function SignupStep1({ formData, updateData }) {
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const location = useLocation();
 
+  // 이메일 분할 상태
+  const [emailLocal, setEmailLocal] = useState(
+    formData.email?.split("@")[0] || ""
+  );
+  const [emailDomain, setEmailDomain] = useState(
+    formData.email?.split("@")[1] || "naver.com"
+  );
+  const [customDomain, setCustomDomain] = useState("");
+
+  const domainOptions = [
+    "naver.com",
+    "google.com",
+    "daum.net",
+    "hanmail.net",
+    "기타",
+  ];
+
+  // 초기 OAuth 데이터 채워 넣기 (formData.email 등은 사용 X)
   useEffect(() => {
     prefillFromOAuthState(location, formData, updateData);
-  }, [location.state, formData.email, formData.name, updateData]);
+  }, [location.state, updateData]);
+
+  // 이메일 조합 → formData.email에 저장 (무한루프 방지)
+  useEffect(() => {
+    const newEmail =
+      emailDomain === "기타"
+        ? `${emailLocal}@${customDomain}`
+        : `${emailLocal}@${emailDomain}`;
+
+    if (formData.email !== newEmail) {
+      updateData({ email: newEmail });
+    }
+  }, [emailLocal, emailDomain, customDomain]);
 
   const handleUsernameCheck = () => {
     handleUsernameCheckLogic(formData.username, setUsernameCheck);
@@ -37,7 +67,6 @@ export default function SignupStep1({ formData, updateData }) {
     const hasLowercase = /[a-z]/.test(password);
     const hasNumber = /\d/.test(password);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
     return hasLowercase && hasNumber && hasSpecial;
   };
 
@@ -53,7 +82,6 @@ export default function SignupStep1({ formData, updateData }) {
       setPasswordError("");
     }
 
-    // 비밀번호 확인값과 일치하는지도 체크
     if (formData.confirmPassword && value !== formData.confirmPassword) {
       setConfirmPasswordError("비밀번호가 일치하지 않습니다.");
     } else {
@@ -74,6 +102,7 @@ export default function SignupStep1({ formData, updateData }) {
 
   return (
     <div className="space-y-4">
+      {/* 아이디 */}
       <div className="flex gap-2 flex-col">
         <div className="flex gap-2">
           <input
@@ -84,7 +113,7 @@ export default function SignupStep1({ formData, updateData }) {
             onChange={handleUsernameChange}
           />
           <button
-            className="px-3 py-2 text-sm bg-blue-500 text-white rounded"
+            className="px-3 py-2 text-sm bg-custom-purple text-white rounded font-bold outline-none focus:outline-none"
             onClick={handleUsernameCheck}
           >
             중복 확인
@@ -93,12 +122,12 @@ export default function SignupStep1({ formData, updateData }) {
         {usernameError && (
           <p className="text-sm text-red-500 ml-1">{usernameError}</p>
         )}
+        {usernameCheck && (
+          <p className="text-sm text-gray-500 ml-1">{usernameCheck}</p>
+        )}
       </div>
 
-      {usernameCheck && (
-        <p className="text-sm text-gray-500 ml-1">{usernameCheck}</p>
-      )}
-
+      {/* 비밀번호 */}
       <div>
         <input
           type="password"
@@ -112,6 +141,7 @@ export default function SignupStep1({ formData, updateData }) {
         )}
       </div>
 
+      {/* 비밀번호 확인 */}
       <div>
         <input
           type="password"
@@ -125,6 +155,7 @@ export default function SignupStep1({ formData, updateData }) {
         )}
       </div>
 
+      {/* 이름 */}
       <input
         type="text"
         placeholder="이름"
@@ -132,13 +163,42 @@ export default function SignupStep1({ formData, updateData }) {
         value={formData.name || ""}
         onChange={(e) => updateData({ name: e.target.value })}
       />
-      <input
-        type="email"
-        placeholder="이메일"
-        className="w-full border p-2 rounded text-black"
-        value={formData.email || ""}
-        onChange={(e) => updateData({ email: e.target.value })}
-      />
+
+      {/* 이메일 */}
+      <div>
+        <div className="flex gap-2 items-center">
+          <input
+            type="text"
+            placeholder="이메일 아이디"
+            className="w-[45%] border p-2 rounded text-black"
+            value={emailLocal}
+            onChange={(e) => setEmailLocal(e.target.value)}
+          />
+          <span className="text-gray-600">@</span>
+          <select
+            value={emailDomain}
+            onChange={(e) => setEmailDomain(e.target.value)}
+            className="w-[50%] border p-2 rounded text-black"
+          >
+            {domainOptions.map((domain) => (
+              <option key={domain} value={domain}>
+                {domain}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 기타 도메인 직접 입력 */}
+        {emailDomain === "기타" && (
+          <input
+            type="text"
+            placeholder="도메인 직접 입력 (예: mydomain.com)"
+            className="mt-2 w-full border p-2 rounded text-black"
+            value={customDomain}
+            onChange={(e) => setCustomDomain(e.target.value)}
+          />
+        )}
+      </div>
     </div>
   );
 }
