@@ -91,7 +91,7 @@ const MatchGroupList = () => {
             </div>
 
             <h1 className="text-2xl font-bold text-center mb-4">
-                {category === "screen" ? "스크린 골프" : "필드 골프"}
+                {category === "screen" ? "SCREEN" : "필드 골프"}
             </h1>
 
             {/* 탭 버튼 */}
@@ -104,7 +104,7 @@ const MatchGroupList = () => {
                     }`}
                     onClick={() => setTab("all")}
                 >
-                    전체 그룹
+                    All
                 </button>
                 <button
                     className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
@@ -114,7 +114,7 @@ const MatchGroupList = () => {
                     }`}
                     onClick={() => setTab("my")}
                 >
-                    나의 그룹
+                    My
                 </button>
             </div>
 
