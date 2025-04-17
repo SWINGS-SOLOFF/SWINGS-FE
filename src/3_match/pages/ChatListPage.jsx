@@ -108,9 +108,9 @@ const ChatListPage = () => {
             {/* 좋아요 전체 보기 버튼 */}
             <button
                 onClick={() => navigate(`/swings/chat/likes/${currentUser?.username}`)}
-                className="fixed bottom-24 right-6 px-5 py-3 rounded-full bg-pink-500 text-white text-sm font-bold shadow-xl hover:bg-pink-600 transition-all z-50"
+                className="fixed bottom-24 right-6 px-6 py-5 rounded-full bg-custom-pink text-white text-sm font-bold shadow-xl hover:bg-pink-600 transition-all z-50"
             >
-                💖 좋아요 보기
+                ❤️
             </button>
         </div>
     );
