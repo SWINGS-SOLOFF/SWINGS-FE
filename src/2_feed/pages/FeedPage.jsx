@@ -108,11 +108,20 @@ const FeedPage = () => {
 
     setLoading(true);
     try {
+      const prevPostsLength = posts.length;
+
       await loadFeeds(feedOrder[step], currentUser);
+
+      // 🔧 현재 단계에서 불러온 피드가 없다면 다음 단계로 강제로 넘김
+      const isSameLength = posts.length === prevPostsLength;
+      if (isSameLength && step < feedOrder.length - 1) {
+        setStep((prev) => prev + 1);
+        await loadFeeds(feedOrder[step + 1], currentUser);
+      }
     } catch (err) {
       console.error("피드 로딩 실패:", err);
     } finally {
-      setStep((prev) => prev + 1);
+      setStep((prev) => prev + 1); // 이건 무조건 마지막에 올려야 중복 로딩 방지됨
       setLoading(false);
     }
   };
@@ -175,7 +184,10 @@ const FeedPage = () => {
 
   return (
     <div className="bg-white min-h-screen pt-4 sm:pt-8 md:pt-12">
-      <CreatePostButton onClick={togglePostForm} customPosition="right-20" />
+      <CreatePostButton
+        onClick={togglePostForm}
+        customPosition="bottom-24 right-6"
+      />
 
       {isRefreshing && (
         <div className="text-center py-3 text-sm text-blue-500 animate-pulse">
@@ -191,7 +203,7 @@ const FeedPage = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 30 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center"
+            className="fixed inset-0 z-50 bg-transparent flex items-center justify-center"
           >
             <div ref={formRef} className="w-[90vw] max-w-md px-4">
               <NewPostForm
