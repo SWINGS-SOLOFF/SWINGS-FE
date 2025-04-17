@@ -83,7 +83,7 @@ export default function SignupContainer() {
   const CurrentStep = steps[step];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-white to-blue-100 flex flex-col justify-center items-center px-4">
+    <div className="min-h-screen bg-white flex flex-col justify-center items-center px-4">
       <button
         className="absolute top-4 left-4 text-sm text-gray-400 hover:text-gray-600"
         onClick={() => navigate("/swings")}
@@ -130,7 +130,7 @@ export default function SignupContainer() {
             {step < steps.length - 1 ? (
               <button
                 onClick={nextStep}
-                className="ml-auto px-6 py-2 bg-pink-500 text-white rounded font-semibold"
+                className="ml-auto px-6 py-2 bg-custom-pink text-white rounded font-bold"
               >
                 다음
               </button>
@@ -138,9 +138,9 @@ export default function SignupContainer() {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="ml-auto px-6 py-2 bg-purple-600 text-white rounded font-semibold disabled:opacity-50"
+                className="ml-auto px-6 py-2 bg-custom-pink text-white rounded font-bold disabled:opacity-50"
               >
-                {loading ? "처리 중..." : "회원가입 완료"}
+                {loading ? "처리 중..." : "회원가입"}
               </button>
             )}
           </div>
@@ -165,7 +165,7 @@ export default function SignupContainer() {
             {/* ✅ 확인 버튼 */}
             <button
               onClick={closeModalAndNavigate}
-              className="bg-pink-500 hover:bg-pink-600 transition text-white px-5 py-2 rounded-full font-semibold shadow-sm"
+              className="bg-custom-pink hover:bg-pink-600 transition text-white px-5 py-2 rounded-full font-bold shadow-sm"
             >
               확인
             </button>

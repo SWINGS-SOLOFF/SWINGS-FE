@@ -135,7 +135,7 @@ export default function MyPage() {
             <Coins size={18} className="text-yellow-500" />
             <span className="text-sm font-bold">보유 하트</span>
           </div>
-          <div className="text-lg font-bold text-custom-pink">
+          <div className="text-lg font-bold text-black">
             {point.toLocaleString()}
           </div>
         </div>
