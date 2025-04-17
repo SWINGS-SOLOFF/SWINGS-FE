@@ -95,10 +95,12 @@ export default function UpdateForm() {
     open: false,
     success: true,
     message: "",
+    logout: false,
   });
   const [loading, setLoading] = useState(true);
   const [usernameChecked, setUsernameChecked] = useState(true);
   const [usernameMsg, setUsernameMsg] = useState("");
+  const [logoutPending, setLogoutPending] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -122,6 +124,14 @@ export default function UpdateForm() {
     };
     loadUser();
   }, []);
+
+  // ✅ 로그아웃 후 강제 이동 (토큰 제거 + 새로고침 포함)
+  useEffect(() => {
+    if (logoutPending) {
+      removeToken();
+      window.location.href = "/swings";
+    }
+  }, [logoutPending]);
 
   const handleUsernameCheck = async () => {
     if (!formData?.username) return;
@@ -182,14 +192,18 @@ export default function UpdateForm() {
     try {
       await updateUserInfo(originalData.username, updatedFields);
       if (updatedFields.username) {
-        alert("아이디가 변경되어 다시 로그인해야 합니다.");
-        removeToken();
-        navigate("/swings");
+        setModal({
+          open: true,
+          success: true,
+          message: "아이디가 변경되어 다시 로그인해야 합니다.",
+          logout: true,
+        });
       } else {
         setModal({
           open: true,
           success: true,
-          message: "✅ 회원정보가 성공적으로 수정되었습니다!",
+          message: "회원정보가 성공적으로 수정되었습니다!",
+          logout: false,
         });
         setOriginalData({ ...formData });
       }
@@ -197,7 +211,8 @@ export default function UpdateForm() {
       setModal({
         open: true,
         success: false,
-        message: "❌ 수정 중 오류가 발생했습니다.",
+        message: "수정 중 오류가 발생했습니다.",
+        logout: false,
       });
     }
   };
@@ -213,8 +228,8 @@ export default function UpdateForm() {
   return (
     <div className="relative min-h-screen bg-white flex flex-col items-center justify-center px-4">
       <br />
-      <h2 className="text-xl font-bold text-gray-800 mb-6">회원정보 수정</h2>
       <div className="w-full max-w-sm space-y-6">
+        {/* 아이디 필드 */}
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1">
             아이디
@@ -232,7 +247,7 @@ export default function UpdateForm() {
             />
             <button
               onClick={handleUsernameCheck}
-              className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded-lg text-sm"
+              className="bg-custom-pink font-bold text-white px-3 py-1 rounded-2xl text-sm"
             >
               중복 확인
             </button>
@@ -248,6 +263,7 @@ export default function UpdateForm() {
           )}
         </div>
 
+        {/* 필드들 */}
         <InputField
           label="이메일"
           value={formData.email}
@@ -320,24 +336,26 @@ export default function UpdateForm() {
         <div className="flex gap-2">
           <button
             onClick={() => navigate("/swings/mypage")}
-            className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 rounded-lg mt-2"
+            className="flex-1 bg-gray-200 text-gray-800 font-bold py-2 rounded-xl mt-2"
           >
             취소
           </button>
           <button
             onClick={handleUpdate}
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg mt-2"
+            className="flex-1 bg-custom-pink font-bold text-white py-2 rounded-xl mt-2"
           >
             수정 완료
           </button>
         </div>
-          <br />
+        <br />
       </div>
 
       <ResultModal
         modal={modal}
         onClose={() => {
-          if (modal.success) {
+          if (modal.success && modal.logout) {
+            setLogoutPending(true); // ✅ logout 플래그를 통해 useEffect에서 로그아웃 처리
+          } else if (modal.success) {
             navigate("/swings/mypage");
           } else {
             setModal({ ...modal, open: false });
@@ -391,10 +409,7 @@ function LabeledSelect({ label, options, value, onChange }) {
 function ResultModal({ modal, onClose }) {
   return (
     <Dialog open={modal.open} onClose={onClose} className="relative z-50">
-      <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
       <div className="fixed inset-0 flex items-center justify-center px-4">
         <Dialog.Panel className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center space-y-4">
           <Dialog.Title
@@ -402,14 +417,14 @@ function ResultModal({ modal, onClose }) {
               modal.success ? "text-green-600" : "text-red-500"
             }`}
           >
-            {modal.success ? "✅ 성공" : "❌ 실패"}
+            {modal.success ? " " : "❌ 실패"}
           </Dialog.Title>
-          <p className="text-gray-700 text-sm whitespace-pre-line">
+          <p className="text-gray-700 text-sm whitespace-pre-line font-bold">
             {modal.message}
           </p>
           <button
             onClick={onClose}
-            className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+            className="bg-custom-pink text-white px-4 py-2 rounded-xl font-bold"
           >
             확인
           </button>

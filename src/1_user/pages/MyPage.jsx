@@ -22,7 +22,9 @@ import {
 import IntroduceEditor from "../components/IntroduceEditor";
 import ProfileImageUploader from "../components/ProfileImageUploader";
 import PasswordChangeForm from "../components/PasswordChangeForm";
+import DeleteUserModal from "../components/DeleteUserModal"; // ✅ 회원탈퇴 모달 컴포넌트
 import { toast } from "react-toastify";
+import { IoIosArrowBack } from "react-icons/io";
 
 export default function MyPage() {
   const navigate = useNavigate();
@@ -34,6 +36,7 @@ export default function MyPage() {
   const [imageFile, setImageFile] = useState(null);
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // ✅ 회원탈퇴 모달
 
   useEffect(() => {
     const loadUser = async () => {
@@ -65,17 +68,17 @@ export default function MyPage() {
   }
 
   return (
-    <div className="bg-gradient-to-b from-white to-[#f9f9fb] px-4 py-8 min-h-screen font-sans relative">
+    <div className="bg-white px-4 py-8 min-h-screen relative">
       <button
         onClick={() => navigate("/swings/social")}
-        className="absolute top-4 left-4 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition z-10"
+        className="absolute top-4 left-4 p-2 rounded-full bg-white transition z-10"
         aria-label="뒤로가기"
       >
-        <ArrowLeft size={20} className="text-gray-600" />
+        <IoIosArrowBack size={20} className="text-gray-600" />
       </button>
 
       {/* 프로필 영역 */}
-      <div className="flex flex-col items-center text-center mb-8">
+      <div className="flex flex-col items-center text-center mb-8 font-bold">
         <div
           className="relative w-24 h-24 cursor-pointer group"
           onClick={() => setShowImageModal(true)}
@@ -104,7 +107,9 @@ export default function MyPage() {
       {/* 자기소개 수정 */}
       {formData && (
         <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-6 shadow-sm">
-          <div className="text-sm text-gray-500 mb-2">프로필 메시지</div>
+          <div className="text-sm text-gray-500 mb-2 font-bold">
+            프로필 메시지
+          </div>
           <IntroduceEditor
             initialText={formData.introduce || ""}
             onSave={async (newText) => {
@@ -120,7 +125,7 @@ export default function MyPage() {
         </div>
       )}
 
-      {/* ✅ 보유 코인 (버튼처럼 작동) */}
+      {/* 보유 코인 */}
       <div
         className="cursor-pointer backdrop-blur-sm bg-white/80 border border-gray-200 rounded-2xl p-4 mb-6 shadow-sm transition hover:shadow-md"
         onClick={() => navigate("/swings/points")}
@@ -128,16 +133,16 @@ export default function MyPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-gray-600">
             <Coins size={18} className="text-yellow-500" />
-            <span className="text-sm">보유 코인</span>
+            <span className="text-sm font-bold">보유 하트</span>
           </div>
-          <div className="text-lg font-bold text-gray-900">
-            {point.toLocaleString()}P
+          <div className="text-lg font-bold text-custom-pink">
+            {point.toLocaleString()}
           </div>
         </div>
       </div>
 
       {/* 설정 액션들 */}
-      <div className="space-y-3">
+      <div className="space-y-3 ">
         <LineAction
           icon={<Settings size={18} />}
           text="회원정보 수정"
@@ -152,7 +157,7 @@ export default function MyPage() {
           icon={<Trash2 size={18} />}
           text="회원 탈퇴"
           textColor="text-red-500"
-          onClick={() => navigate("/swings/mypage/userdelete")}
+          onClick={() => setShowDeleteModal(true)} // ✅ 모달 열기
         />
       </div>
 
@@ -196,6 +201,11 @@ export default function MyPage() {
           </div>
         </div>
       )}
+
+      {/* 회원 탈퇴 모달 */}
+      {showDeleteModal && (
+        <DeleteUserModal onClose={() => setShowDeleteModal(false)} />
+      )}
     </div>
   );
 }
@@ -204,9 +214,9 @@ function LineAction({ icon, text, onClick, textColor = "text-gray-700" }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-xl bg-white hover:bg-gray-50 transition ${textColor}`}
+      className={`w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-xl bg-white hover:bg-gray-50 transition ${textColor} outline-none focus:outline-none`}
     >
-      <div className="flex items-center gap-3 text-sm font-medium">
+      <div className="flex items-center gap-3 text-sm">
         {icon} {text}
       </div>
       <span className="text-gray-300">›</span>

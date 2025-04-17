@@ -33,7 +33,7 @@ export default function LoginLoadingScreen() {
   const current = messages[index];
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-pink-100 via-white to-blue-100 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-gradient-to-br from-pink-200 via-white to-blue-100 z-50 flex items-center justify-center">
       <AnimatePresence mode="wait">
         <motion.div
           key={current.key}
