@@ -74,8 +74,8 @@ const MatchGroupCreate = () => {
     };
 
     return (
-        <div className="min-h-screen px-4 py-8 bg-gray-100">
-            <div className="bg-white max-w-xl mx-auto rounded-xl shadow-lg p-6 space-y-6">
+        <div className="min-h-screen px-4 py-8">
+            <div className="bg-white max-w-xl mx-auto rounded-xl p-6 space-y-6">
                 <h2 className="text-xl font-bold text-center text-black-700">그룹 만들기</h2>
                 {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
@@ -109,12 +109,12 @@ const MatchGroupCreate = () => {
                             value={groupData.location}
                             placeholder="골프장 주소"
                             readOnly
-                            className="w-full p-3 border rounded-xl bg-gray-50"
+                            className="w-full p-2 border rounded-xl bg-gray-50"
                         />
                         <button
                             type="button"
                             onClick={handleAddressSearch}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700"
+                            className="w-full bg-custom-pink text-white font-bold py-2 px-4 rounded-xl hover:bg-pink-400 transition"
                         >
                             주소 검색
                         </button>
@@ -177,7 +177,7 @@ const MatchGroupCreate = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 bg-black text-white rounded-xl font-semibold hover:bg-green-800 transition"
+                        className="w-full bg-custom-pink text-white font-bold py-3 px-4 rounded-xl hover:bg-pink-400 transition"
                     >
                         {loading ? "생성 중..." : "그룹 만들기"}
                     </button>

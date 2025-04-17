@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getParticipantsByGroupId } from "../api/matchParticipantApi";
 import { getCurrentUser, getMatchGroupById } from "../api/matchGroupApi";
-import { Venus, Mars, Crown } from "lucide-react";
+import { Venus, Mars, Crown, LogOut } from "lucide-react";
 import { getProfileImageUrl } from "../../1_user/api/userApi";
+import ParticipantDetailModal from "../components/ParticipantDetailModal";
 
 export default function MatchGroup() {
     const { matchGroupId } = useParams();
@@ -12,6 +13,10 @@ export default function MatchGroup() {
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [group, setGroup] = useState(null);
     const [showSidebar, setShowSidebar] = useState(false);
+
+    const [selectedParticipant, setSelectedParticipant] = useState(null);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -46,7 +51,7 @@ export default function MatchGroup() {
     }
 
     const renderGenderIcon = (gender) => {
-        return gender === "MALE" ? (
+        return gender?.toLowerCase() === "male" ? (
             <Mars className="w-4 h-4 text-blue-500" />
         ) : (
             <Venus className="w-4 h-4 text-pink-500" />
@@ -54,24 +59,36 @@ export default function MatchGroup() {
     };
 
     const openUserDetail = (participant) => {
-        alert(`${participant.name}님의 상세 정보 모달 (추후 구현)`);
+        setSelectedParticipant(participant);
+        setShowDetailModal(true);
+    };
+
+    const handleLeaveGroup = async () => {
+        try {
+            alert("그룹에서 나갔습니다.");
+            setShowLeaveConfirm(false);
+            window.location.href = "/swings/matchgroup";
+        } catch (error) {
+            console.error("그룹 나가기 실패:", error);
+            alert("나가기 실패");
+        }
     };
 
     return (
         <div className="relative min-h-[100dvh] flex flex-col bg-[#f9fafb]">
-            {/* 토글 버튼 */}
+            {/* 참가자 토글 버튼 */}
             <button
                 onClick={() => setShowSidebar(!showSidebar)}
                 className="absolute top-4 right-4 bg-gray-200 text-black text-xs px-3 py-1 rounded-lg shadow-sm hover:bg-gray-200 transition"
             >
-                {showSidebar ? "☰" : "☰"}
+                ☰
             </button>
 
             {/* 참가자 사이드바 */}
             <div className={`fixed top-0 left-0 h-full w-64 bg-white p-4 shadow-md z-40 transition-transform duration-300 ease-in-out
         ${showSidebar ? "translate-x-0" : "-translate-x-full"}`}>
                 <h2 className="text-lg font-bold mb-4 text-center">참가자 목록</h2>
-                <ul className="space-y-3 overflow-y-auto h-[90%]">
+                <ul className="space-y-3 overflow-y-auto max-h-[calc(100vh-120px)] pb-24">
                     {participants.map((p) => (
                         <li
                             key={p.userId}
@@ -90,27 +107,38 @@ export default function MatchGroup() {
                             <div className="text-xs flex gap-1">
                                 {p.userId === p.hostId && (
                                     <span className="text-yellow-600 font-medium flex items-center gap-1">
-                    <Crown className="w-3 h-3" /> 방장
-                  </span>
+                                        <Crown className="w-3 h-3" /> 방장
+                                    </span>
                                 )}
                                 {p.userId === currentUser?.userId && (
-                                    <span className="text-blue-500 font-medium">나</span>
+                                    <span className="text-blue-500 font-medium">
+                                        나
+                                    </span>
                                 )}
                             </div>
                         </li>
                     ))}
                 </ul>
+
+                {/* 그룹 나가기 버튼 */}
+                <div className="mt-6 pt-4 border-t">
+                    <button
+                        onClick={() => setShowLeaveConfirm(true)}
+                        className="w-full text-sm text-red-500 border border-red-300 px-4 py-2 rounded hover:bg-red-50 flex items-center justify-center gap-2"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        그룹 나가기
+                    </button>
+                </div>
             </div>
 
             {/* 본문: 미리보기 → 그룹 정보 → 채팅 */}
             <div className="flex-1 flex flex-col p-4 gap-4 mt-12">
-                {/* 미리보기 대체 콘텐츠 */}
                 <div className="w-full h-48 bg-white border rounded-lg shadow-inner flex items-center justify-center text-gray-400 text-sm">
                     그룹 미리보기 콘텐츠 준비 중...
                 </div>
 
-                {/* 그룹 정보 (위치 클릭 가능) */}
-                <div className="bg-white p-4 rounded-lg shadow-md text-sm grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="bg-white p-4 rounded-lg shadow-md text-sm grid grid-cols-1 md:grid-cols-2 gap-2 relative">
                     <p><strong>⛳ 그룹명:</strong> {group?.groupName}</p>
                     <p><strong>📅 일정:</strong> {group?.schedule}</p>
                     <p><strong>🎯 연령대:</strong> {group?.ageRange}</p>
@@ -129,7 +157,6 @@ export default function MatchGroup() {
                     </p>
                 </div>
 
-                {/* 💬 채팅 공간 */}
                 <div className="flex-1 flex flex-col bg-white p-4 rounded-lg shadow-inner">
                     <h2 className="text-lg font-bold mb-2 text-gray-800">💬 게임 대기 채팅</h2>
                     <div className="flex-1 overflow-y-auto p-2 text-sm text-gray-600">
@@ -150,6 +177,39 @@ export default function MatchGroup() {
                     </form>
                 </div>
             </div>
+
+            {/* 참가자 상세 정보 모달 */}
+            {showDetailModal && (
+                <ParticipantDetailModal
+                    isOpen={showDetailModal}
+                    participant={selectedParticipant}
+                    onClose={() => setShowDetailModal(false)}
+                />
+            )}
+
+            {/* 그룹 나가기 확인 모달 (JSX 직접 삽입) */}
+            {showLeaveConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center">
+                        <h3 className="text-lg font-semibold mb-4">정말 이 그룹을 나가시겠어요?</h3>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={handleLeaveGroup}
+                                className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600 text-sm"
+                            >
+                                나가기
+                            </button>
+                            <button
+                                onClick={() => setShowLeaveConfirm(false)}
+                                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-sm"
+                            >
+                                취소
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
