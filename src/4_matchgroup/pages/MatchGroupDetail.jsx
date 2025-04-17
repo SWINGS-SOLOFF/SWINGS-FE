@@ -1,16 +1,24 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { CalendarIcon, MapPinIcon, UsersIcon, Venus, Mars } from "lucide-react";
+import { useParams } from "react-router-dom";
+import {
+    MapPinIcon,
+    CalendarIcon,
+    UsersIcon,
+    Venus,
+    Mars,
+} from "lucide-react";
 import { getCurrentUser, getMatchGroupById } from "../api/matchGroupApi";
-import { getParticipantsByGroupId } from "../api/matchParticipantApi";
+import {
+    getAcceptedParticipants,
+    getPendingParticipants,
+} from "../api/matchParticipantApi";
 import PendingParticipantModal from "../components/PendingParticipantModal";
 import useMatchGroupActions from "../hooks/useMatchGroupActions";
 import useMatchStatus from "../hooks/useMatchStatus";
-import JoinConfirmModal from "../components/JoinConfirmModal.jsx";
+import JoinConfirmModal from "../components/JoinConfirmModal";
 
 const MatchGroupDetail = () => {
     const { matchGroupId } = useParams();
-    const navigate = useNavigate();
 
     const [group, setGroup] = useState(null);
     const [participants, setParticipants] = useState([]);
@@ -31,12 +39,13 @@ const MatchGroupDetail = () => {
         try {
             const user = await getCurrentUser();
             const groupData = await getMatchGroupById(matchGroupId);
-            const allParticipants = await getParticipantsByGroupId(matchGroupId);
+            const accepted = await getAcceptedParticipants(matchGroupId);
+            const pending = await getPendingParticipants(matchGroupId);
 
             setCurrentUser(user);
             setGroup(groupData);
-            setParticipants(allParticipants.filter((p) => p.participantStatus === "ACCEPTED"));
-            setPendingParticipants(allParticipants.filter((p) => p.participantStatus === "PENDING"));
+            setParticipants(accepted);
+            setPendingParticipants(pending);
         } catch (error) {
             console.error("데이터 로딩 오류:", error);
         } finally {
@@ -66,46 +75,52 @@ const MatchGroupDetail = () => {
     };
 
     const femaleCount = participants.filter((p) => p.gender === "female").length;
-    const maleCount = participants.filter((p) => p.gender === "").length;
+    const maleCount = participants.filter((p) => p.gender === "male").length;
 
     const genderLimitReached =
-        currentUser?.gender === "male" && maleCount >= group?.maleLimit ||
-        currentUser?.gender === "female" && femaleCount >= group?.femaleLimit;
+        (currentUser?.gender === "female" && femaleCount >= group?.femaleLimit) ||
+        (currentUser?.gender === "male" && maleCount >= group?.maleLimit);
 
-    if (loading) return <p className="text-center">⏳ 로딩 중...</p>;
+    if (loading) return <p className="text-center">⏳ 그룹 정보를 불러오는 중...</p>;
     if (!group) return <p className="text-center text-red-500">❌ 그룹 정보를 불러올 수 없습니다.</p>;
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
             <h1 className="text-2xl font-bold mb-2">{group.groupName}</h1>
-            <p className="text-gray-600 mb-2">{group.description}</p>
-            <p className="text-gray-500"> 장소: {group.location}</p>
-            <p className="text-gray-500">
-                일정: {new Date(group.schedule).toLocaleString()}
-            </p>
-            <p className="text-gray-500">
-                모집 현황: {participants.length}/{group.maxParticipants}명
-            </p>
-            <p className="text-gray-500 flex items-center gap-4">
-                <span className="flex items-center gap-1">
-                    <Venus className="w-4 h-4 text-pink-500" />
-                    여자 {femaleCount}/{group.femaleLimit}
-                </span>
-                <span className="flex items-center gap-1">
-                    <Mars className="w-4 h-4 text-blue-500" />
-                    남자 {maleCount}/{group.maleLimit}
-                </span>
-            </p>
-            <p className="text-sm font-semibold text-gray-500">
-                상태:{" "}
-                <span
-                    className={`inline-block px-2 py-0.5 rounded-full text-white text-xs ${
+            <p className="text-gray-600 mb-3">{group.description}</p>
+
+            <div className="space-y-1 mb-4 text-sm text-gray-700">
+                <div className="flex items-center gap-2">
+                    <MapPinIcon className="w-4 h-4 text-pink-500" />
+                    <span>{group.location}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <CalendarIcon className="w-4 h-4 text-orange-500" />
+                    <span>{new Date(group.schedule).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <UsersIcon className="w-4 h-4 text-purple-500" />
+                    <span>{participants.length}/{group.maxParticipants}명 모집 중</span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
+                        <Venus className="w-4 h-4 text-pink-500" />
+                        <span>여자 {femaleCount}/{group.femaleLimit}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Mars className="w-4 h-4 text-blue-500" />
+                        <span>남자 {maleCount}/{group.maleLimit}</span>
+                    </div>
+                </div>
+                <div>
+                    <span className="font-semibold">상태:</span>{" "}
+                    <span className={`inline-block px-2 py-0.5 rounded-full text-white text-xs ${
                         group.status === "모집중" ? "bg-green-500" : "bg-gray-500"
-                    }`}
-                >
-                    {group.status}
-                </span>
-            </p>
+                    }`}>
+            {group.status}
+          </span>
+                </div>
+            </div>
 
             {!isParticipant ? (
                 <button
@@ -117,11 +132,7 @@ const MatchGroupDetail = () => {
                     }`}
                     disabled={isFull || genderLimitReached}
                 >
-                    {isFull
-                        ? "모집 완료됨"
-                        : genderLimitReached
-                            ? "성비 제한으로 신청 불가"
-                            : "참가 신청"}
+                    {isFull ? "모집 완료됨" : genderLimitReached ? "성비 제한으로 신청 불가" : "참가 신청"}
                 </button>
             ) : (
                 <button
@@ -158,24 +169,21 @@ const MatchGroupDetail = () => {
             )}
 
             <div className="mt-6">
-                <h2 className="text-lg font-semibold">참가자 목록</h2>
+                <h2 className="text-lg font-semibold mb-1">참가자 목록</h2>
                 {participants.length === 0 ? (
                     <p className="text-gray-500">아직 참가자가 없습니다.</p>
                 ) : (
-                    <ul className="mt-2 space-y-2">
+                    <ul className="space-y-2 mt-2">
                         {participants.map((participant) => (
-                            <li
-                                key={participant.userId}
-                                className="flex justify-between items-center bg-gray-100 p-2 rounded"
-                            >
-                                <span>
-                                    {participant.username}
-                                    {participant.userId === group.hostId && (
-                                        <span className="ml-2 text-xs px-2 py-0.5 bg-yellow-400 text-white rounded-full">
-                                            ⭐ 방장
-                                        </span>
-                                    )}
-                                </span>
+                            <li key={participant.userId} className="flex justify-between items-center bg-gray-100 p-2 rounded">
+                <span>
+                  {participant.username}
+                    {participant.userId === group.hostId && (
+                        <span className="ml-2 text-xs px-2 py-0.5 bg-yellow-400 text-white rounded-full">
+                      ⭐ 방장
+                    </span>
+                    )}
+                </span>
                                 {isHost && participant.userId !== currentUser?.userId && (
                                     <button
                                         onClick={() =>

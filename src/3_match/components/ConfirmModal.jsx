@@ -40,7 +40,7 @@ function ConfirmModal({
                         onClick={handleConfirm}
                         disabled={submitting}
                         className={`px-4 py-2 rounded-full font-semibold ${
-                            submitting ? "bg-pink-300 cursor-not-allowed" : "bg-pink-500 hover:bg-pink-600"
+                            submitting ? "bg-custom-pink cursor-not-allowed" : "bg-custom-pink"
                         } text-white`}
                     >
                         {confirmLabel}
