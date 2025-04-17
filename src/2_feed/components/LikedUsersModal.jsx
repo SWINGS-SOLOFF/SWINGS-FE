@@ -29,48 +29,45 @@ const LikedUsersModal = ({ users, onClose }) => {
   }, [users]);
 
   const modalContent = (
-    <div className="liked-users-modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+    <div className="liked-users-modal fixed inset-0 bg-transparent z-[9999] flex items-center justify-center p-4">
       <motion.div
         ref={modalRef}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 500 }}
-        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-hidden"
+        className="bg-white rounded-3xl shadow-xl max-w-sm w-full max-h-[75vh] overflow-hidden border-2 border-pink-200"
       >
         {/* 헤더 */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-700">
-          <h2 className="text-xl font-bold flex items-center text-gray-800 dark:text-white">
-            <FaHeart className="text-pink-500 mr-3" />
+        <div className="flex items-center justify-between p-4 border-b border-pink-100">
+          <h2 className="text-lg font-bold flex items-center text-pink-600">
+            <FaHeart className="text-pink-500 mr-2" />
             좋아요
-            <span className="ml-2 text-sm bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full">
-              {users.length}
-            </span>
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            className="text-gray-400 hover:text-pink-600 p-1 rounded-full hover:bg-pink-50 transition"
           >
             <FaTimes />
           </button>
         </div>
 
         {/* 유저 목록 */}
-        <div className="overflow-y-auto max-h-[calc(85vh-80px)] py-3 px-4 custom-scrollbar">
+        <div className="overflow-y-auto max-h-[calc(75vh-70px)] py-2 px-3 custom-scrollbar">
           {users.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-16 h-16 rounded-full bg-pink-50 dark:bg-gray-700 flex items-center justify-center mb-4">
-                <FaHeart className="text-pink-300 text-2xl" />
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="w-14 h-14 rounded-full bg-pink-50 flex items-center justify-center mb-3">
+                <FaHeart className="text-pink-400 text-xl" />
               </div>
-              <p className="text-gray-500 dark:text-gray-400 font-medium">
+              <p className="text-pink-600 font-medium">
                 아직 좋아요를 누른 사용자가 없습니다
               </p>
-              <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
+              <p className="text-pink-300 text-sm mt-1">
                 게시물에 첫 좋아요를 기다리고 있어요
               </p>
             </div>
           ) : (
-            <ul className="grid grid-cols-2 gap-2">
+            <ul className="grid grid-cols-1 gap-1">
               {users.map((user) => {
                 console.log("🧪 유저 이미지 확인:", {
                   userId: user.userId,
@@ -83,10 +80,10 @@ const LikedUsersModal = ({ users, onClose }) => {
                   <li
                     key={user.userId}
                     onClick={() => handleUserClick(user.userId)}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition rounded-xl cursor-pointer group"
+                    className="hover:bg-pink-50 transition rounded-xl cursor-pointer group"
                   >
                     <div className="flex items-center p-2">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-100 to-pink-100 dark:from-blue-900 dark:to-pink-900 flex items-center justify-center mr-3 overflow-hidden border-2 border-white dark:border-gray-700 shadow-sm group-hover:border-pink-200 dark:group-hover:border-pink-800 transition-all">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-100 to-pink-200 flex items-center justify-center mr-3 overflow-hidden border-2 border-white shadow-sm group-hover:border-pink-300 transition-all">
                         {user.avatarUrl ||
                         user.userProfilePic ||
                         user.userImg ? (
@@ -104,11 +101,11 @@ const LikedUsersModal = ({ users, onClose }) => {
                             }}
                           />
                         ) : (
-                          <FaUser className="text-gray-500 dark:text-gray-400" />
+                          <FaUser className="text-pink-300" />
                         )}
                       </div>
                       <div className="overflow-hidden">
-                        <h3 className="font-medium text-gray-800 dark:text-white text-sm truncate">
+                        <h3 className="font-medium text-gray-800 text-sm truncate">
                           {user.username}
                         </h3>
                       </div>

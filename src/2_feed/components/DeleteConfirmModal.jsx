@@ -6,7 +6,7 @@ const DeleteConfirmModal = ({ visible, onCancel, onConfirm }) => {
   if (!visible) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-transparent">
       <div className="bg-white rounded-xl shadow-xl p-6 max-w-xs w-full text-center space-y-4 mx-4">
         <h3 className="text-xl font-bold text-gray-900">게시물 삭제</h3>
         <p className="text-gray-600">

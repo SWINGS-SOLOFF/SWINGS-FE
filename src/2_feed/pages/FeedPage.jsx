@@ -184,7 +184,10 @@ const FeedPage = () => {
 
   return (
     <div className="bg-white min-h-screen pt-4 sm:pt-8 md:pt-12">
-      <CreatePostButton onClick={togglePostForm} customPosition="right-20" />
+      <CreatePostButton
+        onClick={togglePostForm}
+        customPosition="bottom-24 right-6"
+      />
 
       {isRefreshing && (
         <div className="text-center py-3 text-sm text-blue-500 animate-pulse">
@@ -200,7 +203,7 @@ const FeedPage = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 30 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center"
+            className="fixed inset-0 z-50 bg-transparent flex items-center justify-center"
           >
             <div ref={formRef} className="w-[90vw] max-w-md px-4">
               <NewPostForm
