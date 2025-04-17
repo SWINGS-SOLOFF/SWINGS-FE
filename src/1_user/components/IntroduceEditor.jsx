@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchUserData, updateUserInfo } from "../api/userApi"; // 경로에 맞게 조정
+import { fetchUserData, updateUserInfo } from "../api/userApi";
 import { toast } from "react-toastify";
 
 export default function IntroduceEditor() {
@@ -50,13 +50,15 @@ export default function IntroduceEditor() {
       <div className="flex justify-end mt-2 gap-2">
         <button
           onClick={() => setEditing(false)}
-          className="bg-gray-200 px-3 py-1 text-sm rounded-full"
+          className="bg-gray-200 px-3 py-1 text-sm rounded-full border-none outline-none focus:outline-none
+"
         >
           취소
         </button>
         <button
           onClick={handleSave}
-          className="bg-black text-white px-3 py-1 text-sm rounded-full"
+          className="bg-custom-pink text-white px-3 py-1 text-sm rounded-full border-none outline-none focus:outline-none
+"
         >
           저장
         </button>
@@ -68,15 +70,16 @@ export default function IntroduceEditor() {
         {text || "아직 자기소개가 없습니다."}
       </p>
       <div className="absolute top-0 right-0 flex gap-2">
-        {/* 수정 버튼 */}
         <button
           onClick={() => setEditing(true)}
-          className="text-sm text-black border border-black rounded-md px-2 py-1 hover:bg-gray-100 transition"
+          className="text-sm text-black border border-black rounded-md px-2 py-1 transition outline-none focus:outline-none
+"
           title="자기소개 수정"
         >
           수정
         </button>
       </div>
+      <br />
     </div>
   );
 }

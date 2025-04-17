@@ -9,6 +9,7 @@ import SwipeCard from "../components/SwipeCard";
 import ConfirmModal from "../components/ConfirmModal";
 import SwipeModals from "../components/SwipeModals";
 import { useSwipeData } from "../hooks/useSwipeData";
+import { IoIosArrowBack } from "react-icons/io";
 
 function SwipePage() {
     const {
@@ -109,7 +110,7 @@ function SwipePage() {
             const status = error.response?.status;
 
             // ✅ 메시지 기준으로 포인트 부족 판단
-            if (status === 400 || msg.includes("포인트가 부족")) {
+            if (status === 400 || msg.includes("하트가 부족")) {
                 setShowChargeModal(true);
             } else {
                 toast.error("슈퍼챗 도중 오류 발생");
@@ -140,12 +141,13 @@ function SwipePage() {
                         className="text-gray-700 hover:text-blue-600 p-2"
                         aria-label="뒤로가기"
                     >
-                        <ArrowLeft size={28} />
+                        <IoIosArrowBack size={28} />
                     </button>
                 </div>
 
-                <h2 className="text-xl font-bold text-gray-800 animate-bounce mb-2 text-center">💘 오늘의 골프 메이트 추천!</h2>
-                <p className="text-sm text-gray-700 mb-4">남은 무료 좋아요: {remainingLikes}회</p>
+                <h2 className="text-3xl font-bold text-gray-800 animate-bounce mb-2 text-center">💘 나랑 골프 치러 갈래?</h2>
+
+                <p className="text-sm font-bold text-gray-700 mb-4">남은 무료 좋아요: {remainingLikes}회</p>
                 {remainingLikes === 0 && (
                     <p className="text-xs text-red-600 font-medium animate-pulse mb-3">
                         ⏳ 좋아요 기회 충전까지 {remainingTime}
@@ -181,18 +183,13 @@ function SwipePage() {
                         )}
                     </AnimatePresence>
                 </div>
-
-                <br/>
-                <br/>
-                <br/>
-                <br/>
                 <br/>
 
-                <div className="flex gap-4 flex-wrap justify-center">
+                <div className="flex flex-row gap-x-6 justify-center items-center mt-4">
                     <button
                         onClick={handleLike}
                         disabled={!profile}
-                        className={`${profile ? "bg-pink-500 hover:bg-pink-600" : "bg-gray-300 cursor-not-allowed"} text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2`}
+                        className={`${profile ? "bg-custom-pink" : "bg-gray-300 cursor-not-allowed"} text-white px-6 py-3 font-bold rounded-2xl outline-none focus:outline-none shadow-lg flex items-center gap-2`}
                     >
                         <FaThumbsUp />
                         매력있어요!
@@ -201,7 +198,7 @@ function SwipePage() {
                     <button
                         onClick={() => setShowSuperChatModal(true)}
                         disabled={!profile}
-                        className={`${profile ? "bg-yellow-400 hover:bg-yellow-500" : "bg-gray-300 cursor-not-allowed"} text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2 font-semibold`}
+                        className={`${profile ? "bg-custom-purple" : "bg-gray-300 cursor-not-allowed"} text-white px-6 py-3 rounded-2xl shadow-lg outline-none focus:outline-none flex items-center gap-2 font-bold`}
                     >
                         슈퍼챗 💎
                     </button>

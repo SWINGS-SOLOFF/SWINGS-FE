@@ -3,14 +3,13 @@ import { Routes, Route } from "react-router-dom";
 import MyPage from "../pages/MyPage";
 import UpdateForm from "../components/UpdateForm";
 import PasswordChangeForm from "../components/PasswordChangeForm";
-import DeleteUser from "../components/DeleteUser";
 import PrivateRoute from "../components/PrivateRoute";
 import MyPointPage from "../pages/MyPointPage";
 import PointCharge from "../pages/PointCharge";
 import TossSuccess from "../pages/TossSuccess";
 import TossFail from "../pages/TossFail";
 import TossCheckout from "../pages/TossCheckout";
-
+import DeleteUserModal from "../components/DeleteUserModal";
 import ProfileImage from "../pages/ProfileImage";
 import FeedPage from "../../2_feed/pages/FeedPage";
 
@@ -120,7 +119,7 @@ export default function UserRoutes() {
         path="mypage/userdelete"
         element={
           <PrivateRoute>
-            <DeleteUser />
+            <DeleteUserModal />
           </PrivateRoute>
         }
       />
