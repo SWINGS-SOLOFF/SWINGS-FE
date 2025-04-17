@@ -2,6 +2,14 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      colors: {
+        "custom-pink": "#FF7E9D",
+        "custom-blue": "#87CEEB",
+        "custom-purple-empty": "#D8B4FE",
+        "custom-purple": "#C084FC",
+        "custom-coin": "#A78BFA",
+      },
+
       animation: {
         sakura: "sakuraFall linear infinite",
       },

@@ -4,6 +4,8 @@ import { changePassword, fetchUserData } from "../api/userApi";
 import { validatePasswordMatch } from "../utils/userUtils";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { Dialog } from "@headlessui/react";
+import { removeToken } from "../utils/userUtils";
 
 export default function PasswordChangeForm({ isModal = false, onClose }) {
   const { token } = useAuth();
@@ -11,6 +13,7 @@ export default function PasswordChangeForm({ isModal = false, onClose }) {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // ✅ 모달 상태
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,15 +41,21 @@ export default function PasswordChangeForm({ isModal = false, onClose }) {
 
     try {
       await changePassword(username, newPassword);
-      setMessage("✅ 비밀번호가 성공적으로 변경되었습니다.");
+      setMessage("비밀번호 변경 완료");
       setNewPassword("");
       setConfirmPassword("");
 
-      if (isModal && onClose) onClose(); // ✅ 모달일 경우 자동 닫기
+      // ✅ 모달 열기
+      setShowSuccessModal(true);
     } catch (err) {
       console.error(err);
-      setMessage("❌ 비밀번호 변경 중 오류가 발생했습니다.");
+      setMessage("비밀번호 변경 실패");
     }
+  };
+
+  const handleLogout = () => {
+    removeToken(); // ✅ 로그아웃 처리
+    navigate("/swings"); // ✅ 이동
   };
 
   if (!username) {
@@ -87,7 +96,7 @@ export default function PasswordChangeForm({ isModal = false, onClose }) {
           placeholder="새 비밀번호"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="w-full border border-gray-300 p-2 rounded text-black text-sm"
+          className="w-full border border-gray-300 p-2 rounded text-black text-sm outline-none focus:outline-none"
           required
         />
 
@@ -96,14 +105,14 @@ export default function PasswordChangeForm({ isModal = false, onClose }) {
           placeholder="비밀번호 확인"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full border border-gray-300 p-2 rounded text-black text-sm"
+          className="w-full border border-gray-300 p-2 rounded text-black text-sm outline-none focus:outline-none"
           required
         />
 
         {message && (
           <p
-            className={`text-xs text-center ${
-              message.includes("성공") ? "text-green-600" : "text-red-500"
+            className={`text-xs text-center font-bold ${
+              message.includes("완료") ? "text-green-600" : "text-red-500"
             }`}
           >
             {message}
@@ -112,11 +121,36 @@ export default function PasswordChangeForm({ isModal = false, onClose }) {
 
         <button
           type="submit"
-          className="bg-blue-600 text-white py-2 rounded w-full text-sm hover:bg-blue-700 transition"
+          className="bg-custom-pink text-white py-2 rounded w-full text-sm font-bold transition"
         >
           비밀번호 변경
         </button>
       </form>
+
+      {/* ✅ 비밀번호 변경 성공 시 표시되는 모달 */}
+      <Dialog
+        open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        className="relative z-50"
+      >
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="fixed inset-0 flex items-center justify-center px-4">
+          <Dialog.Panel className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center space-y-4">
+            <Dialog.Title className="text-lg font-bold text-black">
+              비밀번호 변경 완료
+            </Dialog.Title>
+            <p className="text-sm font-bold text-gray-700">
+              다시 로그인해주세요.
+            </p>
+            <button
+              onClick={handleLogout}
+              className="bg-custom-pink text-white px-4 py-2 rounded-xl font-bold shadow-md hover:brightness-110 transition duration-300"
+            >
+              확인
+            </button>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </div>
   );
 }

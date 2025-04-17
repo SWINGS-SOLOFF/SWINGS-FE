@@ -1,25 +1,36 @@
 import { useEffect, useState } from "react";
-import {
-  Coins,
-  DollarSign,
-  Gem,
-  PiggyBank,
-  Wallet,
-  ArrowLeft,
-} from "lucide-react";
+import { Heart } from "lucide-react";
+import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import CoinSelectModal from "../components/CoinSelectModal";
 import { fetchUserData } from "../api/userApi";
 
 // 코인 금액 옵션
 const coinOptions = [
-  { coin: 5, price: 5000, icon: PiggyBank },
-  { coin: 10, price: 10000, icon: Coins },
-  { coin: 33, price: 30000, icon: DollarSign },
-  { coin: 55, price: 50000, icon: Wallet },
-  { coin: 110, price: 100000, icon: Gem },
-  { coin: 330, price: 300000, icon: Gem },
+  { coin: 5, price: 5000 },
+  { coin: 10, price: 10000 },
+  { coin: 33, price: 30000, label: "30 + 10%" },
+  { coin: 55, price: 50000, label: "50 + 10%" },
+  { coin: 110, price: 100000, label: "100 + 10%" },
+  { coin: 330, price: 300000, label: "300 + 10%" },
 ];
+
+// 하트 스타일 맵 (크기 + 색상)
+const getHeartStyle = (coin) => {
+  if (coin === 5)
+    return { size: 24, textColor: "text-gray-300", fillColor: "fill-none" };
+  if (coin === 10)
+    return { size: 28, textColor: "text-pink-200", fillColor: "fill-pink-100" };
+  if (coin === 33)
+    return { size: 32, textColor: "text-pink-300", fillColor: "fill-pink-200" };
+  if (coin === 55)
+    return { size: 36, textColor: "text-pink-400", fillColor: "fill-pink-300" };
+  if (coin === 110)
+    return { size: 40, textColor: "text-pink-500", fillColor: "fill-pink-400" };
+  if (coin === 330)
+    return { size: 44, textColor: "text-pink-600", fillColor: "fill-pink-500" };
+  return { size: 24, textColor: "text-gray-300", fillColor: "fill-none" };
+};
 
 export default function PointCharge() {
   const [user, setUser] = useState(null);
@@ -45,22 +56,23 @@ export default function PointCharge() {
         className="absolute left-4 top-4 text-gray-500 hover:text-black transition-colors"
         onClick={() => navigate("/swings/points")}
       >
-        <ArrowLeft size={24} />
+        <IoIosArrowBack size={24} />
       </button>
 
       <h1 className="text-2xl font-semibold text-[#2E384D] animate-fade-in">
         충전소
       </h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 max-w-lg mx-auto">
-        {coinOptions.map(({ coin, price, icon: Icon }) => {
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4 w-full max-w-md sm:max-w-3xl mx-auto">
+        {coinOptions.map(({ coin, price, label }) => {
           const isEvent = coin >= 30;
+          const { size, textColor, fillColor } = getHeartStyle(coin);
 
           return (
             <button
               key={coin}
               onClick={() => handleCoinClick(coin)}
-              className="group relative border rounded-xl p-6 shadow-md hover:shadow-xl transition-transform duration-300 transform hover:scale-105 hover:-translate-y-1 bg-white"
+              className="group relative flex flex-col justify-between items-center border rounded-xl p-4 min-h-[160px] shadow-md hover:shadow-xl transition-transform duration-300 transform hover:scale-105 hover:-translate-y-1 bg-white"
             >
               {/* 이벤트 뱃지 */}
               {isEvent && (
@@ -70,18 +82,29 @@ export default function PointCharge() {
               )}
 
               {/* 아이콘 */}
-              <div className="flex justify-center text-yellow-500 mb-3">
-                <Icon
-                  size={36}
-                  className="transition-transform duration-300 group-hover:rotate-6"
+              <div className={`flex justify-center ${textColor}`}>
+                <Heart
+                  size={size}
+                  className={`transition-transform duration-300 group-hover:rotate-6 ${textColor} ${fillColor}`}
                 />
               </div>
 
-              {/* 코인 라벨 */}
-              <div className="text-lg font-bold text-black">{coin}코인</div>
+              {/* 하트 라벨 */}
+              <div className="text-lg font-bold text-black mt-3 text-center">
+                {label ? (
+                  <>
+                    <span>{label.split(" + ")[0]} + </span>
+                    <span className="text-red-500 font-extrabold">10%</span>
+                    <br />
+                    <span className="ml-1 text-gray-700">({coin}하트)</span>
+                  </>
+                ) : (
+                  `${coin}하트`
+                )}
+              </div>
 
               {/* 가격 */}
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 mt-1">
                 ₩{price.toLocaleString()}
               </div>
             </button>

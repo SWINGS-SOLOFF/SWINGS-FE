@@ -33,14 +33,28 @@ export const getUpdatedFields = (original, edited) => {
   return updated;
 };
 
-// 비밀번호 일치 검사
+// 비밀번호 유효성 검사 및 일치 검사
 export const validatePasswordMatch = (pwd1, pwd2) => {
   if (pwd1 !== pwd2) {
-    return "비밀번호가 일치하지 않습니다.";
+    return "비밀번호가 일치하지 않습니다";
   }
-  if (pwd1.length < 4) {
-    return "비밀번호는 최소 4자 이상이어야 합니다.";
+
+  if (pwd1.length < 3) {
+    return "최소 4자 이상이어야 합니다";
   }
+
+  if (!/[a-z]/.test(pwd1)) {
+    return "소문자가 최소 1자 이상 포함되어야 합니다";
+  }
+
+  if (!/[0-9]/.test(pwd1)) {
+    return "숫자가 최소 1자 이상 포함되어야 합니다";
+  }
+
+  if (!/[!@#$%^&*(),.?":{}|<>_\-\\[\]~`+=/]/.test(pwd1)) {
+    return "특수문자가 최소 1자 이상 포함되어야 합니다";
+  }
+
   return null;
 };
 
@@ -72,7 +86,6 @@ export const formDataPerStep = [
   { golfSkill: "", introduce: "" },
 ];
 
-
 //현재 step에서 비어 있는 필드가 있는지 확인
 
 export const hasEmptyFields = (step, formData) => {
@@ -82,7 +95,6 @@ export const hasEmptyFields = (step, formData) => {
   );
 };
 
-
 //아이디 중복 확인
 export const handleUsernameCheckLogic = async (username, setMessage) => {
   if (!username) {
@@ -90,9 +102,10 @@ export const handleUsernameCheckLogic = async (username, setMessage) => {
     return;
   }
   const exists = await checkUsername(username);
-  setMessage(exists ? "이미 사용 중인 아이디입니다." : "사용 가능한 아이디입니다.");
+  setMessage(
+    exists ? "이미 사용 중인 아이디입니다." : "사용 가능한 아이디입니다."
+  );
 };
-
 
 //Google 로그인 상태로부터 초기값 설정
 export const prefillFromOAuthState = (location, formData, updateData) => {
@@ -107,10 +120,22 @@ export const prefillFromOAuthState = (location, formData, updateData) => {
 
 //회원가입 mbti, region 설정정
 export const mbtiOptions = [
-  "ISTJ", "ISFJ", "INFJ", "INTJ",
-  "ISTP", "ISFP", "INFP", "INTP",
-  "ESTP", "ESFP", "ENFP", "ENTP",
-  "ESTJ", "ESFJ", "ENFJ", "ENTJ",
+  "ISTJ",
+  "ISFJ",
+  "INFJ",
+  "INTJ",
+  "ISTP",
+  "ISFP",
+  "INFP",
+  "INTP",
+  "ESTP",
+  "ESFP",
+  "ENFP",
+  "ENTP",
+  "ESTJ",
+  "ESFJ",
+  "ENFJ",
+  "ENTJ",
 ].map((type) => ({ label: type, value: type }));
 
 export const regionOptions = [

@@ -70,30 +70,30 @@ export default function MyPointPage() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-500 mb-1">보유 중인 코인</p>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {balance.toLocaleString()} Coin
+            <p className="text-sm text-gray-500 mb-1">보유 중인 하트</p>
+            <h1 className="text-3xl font-bold text-custom-pink">
+              {balance.toLocaleString()} 하트
             </h1>
             <p className="text-xs text-gray-400 mt-1">
               지금까지{" "}
               <span className="font-semibold text-gray-700">
-                {totalSpent.toLocaleString()} Coin
+                {totalSpent.toLocaleString()} 하트
               </span>{" "}
               사용했어요
             </p>
           </div>
           <button
             onClick={goToChargePage}
-            className="bg-black text-white text-sm font-semibold py-2 px-4 rounded-xl hover:opacity-90 active:scale-95"
+            className="bg-custom-coin text-white text-sm py-2 px-4 rounded-xl hover:opacity-90 active:scale-95 font-bold"
           >
-            💳 충전
+            충전
           </button>
         </div>
       </motion.section>
 
       {/* ✅ 이벤트 배너 - 말풍선처럼 작게 */}
       <section className="bg-[#fff3cd] text-[#856404] px-4 py-2.5 rounded-xl text-xs font-medium mb-6 shadow-sm flex items-center gap-2">
-        🎁 이벤트: 30코인 이상 충전 시 10% 더 드려요!
+        🎁 이벤트: 30하트 이상 충전 시 10% 더 드려요!
       </section>
 
       <hr className="my-6 border-gray-200" />

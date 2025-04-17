@@ -70,8 +70,10 @@ body {
 
 /* ------------------------ 버튼 및 카드 ------------------------ */
 button:hover {
-  border-color: #646cff;
+  border-color: gray;
 }
+
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
