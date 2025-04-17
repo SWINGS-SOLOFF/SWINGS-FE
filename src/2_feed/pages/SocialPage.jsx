@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AnimatePresence, motion } from "framer-motion";
+import NewPostForm from "../components/NewPostForm";
 
 import useProfileData from "../hooks/useProfileData";
 import useFeedData from "../hooks/useFeedData";
@@ -13,6 +15,8 @@ import FollowListModal from "../components/FollowListModal";
 import LikedUsersModal from "../components/LikedUsersModal";
 import FeedDetailModal from "../components/FeedDetailModal";
 import DeleteConfirmModal from "../components/DeleteConfirmModal";
+import CreatePostButton from "../components/CreatePostButton";
+import useNewPostForm from "../hooks/useNewPostForm";
 
 import socialApi from "../api/socialApi";
 import feedApi from "../api/feedApi";
@@ -35,6 +39,7 @@ const SocialPage = () => {
   const [showFollowingList, setShowFollowingList] = useState(false);
   const [likedByUsers, setLikedByUsers] = useState([]);
   const [showLikedByModal, setShowLikedByModal] = useState(false);
+  const [showNewPostForm, setShowNewPostForm] = useState(false);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTargetFeedId, setDeleteTargetFeedId] = useState(null);
@@ -59,6 +64,34 @@ const SocialPage = () => {
     handleCommentSubmit,
     handleCommentDelete,
   } = useFeedData(viewedUserId, currentUser, setSelectedFeed);
+
+  const {
+    newPostContent,
+    setNewPostContent,
+    imagePreview,
+    handleImageChange,
+    reset,
+  } = useNewPostForm();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!currentUser?.userId) return;
+
+    const formData = new FormData();
+    formData.append("userId", currentUser.userId);
+    formData.append("content", newPostContent);
+    if (selectedImage) formData.append("file", selectedImage);
+
+    try {
+      const newPost = await feedApi.uploadFeed(formData);
+      setFeeds((prev) => [newPost, ...prev]);
+      reset();
+      setSelectedImage(null);
+      setShowNewPostForm(false);
+    } catch {
+      console.error("게시물 업로드 실패");
+    }
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -145,9 +178,9 @@ const SocialPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen">
+      {" "}
       <ToastContainer position="bottom-right" />
-
       <SocialProfile
         user={profile}
         userStats={stats}
@@ -198,7 +231,6 @@ const SocialPage = () => {
         onFeedClick={handleFeedClick}
         refreshProfileData={refreshProfileData}
       />
-
       {showFollowersList && (
         <FollowListModal
           users={followers}
@@ -219,7 +251,6 @@ const SocialPage = () => {
           onClose={() => setShowLikedByModal(false)}
         />
       )}
-
       {showSuperChatModal && (
         <ConfirmModal
           message={`슈퍼챗은 3코인을 사용합니다.\n사용하시겠어요?`}
@@ -229,7 +260,6 @@ const SocialPage = () => {
           onCancel={() => setShowSuperChatModal(false)}
         />
       )}
-
       {showChargeModal && (
         <ConfirmModal
           message={`포인트가 부족합니다.\n충전하러 가시겠어요?`}
@@ -239,7 +269,6 @@ const SocialPage = () => {
           onCancel={() => setShowChargeModal(false)}
         />
       )}
-
       {selectedFeed && (
         <FeedDetailModal
           feed={selectedFeed}
@@ -263,7 +292,6 @@ const SocialPage = () => {
           }}
         />
       )}
-
       {showDeleteModal && (
         <DeleteConfirmModal
           visible={true}
@@ -283,13 +311,44 @@ const SocialPage = () => {
           }}
         />
       )}
-
       {selectedImage && (
         <ImageModal
           imageUrl={selectedImage}
           onClose={() => setSelectedImage(null)}
         />
       )}
+      <CreatePostButton
+        onClick={() => setShowNewPostForm(true)}
+        customPosition="bottom-24 right-6"
+      />
+      <AnimatePresence>
+        {showNewPostForm && (
+          <motion.div
+            key="new-post-form"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 bg-transparent flex items-center justify-center"
+          >
+            <div className="w-[90vw] max-w-md px-4">
+              <NewPostForm
+                newPostContent={newPostContent}
+                setNewPostContent={setNewPostContent}
+                handleImageChange={handleImageChange}
+                imagePreview={imagePreview}
+                handleSubmit={handleSubmit}
+                setShowNewPostForm={() => {
+                  setShowNewPostForm(false);
+                  reset();
+                }}
+                selectedImage={selectedImage}
+                setSelectedImage={setSelectedImage}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
