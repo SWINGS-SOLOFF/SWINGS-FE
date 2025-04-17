@@ -37,10 +37,7 @@ const ChatRoomPage = () => {
                 const res = await fetchChatMessages(roomId);
                 const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
 
-                const formatted = data.map((msg) => ({
-                    ...msg,
-                    createdAt: msg.sentAt,
-                }));
+                const formatted = data;
 
                 setMessages(formatted);
                 await markMessagesAsRead(roomId, user.username);
@@ -59,7 +56,6 @@ const ChatRoomPage = () => {
         client.onConnect = () => {
             client.subscribe(`/topic/chat/${roomId}`, (message) => {
                 const newMsg = JSON.parse(message.body);
-                newMsg.createdAt = newMsg.sentAt || new Date().toISOString();
                 setMessages((prev) => [...prev, newMsg]);
             });
         };
@@ -127,7 +123,7 @@ const ChatRoomPage = () => {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-gray-100">
+        <div className="flex flex-col h-screen bg-white">
             {/* ✅ 상단바 */}
             <div className="fixed top-0 left-0 w-full h-14 bg-white px-4 flex justify-between items-center shadow z-50">
                 <h1 className="text-lg font-bold">채팅방</h1>
@@ -154,19 +150,19 @@ const ChatRoomPage = () => {
                     return (
                         <div key={idx} className={`mb-5 flex ${isMe ? "justify-end" : "justify-start"}`}>
                             <div className={`max-w-xs ${isMe ? "text-right" : "text-left"}`}>
-                                <p className={`mb-2 text-sm font-semibold ${isMe ? "text-blue-600" : "text-gray-700"}`}>
-                                    {msg.sender}
+                                <p className={`mb-2 text-sm font-semibold ${isMe ? "text-custom-pink" : "text-gray-700"}`}>
+                                    {msg.senderName || msg.sender}
                                 </p>
                                 <div
-                                    className={`inline-block px-4 py-2 rounded-xl text-sm break-words ${
-                                        isMe ? "bg-blue-500 text-white" : "bg-white text-gray-800 border"
+                                    className={`inline-block px-4 font-bold py-2 rounded-xl text-sm break-words ${
+                                        isMe ? "bg-custom-pink text-white" : "bg-white text-gray-800 border"
                                     }`}
                                 >
                                     {msg.content}
                                 </div>
-                                {msg.createdAt && (
+                                {msg.sentAt && (
                                     <p className="text-[11px] text-gray-500 mt-1">
-                                        {new Date(msg.createdAt).toLocaleTimeString("ko-KR", {
+                                        {new Date(msg.sentAt).toLocaleTimeString("ko-KR", {
                                             hour: "2-digit",
                                             minute: "2-digit",
                                         })}
@@ -180,7 +176,7 @@ const ChatRoomPage = () => {
             </div>
 
             {/* ✅ 입력창 */}
-            <div className="absolute bottom-12 left-0 w-full p-4 bg-white border-t flex items-center mb-2">
+            <div className="absolute bottom-12 left-0 w-full p-4 bg-white flex items-center mb-2">
                 <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -190,7 +186,7 @@ const ChatRoomPage = () => {
                 />
                 <button
                     onClick={sendMessage}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                    className="bg-custom-pink  text-white px-4 py-2 rounded font-bold"
                 >
                     전송
                 </button>
