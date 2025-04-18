@@ -84,8 +84,8 @@ const socialApi = {
   },
 
   // 유저 프로필 조회 (상세 정보)
-  getProfile: async (userId) => {
-    const res = await socialApi.request("get", `/social/user/${userId}`);
+  getProfile: async (username) => {
+    const res = await socialApi.request("get", `/social/user/${username}`);
     return res.data;
   },
 
