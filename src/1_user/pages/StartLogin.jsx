@@ -133,7 +133,7 @@ export default function StartLogin() {
             initial="hidden"
             animate="visible"
           >
-            나랑 골프치러 갈래?
+            나랑 골프치러 갈래???
           </motion.p>
 
           <motion.form
