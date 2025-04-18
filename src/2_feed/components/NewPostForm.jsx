@@ -100,13 +100,16 @@ const NewPostForm = ({
         >
           <div className="space-y-4">
             {/* 이미지 업로드 버튼 */}
-            <div className="flex justify-between items-center">
+            <div className="outline-none focus:outline-none flex justify-between items-center">
               <button
                 type="button"
                 className="p-2 text-black hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
               >
-                <label className="cursor-pointer">
-                  <FaImage className="text-xl text-gray-600" />{" "}
+                <label className="cursor-pointer flex items-center gap-1">
+                  <FaImage className="text-xl text-custom-pink" />
+                  <span className="text-sm text-gray-700 font-medium">
+                    업로드
+                  </span>
                   <input
                     id="image-upload"
                     type="file"
@@ -116,7 +119,6 @@ const NewPostForm = ({
                   />
                 </label>
               </button>
-              <p className="text-xs text-gray-700">사진은 선택사항입니다</p>
             </div>
 
             {/* 이미지 미리보기 */}
@@ -158,7 +160,8 @@ const NewPostForm = ({
             </div>
 
             {/* 버튼 영역 */}
-            <div className="pt-3 flex justify-end border-t border-gray-300 mt-3">
+            <div className="pt-3 flex justify-end mt-3">
+              {" "}
               <button
                 type="button"
                 onClick={() => setShowNewPostForm(false)}
