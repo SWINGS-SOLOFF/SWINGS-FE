@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import UserLayout from "./1_user/layouts/UserLayout";
 import AdminLayout from "./1_user/layouts/AdminLayout";
 import UserRoutes from "./1_user/routes/UserRoutes";
@@ -20,6 +21,9 @@ export default function App() {
     <>
       <ScrollToTop /> {/* ✅ 페이지 이동 시 스크롤 맨 위로 이동 */}
       <Routes>
+        {/* Nginx root 요청*/}
+        <Route path="/" element={<Navigate to="/swings" />} />
+
         {/* 로그인/회원가입 (Nav 없이) */}
         <Route path="/swings" element={<StartLogin />} />
         <Route path="/swings/signup" element={<SignUp />} />
