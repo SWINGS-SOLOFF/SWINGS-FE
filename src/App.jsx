@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
-
 import UserLayout from "./1_user/layouts/UserLayout";
 import AdminLayout from "./1_user/layouts/AdminLayout";
 import UserRoutes from "./1_user/routes/UserRoutes";
