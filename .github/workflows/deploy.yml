@@ -30,7 +30,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
-          source: "build/*"
+          source: "dist/*"
           target: "/home/ubuntu/swings-fe"
 
       - name: Restart Nginx
