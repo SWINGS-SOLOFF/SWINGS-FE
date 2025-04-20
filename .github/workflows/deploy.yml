@@ -38,6 +38,9 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Fix dist permission
+        run: chmod -R 755 dist
+
       - name: Upload build files to EC2
         uses: appleboy/scp-action@v0.1.4
         with:
