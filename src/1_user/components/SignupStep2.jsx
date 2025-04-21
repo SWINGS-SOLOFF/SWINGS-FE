@@ -7,11 +7,7 @@ export default function SignupStep2({ formData, updateData }) {
     { value: "female", label: "여성" },
   ];
 
-  const customSelectStyles = {
-    container: (base) => ({
-      ...base,
-      width: "100%",
-    }),
+  const baseSelectStyles = {
     menu: (base) => ({
       ...base,
       maxHeight: "150px",
@@ -26,12 +22,35 @@ export default function SignupStep2({ formData, updateData }) {
     }),
   };
 
+  const yearSelectStyles = {
+    ...baseSelectStyles,
+    container: (base) => ({
+      ...base,
+      width: "44%", // 약간 넓게
+    }),
+  };
+
+  const monthDaySelectStyles = {
+    ...baseSelectStyles,
+    container: (base) => ({
+      ...base,
+      width: "28%", // 약간 좁게
+    }),
+  };
+
+  const genderSelectStyles = {
+    ...baseSelectStyles,
+    container: (base) => ({
+      ...base,
+      width: "100%",
+    }),
+  };
+
   const today = new Date();
   const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth() + 1; // 0-based
+  const currentMonth = today.getMonth() + 1;
   const currentDate = today.getDate();
 
-  // 📌 생년, 생월, 생일 옵션 생성 (필터링 포함)
   const yearOptions = Array.from({ length: 100 }, (_, i) => {
     const year = currentYear - i;
     return { value: `${year}`, label: `${year}년` };
@@ -92,7 +111,7 @@ export default function SignupStep2({ formData, updateData }) {
             value={genderOptions.find((opt) => opt.value === formData.gender)}
             onChange={(selected) => updateData({ gender: selected.value })}
             placeholder="성별 선택"
-            styles={customSelectStyles}
+            styles={genderSelectStyles}
           />
         </div>
 
@@ -111,7 +130,7 @@ export default function SignupStep2({ formData, updateData }) {
               }
               onChange={(e) => handleBirthDateChange("birthYear", e.value)}
               placeholder="년"
-              styles={customSelectStyles}
+              styles={yearSelectStyles}
             />
             <Select
               options={monthOptions}
@@ -122,7 +141,7 @@ export default function SignupStep2({ formData, updateData }) {
               }
               onChange={(e) => handleBirthDateChange("birthMonth", e.value)}
               placeholder="월"
-              styles={customSelectStyles}
+              styles={monthDaySelectStyles}
             />
             <Select
               options={dayOptions}
@@ -133,7 +152,7 @@ export default function SignupStep2({ formData, updateData }) {
               }
               onChange={(e) => handleBirthDateChange("birthDay", e.value)}
               placeholder="일"
-              styles={customSelectStyles}
+              styles={monthDaySelectStyles}
             />
           </div>
         </div>
@@ -148,7 +167,6 @@ export default function SignupStep2({ formData, updateData }) {
             value={formData.phonenumber || ""}
             onChange={(e) => updateData({ phonenumber: e.target.value })}
             className="w-full border border-gray-300 rounded-lg px-4 py-2 text-black"
-            placeholder="010xxxxxxxx"
           />
         </div>
       </div>

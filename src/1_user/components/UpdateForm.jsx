@@ -264,28 +264,14 @@ export default function UpdateForm() {
         </div>
 
         {/* 필드들 */}
-        <InputField
-          label="이메일"
-          value={formData.email}
-          onChange={(v) => setFormData({ ...formData, email: v })}
-        />
+
         <InputField
           label="생년월일"
           type="date"
           value={formData.birthDate}
           onChange={(v) => setFormData({ ...formData, birthDate: v })}
         />
-        <InputField
-          label="전화번호"
-          value={formData.phonenumber}
-          onChange={(v) => setFormData({ ...formData, phonenumber: v })}
-        />
-        <LabeledSelect
-          label="성별"
-          options={genderOptions}
-          value={formData.gender}
-          onChange={(v) => setFormData({ ...formData, gender: v })}
-        />
+
         <InputField
           label="직업"
           value={formData.job}

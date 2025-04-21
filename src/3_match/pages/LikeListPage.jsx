@@ -128,7 +128,7 @@ export default function LikeListPage() {
 
       {showConfirmModal && (
         <ConfirmModal
-          message={`무료 좋아요가 모두 소진되었습니다.\n1코인을 사용해 좋아요를 보내시겠어요?`}
+          message={`무료 좋아요가 모두 소진되었습니다.\n1하트를 사용하시겠어요?`}
           confirmLabel="보내기"
           cancelLabel="아니요"
           onConfirm={confirmPaidLike}
@@ -138,7 +138,7 @@ export default function LikeListPage() {
 
       {showChargeModal && (
         <ConfirmModal
-          message={`포인트가 부족합니다.\n충전하러 가시겠어요?`}
+          message={`하트가 부족합니다.\n충전하러 가시겠어요?`}
           confirmLabel="충전하러 가기"
           cancelLabel="돌아가기"
           onConfirm={() => {

@@ -300,7 +300,7 @@ const SocialProfile = ({
       {/* 슈퍼챗 사용 확인 모달 */}
       {showSuperChatModal && (
         <ConfirmModal
-          message={`슈퍼챗은 3코인을 사용합니다.\n사용하시겠어요?`}
+          message={`슈퍼챗은 3하트를 사용합니다.\n사용하시겠어요?`}
           confirmLabel="사용하기"
           cancelLabel="취소"
           onConfirm={handleSuperChatConfirm}
@@ -310,7 +310,7 @@ const SocialProfile = ({
       {/* 포인트 부족 시 충전 유도 모달 */}
       {showChargeModal && (
         <ConfirmModal
-          message={`포인트가 부족합니다.\n충전하러 가시겠어요?`}
+          message={`하트가 부족합니다.\n충전하러 가시겠어요?`}
           confirmLabel="충전소로 가기"
           cancelLabel="닫기"
           onConfirm={onRequestCharge}

@@ -159,7 +159,7 @@ const SocialPage = () => {
         },
       });
 
-      toast.success("💎 슈퍼챗으로 채팅방이 생성되었습니다!");
+      toast.success("💎 슈퍼챗 성공!");
       fetchRecommendedUser(currentUser.username);
     } catch (error) {
       const message = error?.response?.data?.message;
@@ -253,7 +253,7 @@ const SocialPage = () => {
       )}
       {showSuperChatModal && (
         <ConfirmModal
-          message={`슈퍼챗은 3코인을 사용합니다.\n사용하시겠어요?`}
+          message={`슈퍼챗은 3하트을 사용합니다.\n사용하시겠어요?`}
           confirmLabel="사용하기"
           cancelLabel="취소"
           onConfirm={handleSuperChatConfirm}
@@ -262,7 +262,7 @@ const SocialPage = () => {
       )}
       {showChargeModal && (
         <ConfirmModal
-          message={`포인트가 부족합니다.\n충전하러 가시겠어요?`}
+          message={`하트가 부족합니다.\n충전하러 가시겠어요?`}
           confirmLabel="충전소로 가기"
           cancelLabel="닫기"
           onConfirm={onRequestCharge}
