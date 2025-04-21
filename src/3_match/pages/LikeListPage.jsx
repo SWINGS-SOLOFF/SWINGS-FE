@@ -1,8 +1,5 @@
-// ✅ 1. React 관련
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-// ✅ 2. 외부 라이브러리
 import { motion } from "framer-motion";
 import { ThumbsUp, ThumbsUpIcon } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
@@ -17,8 +14,6 @@ import {
 } from "../api/matchApi";
 import ConfirmModal from "../components/ConfirmModal";
 import { fetchUserData, getProfileImageUrl } from "../../1_user/api/userApi";
-
-// ✅ 4. 이미지 등 asset
 import defaultImg from "../../assets/default-profile.png";
 
 export default function LikeListPage() {
@@ -27,9 +22,11 @@ export default function LikeListPage() {
   const [sentLikes, setSentLikes] = useState([]);
   const [receivedLikes, setReceivedLikes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showChargeModal, setShowChargeModal] = useState(false);
+
+  const [targetUsername, setTargetUsername] = useState(null);
+  const [modalStep, setModalStep] = useState(null); // null | "confirm" | "paid" | "charge"
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,53 +57,70 @@ export default function LikeListPage() {
     }
   };
 
-  const handleSendLike = async (targetUsername) => {
+  const handleClickLike = (username) => {
+    setTargetUsername(username);
+    setModalStep("confirm");
+  };
+
+  const handleConfirmLike = async () => {
+    if (!currentUser || !targetUsername) return;
+
     try {
       const res = await axios.get(`/api/likes/count/${currentUser.username}`);
       const remaining = res.data;
 
-      if (remaining <= 0) {
-        setSelectedUser(targetUsername);
-        setShowConfirmModal(true);
-      } else {
+      if (remaining > 0) {
         await sendLikeToUser(currentUser.username, targetUsername, false);
         await createChatRoom(currentUser.username, targetUsername, false);
-        toast.success("💓 호감 표시 완료 💓");
-        toast.success("💬 채팅방이 생성되었습니다");
+        toast.success("💓 무료 좋아요 완료!");
+        toast.success("💬 채팅방이 생성되었습니다!");
         fetchData(currentUser.username);
+        resetModal();
+      } else {
+        setModalStep("paid");
       }
     } catch (err) {
-      console.error("❌ 좋아요 보내기 또는 채팅방 생성 실패", err);
+      console.error("❌ 좋아요 처리 실패", err);
+      toast.error("좋아요 처리 중 오류 발생");
+      resetModal();
     }
   };
 
-  const confirmPaidLike = async () => {
+  const handleConfirmPaidLike = async () => {
+    if (isProcessing || !targetUsername) return;
+    setIsProcessing(true);
+
     try {
       const data = new URLSearchParams();
       data.append("amount", 1);
       data.append("description", "좋아요 유료 사용");
 
       await axios.post(`/users/me/points/use`, data, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 
-      await sendLikeToUser(currentUser.username, selectedUser, true);
-      await createChatRoom(currentUser.username, selectedUser, false);
+      await createChatRoom(currentUser.username, targetUsername, false);
 
-      toast.success("💓 유료 좋아요 완료!");
+      toast.success("💎 유료 좋아요 완료!");
+      toast.success("💬 채팅방이 생성되었습니다!");
       fetchData(currentUser.username);
+      resetModal();
     } catch (err) {
       if (err.response?.status === 400) {
-        setShowChargeModal(true);
+        setModalStep("charge");
       } else {
         toast.error("유료 좋아요 실패");
         console.error(err);
+        resetModal();
       }
     } finally {
-      setShowConfirmModal(false);
+      setIsProcessing(false);
     }
+  };
+
+  const resetModal = () => {
+    setModalStep(null);
+    setTargetUsername(null);
   };
 
   const activeList = tab === "sent" ? sentLikes : receivedLikes;
@@ -121,8 +135,6 @@ export default function LikeListPage() {
 
   return (
     <div className="flex flex-col h-full min-h-screen bg-white text-gray-900 px-4 py-6">
-      <Toaster />
-
       {/* ✅ 상단 뒤로가기 + 제목 */}
       <div className="flex items-center gap-2 mb-6">
         <button
@@ -132,33 +144,40 @@ export default function LikeListPage() {
           <IoIosArrowBack size={24} />
         </button>
       </div>
+      <Toaster />
 
-      {/* ✅ 유료 좋아요 모달 */}
-      {showConfirmModal && (
+      {/* 단계별 모달 */}
+      {modalStep === "confirm" && (
         <ConfirmModal
-          message={`무료 좋아요가 모두 소진되었습니다.\n1하트를 사용하시겠어요?`}
-          confirmLabel="보내기"
+          message="유저에게 좋아요를 보내시겠습니까?"
+          confirmLabel="예"
           cancelLabel="아니요"
-          onConfirm={confirmPaidLike}
-          onCancel={() => setShowConfirmModal(false)}
+          onConfirm={handleConfirmLike}
+          onCancel={resetModal}
         />
       )}
-
-      {/* ✅ 충전 모달 */}
-      {showChargeModal && (
+      {modalStep === "paid" && (
         <ConfirmModal
-          message={`하트가 부족합니다.\n충전하러 가시겠어요?`}
+          message="무료 좋아요가 모두 소진되었습니다.1코인을 사용해 좋아요를 보내시겠습니까?"
+          confirmLabel="보내기"
+          cancelLabel="아니요"
+          onConfirm={handleConfirmPaidLike}
+          onCancel={resetModal}
+        />
+      )}
+      {modalStep === "charge" && (
+        <ConfirmModal
+          message="포인트가 부족합니다.\n충전하러 가시겠어요?"
           confirmLabel="충전하러 가기"
           cancelLabel="돌아가기"
           onConfirm={() => {
-            setShowChargeModal(false);
+            resetModal();
             navigate("/swings/points");
           }}
-          onCancel={() => setShowChargeModal(false)}
+          onCancel={resetModal}
         />
       )}
 
-      {/* ✅ 탭 전환 */}
       <div className="flex justify-center gap-4 mb-6">
         <button
           className={`px-4 py-2 rounded-xl transition-all font-bold outline-none focus:outline-none duration-200 ${
@@ -182,7 +201,6 @@ export default function LikeListPage() {
         </button>
       </div>
 
-      {/* ✅ 리스트 */}
       <div className="space-y-3 pb-20">
         {activeList.length === 0 ? (
           <p className="text-center text-gray-400 py-10 animate-pulse">
@@ -191,7 +209,6 @@ export default function LikeListPage() {
         ) : (
           activeList.map((user, index) => {
             const isMutual = String(user.mutual) === "true";
-
             return (
               <motion.div
                 key={`${user.username}-${index}`}
@@ -229,9 +246,9 @@ export default function LikeListPage() {
                       disabled={!currentUser || loading}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleSendLike(user.username);
+                        handleClickLike(user.username);
                       }}
-                      className="text-sm bg-custom-pink text-white px-3 py-1 rounded-xl "
+                      className="text-sm bg-custom-pink text-white px-3 py-1 rounded-xl"
                     >
                       좋아요 보내기
                     </button>

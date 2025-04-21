@@ -1,4 +1,4 @@
-// ✅ chatRoomApi.js - 채팅방 관련 API 모듈 (수정완료)
+//  chatRoomApi.js - 채팅방 관련 API 모듈 (수정완료)
 import axios from "../../1_user/api/axiosInstance";
 
 /**
