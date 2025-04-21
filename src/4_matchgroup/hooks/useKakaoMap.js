@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import {openKakaoPostcode} from "../utils/openKakaoPostcode.js";
-import {loadKakaoMapScript} from "../utils/loadKakaoMapScript.js";
+import { openKakaoPostcode } from "../utils/openKakaoPostcode.js";
+import { loadKakaoMapScript } from "../utils/loadKakaoMapScript.js";
 
 export function useKakaoMap(groupData, setGroupData) {
+    // 주소 검색 시 호출
     const handleAddressSearch = async () => {
         try {
             await loadKakaoMapScript();
@@ -18,6 +19,7 @@ export function useKakaoMap(groupData, setGroupData) {
         }
     };
 
+    // 지도 로딩
     useEffect(() => {
         if (!groupData.location) return;
 
@@ -27,11 +29,19 @@ export function useKakaoMap(groupData, setGroupData) {
                 const { kakao } = window;
                 if (!kakao || !kakao.maps) return;
 
+                const mapContainer = document.getElementById("map");
+
+                if (!mapContainer) {
+                    console.warn("🛑 지도 DOM이 존재하지 않아 kakao map 생성을 생략합니다.");
+                    return;
+                }
+
                 const geocoder = new kakao.maps.services.Geocoder();
                 geocoder.addressSearch(groupData.location, (result, status) => {
                     if (status === kakao.maps.services.Status.OK) {
                         const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                        const map = new kakao.maps.Map(document.getElementById("map"), {
+
+                        const map = new kakao.maps.Map(mapContainer, {
                             center: coords,
                             level: 3,
                         });
@@ -50,7 +60,8 @@ export function useKakaoMap(groupData, setGroupData) {
             }
         };
 
-        loadMap();
+        // 💡 약간의 지연을 주어 DOM이 렌더된 이후 실행
+        setTimeout(loadMap, 100);
     }, [groupData.location]);
 
     return { handleAddressSearch };
