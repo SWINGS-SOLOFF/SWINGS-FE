@@ -101,14 +101,14 @@ export default function SignupStep1({ formData, updateData }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 outline-none focus:outline-none">
       {/* 아이디 */}
       <div className="flex gap-2 flex-col">
         <div className="flex gap-2">
           <input
             type="text"
             placeholder="아이디"
-            className="flex-1 border p-2 rounded text-black"
+            className="flex-1 border p-2 rounded text-black outline-none focus:outline-none"
             value={formData.username || ""}
             onChange={handleUsernameChange}
           />

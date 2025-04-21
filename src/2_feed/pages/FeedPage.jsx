@@ -12,6 +12,8 @@ import FeedPost from "../components/FeedPost";
 import NewPostForm from "../components/NewPostForm";
 import ImageModal from "../components/ImageModal";
 import LikedUsersModal from "../components/LikedUsersModal";
+import ProfileImageUploaderStart from "../../1_user/components/ProfileImageUploaderStart";
+
 import feedApi from "../api/feedApi";
 import socialApi from "../api/socialApi";
 
@@ -25,6 +27,8 @@ const FeedPage = () => {
   const [feedOrder, setFeedOrder] = useState([]);
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [showProfileUploader, setShowProfileUploader] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
 
   const {
     posts,
@@ -55,6 +59,12 @@ const FeedPage = () => {
       try {
         const user = await feedApi.getCurrentUser();
         setCurrentUser(user);
+
+        if (!user.userImg) {
+          setShowProfileUploader(true);
+          return;
+        }
+
         setPosts([]);
         const order = ["followings", "all", "mine"].sort(
           () => Math.random() - 0.5
@@ -69,6 +79,13 @@ const FeedPage = () => {
     init();
   }, [userId]);
 
+  useEffect(() => {
+    document.body.style.overflow = showProfileUploader ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showProfileUploader]);
+
   const loadFeeds = async (type, user) => {
     setLoading(true);
     try {
@@ -81,7 +98,7 @@ const FeedPage = () => {
         const filter =
           type === "followings" && followings.length > 0 ? "followings" : "all";
 
-        const sort = type === "followings" ? "latest" : "random"; // 핵심 수정
+        const sort = type === "followings" ? "latest" : "random";
 
         newFeeds = await feedApi.getFeeds(user.userId, 0, 10, {
           sort,
@@ -112,7 +129,6 @@ const FeedPage = () => {
 
       await loadFeeds(feedOrder[step], currentUser);
 
-      // 🔧 현재 단계에서 불러온 피드가 없다면 다음 단계로 강제로 넘김
       const isSameLength = posts.length === prevPostsLength;
       if (isSameLength && step < feedOrder.length - 1) {
         setStep((prev) => prev + 1);
@@ -121,7 +137,7 @@ const FeedPage = () => {
     } catch (err) {
       console.error("피드 로딩 실패:", err);
     } finally {
-      setStep((prev) => prev + 1); // 이건 무조건 마지막에 올려야 중복 로딩 방지됨
+      setStep((prev) => prev + 1);
       setLoading(false);
     }
   };
@@ -158,7 +174,7 @@ const FeedPage = () => {
     formData.append("content", newPostContent);
 
     if (selectedImage) {
-      formData.append("file", selectedImage); // 🔥 핵심 포인트
+      formData.append("file", selectedImage);
     }
 
     try {
@@ -184,118 +200,132 @@ const FeedPage = () => {
 
   return (
     <div className="bg-white min-h-screen pt-4 sm:pt-8 md:pt-12">
-      <CreatePostButton
-        onClick={togglePostForm}
-        customPosition="bottom-24 right-6"
-      />
-
-      {isRefreshing && (
-        <div className="text-center py-3 text-sm text-blue-500 animate-pulse">
-          🔄 새로고침 중입니다...
+      {showProfileUploader ? (
+        <div className="fixed inset-0 flex justify-center items-center z-[999] bg-black bg-opacity-40">
+          <ProfileImageUploaderStart
+            imageFile={imageFile}
+            setImageFile={setImageFile}
+            initialImage={null}
+            onClose={() => window.location.reload()}
+            onComplete={() => window.location.reload()}
+          />
         </div>
-      )}
+      ) : (
+        <>
+          <CreatePostButton
+            onClick={togglePostForm}
+            customPosition="bottom-24 right-6"
+          />
 
-      <AnimatePresence>
-        {showNewPostForm && (
-          <motion.div
-            key="new-post-form"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-transparent flex items-center justify-center"
+          {isRefreshing && (
+            <div className="text-center py-3 text-sm text-blue-500 animate-pulse">
+              🔄 새로고침 중입니다...
+            </div>
+          )}
+
+          <AnimatePresence>
+            {showNewPostForm && (
+              <motion.div
+                key="new-post-form"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 30 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 z-50 bg-transparent flex items-center justify-center"
+              >
+                <div ref={formRef} className="w-[90vw] max-w-md px-4">
+                  <NewPostForm
+                    newPostContent={newPostContent}
+                    setNewPostContent={setNewPostContent}
+                    handleImageChange={handleImageChange}
+                    imagePreview={imagePreview}
+                    handleSubmit={handleSubmit}
+                    setShowNewPostForm={() => {
+                      setShowNewPostForm(false);
+                      reset();
+                    }}
+                    selectedImage={selectedImage}
+                    setSelectedImage={setSelectedImage}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div
+            ref={containerRef}
+            className="w-full px-4 md:px-12 h-full overflow-y-auto"
+            style={{ height: "calc(100vh - 64px)" }}
           >
-            <div ref={formRef} className="w-[90vw] max-w-md px-4">
-              <NewPostForm
-                newPostContent={newPostContent}
-                setNewPostContent={setNewPostContent}
-                handleImageChange={handleImageChange}
-                imagePreview={imagePreview}
-                handleSubmit={handleSubmit}
-                setShowNewPostForm={() => {
-                  setShowNewPostForm(false);
-                  reset();
-                }}
-                selectedImage={selectedImage}
-                setSelectedImage={setSelectedImage}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <div className="space-y-4 pb-24">
+              {loading && (
+                <div className="text-center py-8 text-gray-500 text-sm">
+                  피드를 불러오는 중...
+                </div>
+              )}
 
-      <div
-        ref={containerRef}
-        className="w-full px-4 md:px-12 h-full overflow-y-auto"
-        style={{ height: "calc(100vh - 64px)" }}
-      >
-        <div className="space-y-4 pb-24">
-          {loading && (
-            <div className="text-center py-8 text-gray-500 text-sm">
-              피드를 불러오는 중...
+              {!loading && posts.length === 0 && (
+                <div className="text-center py-8 text-gray-400 text-sm">
+                  표시할 피드가 없습니다.
+                </div>
+              )}
+
+              {posts.map((post, index) => (
+                <motion.div
+                  key={post.feedId}
+                  ref={index === posts.length - 1 ? lastPostRef : null}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                >
+                  <FeedPost
+                    post={post}
+                    currentUser={currentUser}
+                    onImageClick={setSelectedImage}
+                    onLike={() => handleLikeToggle(post.feedId, false)}
+                    onUnlike={() => handleLikeToggle(post.feedId, true)}
+                    onToggleComments={(feedId) => {
+                      setPosts((prev) =>
+                        prev.map((p) =>
+                          p.feedId === feedId
+                            ? { ...p, showComments: !p.showComments }
+                            : p
+                        )
+                      );
+                    }}
+                    onCommentSubmit={handleCommentSubmit}
+                    onCommentDelete={(commentId) =>
+                      handleCommentDelete(post.feedId, commentId)
+                    }
+                    onDelete={() => handleDelete(post.feedId)}
+                    onShowLikedBy={handleShowLikedBy}
+                    updatePostInState={(updatedPost) =>
+                      setPosts((prev) =>
+                        prev.map((p) =>
+                          p.feedId === updatedPost.feedId ? updatedPost : p
+                        )
+                      )
+                    }
+                  />
+                </motion.div>
+              ))}
             </div>
+          </div>
+
+          {selectedImage && (
+            <ImageModal
+              imageUrl={selectedImage}
+              onClose={() => setSelectedImage(null)}
+            />
           )}
 
-          {!loading && posts.length === 0 && (
-            <div className="text-center py-8 text-gray-400 text-sm">
-              표시할 피드가 없습니다.
-            </div>
+          {isLikedModalOpen && (
+            <LikedUsersModal
+              users={likedUsers}
+              onClose={() => setIsLikedModalOpen(false)}
+            />
           )}
-
-          {posts.map((post, index) => (
-            <motion.div
-              key={post.feedId}
-              ref={index === posts.length - 1 ? lastPostRef : null}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.05 }}
-            >
-              <FeedPost
-                post={post}
-                currentUser={currentUser}
-                onImageClick={setSelectedImage}
-                onLike={() => handleLikeToggle(post.feedId, false)}
-                onUnlike={() => handleLikeToggle(post.feedId, true)}
-                onToggleComments={(feedId) => {
-                  setPosts((prev) =>
-                    prev.map((p) =>
-                      p.feedId === feedId
-                        ? { ...p, showComments: !p.showComments }
-                        : p
-                    )
-                  );
-                }}
-                onCommentSubmit={handleCommentSubmit}
-                onCommentDelete={(commentId) =>
-                  handleCommentDelete(post.feedId, commentId)
-                }
-                onDelete={() => handleDelete(post.feedId)}
-                onShowLikedBy={handleShowLikedBy}
-                updatePostInState={(updatedPost) =>
-                  setPosts((prev) =>
-                    prev.map((p) =>
-                      p.feedId === updatedPost.feedId ? updatedPost : p
-                    )
-                  )
-                }
-              />
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {selectedImage && (
-        <ImageModal
-          imageUrl={selectedImage}
-          onClose={() => setSelectedImage(null)}
-        />
-      )}
-
-      {isLikedModalOpen && (
-        <LikedUsersModal
-          users={likedUsers}
-          onClose={() => setIsLikedModalOpen(false)}
-        />
+        </>
       )}
     </div>
   );
