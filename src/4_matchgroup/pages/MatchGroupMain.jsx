@@ -7,8 +7,8 @@ import {
     ArrowRightIcon,
     LandPlotIcon,
 } from "lucide-react";
-
 import GroupMainBanner from "../components/ui/GroupMainBanner.jsx";
+import BaseModal from "../components/ui/BaseModal.jsx";
 
 export default function MatchGroupMain() {
 
@@ -47,7 +47,7 @@ export default function MatchGroupMain() {
 
             {/* 안내 모달 */}
             {isModalOpen && (
-                <Modal onClose={() => setIsModalOpen(false)} title="이용 안내">
+                <BaseModal onClose={() => setIsModalOpen(false)} title="이용 안내">
                     <div className="grid gap-6 md:grid-cols-3">
                         <InfoItem
                             icon={<Users2Icon className="h-5 w-5 text-gray-700" />}
@@ -65,7 +65,7 @@ export default function MatchGroupMain() {
                             desc="참여한 그룹의 일정을 한눈에 확인하고 관리할 수 있어요."
                         />
                     </div>
-                </Modal>
+                </BaseModal>
             )}
         </div>
     );
