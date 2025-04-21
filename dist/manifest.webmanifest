@@ -1,0 +1,1 @@
+{"name":"SWINGS","short_name":"SWINGS","description":"골프 그룹 매칭 서비스","start_url":"/swings","display":"standalone","background_color":"#ffffff","theme_color":"#ffffff","lang":"en","scope":"/","icons":[{"src":"/pwa3-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/pwa3-512x512.png","sizes":"512x512","type":"image/png"}]}

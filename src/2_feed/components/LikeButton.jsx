@@ -46,9 +46,9 @@ const LikeButton = ({
           transition={{ type: "spring", stiffness: 200, damping: 10 }}
         >
           {liked ? (
-            <FaHeart className="text-red-500 text-xl" />
+            <FaHeart className="text-red-500 text-base" />
           ) : (
-            <FaRegHeart className="text-gray-500 text-xl" />
+            <FaRegHeart className="text-gray-500 text-base" />
           )}
         </motion.div>
       </motion.button>
