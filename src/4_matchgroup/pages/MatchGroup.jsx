@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import {
@@ -6,6 +6,16 @@ import {
 } from "lucide-react";
 import { getProfileImageUrl } from "../../1_user/api/userApi";
 import ParticipantDetailModal from "../components/ParticipantDetailModal";
+import PendingUserList from "../components/PendingUserList";
+import AcceptedUserList from "../components/AcceptedUserList";
+import {
+    approveParticipant,
+    rejectParticipant,
+    removeParticipant,
+    getPendingParticipants,
+    getAcceptedParticipants
+} from "../api/matchParticipantApi";
+import { deleteMatchGroup } from "../api/matchGroupApi";
 import { useMatchGroupData } from "../hooks/useMatchGroupData";
 import { useMatchGroupChat } from "../hooks/useMatchGroupChat";
 
@@ -17,6 +27,10 @@ export default function MatchGroup() {
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [showSidebar, setShowSidebar] = useState(false);
     const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+    const [showPendingModal, setShowPendingModal] = useState(false);
+    const [showAcceptedModal, setShowAcceptedModal] = useState(false);
+    const [pendingUsers, setPendingUsers] = useState([]);
+    const [acceptedUsers, setAcceptedUsers] = useState([]);
 
     const {
         participants, currentUser, group, isAuthorized, fetchData
@@ -29,6 +43,14 @@ export default function MatchGroup() {
     useEffect(() => {
         fetchData().then((initialMessages) => setMessages(initialMessages));
     }, [matchGroupId]);
+
+    useEffect(() => {
+        if (showPendingModal) getPendingParticipants(matchGroupId).then(setPendingUsers);
+    }, [showPendingModal]);
+
+    useEffect(() => {
+        if (showAcceptedModal) getAcceptedParticipants(matchGroupId).then(setAcceptedUsers);
+    }, [showAcceptedModal]);
 
     if (!isAuthorized) {
         return (
@@ -45,62 +67,73 @@ export default function MatchGroup() {
             <Venus className="w-4 h-4 text-pink-500" />
         );
 
+    const handleApprove = async (p) => {
+        await approveParticipant(group.matchGroupId, p.matchParticipantId, currentUser.userId);
+        setPendingUsers(await getPendingParticipants(group.matchGroupId));
+        await fetchData();
+    };
+
+    const handleReject = async (p) => {
+        await rejectParticipant(group.matchGroupId, p.matchParticipantId, currentUser.userId);
+        setPendingUsers(await getPendingParticipants(group.matchGroupId));
+        await fetchData();
+    };
+
+    const handleKick = async (p) => {
+        if (!window.confirm(`${p.username}님을 강퇴하시겠습니까?`)) return;
+        await removeParticipant(group.matchGroupId, p.userId, currentUser.userId);
+        setAcceptedUsers(await getAcceptedParticipants(group.matchGroupId));
+        await fetchData();
+    };
+
+    const isHost = String(currentUser?.userId) === String(group?.hostId);
+
     return (
         <div className="relative min-h-[100dvh] flex flex-col bg-[#f9fafb]">
-            {/* 헤더 */}
-            <div className="flex items-center justify-between p-4 border-b bg-white z-50">
-                <button onClick={() => navigate("/swings/matchgroup")}>
-                    <IoIosArrowBack size={24} />
-                </button>
-                <h1 className="text-lg font-bold truncate">{group.groupName}</h1>
-                <button onClick={() => setShowSidebar(!showSidebar)}>
-                    <Menu size={24} />
-                </button>
+            <div className="flex items-center justify-between p-4 border-b bg-white z-40">
+                <button onClick={() => navigate("/swings/matchgroup")}> <IoIosArrowBack size={24} /> </button>
+                <h1 className="text-lg font-bold truncate z-0">{group.groupName}</h1>
+                <button onClick={() => setShowSidebar(!showSidebar)}> <Menu size={24} /> </button>
             </div>
 
-            {/* 참가자 목록 사이드바 */}
-            <div className={`fixed top-0 left-0 h-full w-64 bg-white p-4 shadow-md z-40 transition-transform ${showSidebar ? "translate-x-0" : "-translate-x-full"}`}>
+            {/* 사이드바 */}
+            <div className={`fixed top-0 left-0 h-full w-64 bg-white p-4 shadow-md z-50 transition-transform ${showSidebar ? "translate-x-0" : "-translate-x-full"}`}>
                 <h2 className="text-lg font-bold mb-4 text-center">참가자 목록</h2>
                 <ul className="space-y-3 overflow-y-auto max-h-[calc(100vh-120px)] pb-24">
                     {participants.map((p) => (
                         <li key={p.userId} onClick={() => { setSelectedParticipant(p); setShowDetailModal(true); }}
                             className="flex items-center justify-between bg-gray-50 p-2 rounded-md shadow-sm cursor-pointer">
                             <div className="flex items-center gap-3">
-                                <img src={p.userImg ? getProfileImageUrl(p.userImg) : "/default-profile.png"} className="w-8 h-8 rounded-full" />
+                                <img src={p.userImg ? getProfileImageUrl(p.userImg) : "/default-profile.png"} className="w-8 h-8 rounded-full" alt="" />
                                 {renderGenderIcon(p.gender)}
                                 <span>{p.username}</span>
                             </div>
                             <div className="text-xs flex gap-1">
-                                {/* ✅ hostId 비교를 문자열로 명확하게 */}
-                                {String(p.userId) === String(group?.hostId) && (
-                                    <span className="text-yellow-600 flex items-center gap-1">
-                                        <Crown className="w-3 h-3" /> 방장
-                                    </span>
-                                )}
-                                {String(p.userId) === String(currentUser?.userId) && (
-                                    <span className="text-blue-500">나</span>
-                                )}
+                                {String(p.userId) === String(group?.hostId) && <span className="text-yellow-600 flex items-center gap-1"><Crown className="w-3 h-3" /> 방장</span>}
+                                {String(p.userId) === String(currentUser?.userId) && <span className="text-blue-500">나</span>}
                             </div>
                         </li>
                     ))}
                 </ul>
-                <div className="mt-6 pt-4 border-t">
-                    <button onClick={() => setShowLeaveConfirm(true)} className="w-full text-sm text-red-500 border px-4 py-2 rounded">그룹 나가기</button>
+                <div className="flex flex-col gap-2 mt-6">
+                    {isHost && (
+                        <>
+                            <button onClick={() => setShowPendingModal(true)} className="bg-custom-pink text-white px-3 py-2 rounded-lg">참가 신청 관리</button>
+                            <button onClick={() => setShowAcceptedModal(true)} className="bg-custom-purple text-white px-3 py-2 rounded-lg">참가 인원 관리</button>
+                        </>
+                    )}
+                    <button onClick={() => setShowLeaveConfirm(true)} className="w-full px-3 py-2 rounded-lg border border-red-300 text-red-500 font-semibold hover:bg-red-50">그룹 나가기</button>
                 </div>
             </div>
 
-            {/* 그룹 정보 + 채팅 */}
+            {/* 그룹 정보 */}
             <div className="flex-1 flex flex-col p-4 gap-4">
                 <div className="bg-white p-4 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 gap-2">
                     <InfoItem icon={<CalendarIcon />} text={group?.schedule} />
                     <InfoItem icon={<TargetIcon />} text={group?.ageRange} />
                     <InfoItem icon={<Sparkles />} text={group?.playStyle} />
                     <InfoItem icon={<UsersIcon />} text={`여성 ${group?.femaleLimit} / 남성 ${group?.maleLimit}`} />
-                    <InfoItem icon={<MapPinIcon />} text={
-                        <a href={`https://map.kakao.com/link/map/${encodeURIComponent(group?.location)},${group?.latitude},${group?.longitude}`} target="_blank" className="underline">
-                            {group?.location}
-                        </a>
-                    } />
+                    <InfoItem icon={<MapPinIcon />} text={<a href={`https://map.kakao.com/link/map/${encodeURIComponent(group?.location)},${group?.latitude},${group?.longitude}`} target="_blank" className="underline">{group?.location}</a>} />
                 </div>
 
                 {/* 채팅 */}
@@ -125,10 +158,9 @@ export default function MatchGroup() {
                 </div>
             </div>
 
-            {/* 참가자 상세 모달 */}
+            {/* 상세모달들 */}
             {showDetailModal && <ParticipantDetailModal isOpen={showDetailModal} participant={selectedParticipant} onClose={() => setShowDetailModal(false)} />}
 
-            {/* 나가기 모달 */}
             {showLeaveConfirm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
                     <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center">
@@ -136,6 +168,30 @@ export default function MatchGroup() {
                         <div className="flex justify-center gap-4">
                             <button onClick={() => (window.location.href = "/swings/matchgroup")} className="px-4 py-2 rounded bg-red-500 text-white">나가기</button>
                             <button onClick={() => setShowLeaveConfirm(false)} className="px-4 py-2 rounded bg-gray-200">취소</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showPendingModal && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                        <h3 className="text-lg font-bold mb-4 text-center">신청자 관리</h3>
+                        <PendingUserList pending={pendingUsers} onApprove={handleApprove} onReject={handleReject} />
+                        <div className="mt-6 text-center">
+                            <button onClick={() => setShowPendingModal(false)} className="px-4 py-2 rounded bg-gray-200">닫기</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showAcceptedModal && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                        <h3 className="text-lg font-bold mb-4 text-center">참가자 관리</h3>
+                        <AcceptedUserList participants={acceptedUsers} currentUserId={currentUser?.userId} onRemove={handleKick} />
+                        <div className="mt-6 text-center">
+                            <button onClick={() => setShowAcceptedModal(false)} className="px-4 py-2 rounded bg-gray-200">닫기</button>
                         </div>
                     </div>
                 </div>
