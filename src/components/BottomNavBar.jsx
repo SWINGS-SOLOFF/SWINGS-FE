@@ -32,7 +32,7 @@ export default function BottomNavBar() {
               }`}
             >
               <motion.div
-                animate={{ scale: isActive ? 1.35 : 1 }}
+                animate={{ scale: isActive ? 1.2 : 1 }}
                 transition={{ type: "spring", stiffness: 300, damping: 15 }}
               >
                 <Icon className="w-7 h-7 text-current" />
