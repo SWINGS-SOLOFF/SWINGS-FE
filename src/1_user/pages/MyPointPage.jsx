@@ -139,7 +139,7 @@ export default function MyPointPage() {
                             log.amount >= 0 ? "text-green-500" : "text-red-500"
                           }`}
                         >
-                          {log.amount >= 0 ? `+${log.amount}` : log.amount} Coin
+                          {log.amount >= 0 ? `+${log.amount}` : log.amount} 하트
                         </p>
                       </motion.li>
                     ))}

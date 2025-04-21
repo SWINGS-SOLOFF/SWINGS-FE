@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { resetPassword } from "../api/userApi";
-import { X } from "lucide-react";
+import { X, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function FindPasswordModal({ onClose }) {
@@ -8,7 +8,7 @@ export default function FindPasswordModal({ onClose }) {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showResultModal, setShowResultModal] = useState(false); // ✅ 결과 모달
+  const [showResultModal, setShowResultModal] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -19,7 +19,7 @@ export default function FindPasswordModal({ onClose }) {
     try {
       const res = await resetPassword({ username, email });
       setMessage("✅ " + res.data);
-      setShowResultModal(true); // ✅ 성공 시 결과 모달 띄움
+      setShowResultModal(true);
     } catch (err) {
       setMessage("❌ " + (err.response?.data || "에러가 발생했습니다."));
     } finally {
@@ -28,9 +28,9 @@ export default function FindPasswordModal({ onClose }) {
   };
 
   const handleConfirm = () => {
-    setShowResultModal(false); // 결과 모달 닫기
-    onClose(); // 부모 모달 닫기
-    navigate("/swings"); // ✅ /swings 이동
+    setShowResultModal(false);
+    onClose();
+    navigate("/swings");
   };
 
   return (
@@ -65,7 +65,7 @@ export default function FindPasswordModal({ onClose }) {
 
             <input
               type="email"
-              placeholder="가입 시 사용한 이메일 입력"
+              placeholder="이메일 입력"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -75,7 +75,11 @@ export default function FindPasswordModal({ onClose }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-purple-300 hover:bg-pink-400 text-white py-2 rounded font-semibold"
+              className={`w-full ${
+                username && email
+                  ? "bg-custom-purple hover:bg-pink-400"
+                  : "bg-custom-purple-empty"
+              } text-white py-2 rounded font-semibold transition`}
             >
               {loading ? "전송 중..." : "임시 비밀번호 보내기"}
             </button>
@@ -89,17 +93,21 @@ export default function FindPasswordModal({ onClose }) {
         </div>
       </div>
 
-      {/* ✅ 전송 완료 후 결과 알림 모달 */}
       {showResultModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-xl shadow-md text-center w-full max-w-sm">
-            <h3 className="text-l font-semibold text-gray-800 mb-2">
-              임시 비밀번호가 이메일로 전송되었습니다.
+          <div className="bg-white p-8 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-fadeIn">
+            <CheckCircle className="mx-auto text-green-500 w-12 h-12 mb-3" />
+            <h3 className="text-xl font-semibold text-gray-800 mb-1">
+              임시 비밀번호 전송 완료
             </h3>
-
+            <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+              입력하신 이메일로
+              <br />
+              임시 비밀번호가 전송되었습니다.
+            </p>
             <button
               onClick={handleConfirm}
-              className="w-full bg-pink-300  text-white py-2 rounded font-semibold"
+              className="w-full bg-custom-purple hover:bg-pink-400 text-white py-2 rounded-lg font-semibold transition"
             >
               확인
             </button>

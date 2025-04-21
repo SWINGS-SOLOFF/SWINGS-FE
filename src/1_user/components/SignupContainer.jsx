@@ -10,6 +10,7 @@ import SignupStep4 from "./SignupStep4";
 import SignupStep5 from "./SignupStep5";
 import { signupUser } from "../api/userApi";
 import { hasEmptyFields } from "../utils/userUtils";
+import { IoIosArrowBack } from "react-icons/io";
 
 const steps = [SignupStep1, SignupStep2, SignupStep3, SignupStep4, SignupStep5];
 
@@ -85,10 +86,11 @@ export default function SignupContainer() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-200 via-white to-blue-100 flex flex-col justify-center items-center px-4">
       <button
-        className="absolute top-4 left-4 text-sm text-black hover:text-gray-600"
+        className="absolute top-4 left-4 flex items-center gap-1 text-sm text-gray-700 hover:text-gray-600"
         onClick={() => navigate("/swings")}
       >
-        ← 로그인
+        <IoIosArrowBack className="text-lg" />
+        로그인
       </button>
 
       <div className="w-full max-w-sm">
@@ -119,7 +121,7 @@ export default function SignupContainer() {
             {step > 0 ? (
               <button
                 onClick={prevStep}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded font-semibold"
+                className="px-4 py-2 bg-gray-300 border-none outline-none text-gray-700 rounded font-semibold"
               >
                 이전
               </button>
@@ -130,7 +132,7 @@ export default function SignupContainer() {
             {step < steps.length - 1 ? (
               <button
                 onClick={nextStep}
-                className="ml-auto px-6 py-2 bg-custom-pink text-white rounded font-bold"
+                className="ml-auto px-6 py-2 border-none outline-none bg-custom-pink text-white rounded font-bold"
               >
                 다음
               </button>
@@ -138,7 +140,7 @@ export default function SignupContainer() {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="ml-auto px-6 py-2 bg-custom-pink text-white rounded font-bold disabled:opacity-50"
+                className="ml-auto px-6 py-2border-none outline-none  bg-custom-pink text-white rounded font-bold disabled:opacity-50"
               >
                 {loading ? "처리 중..." : "회원가입"}
               </button>
@@ -156,7 +158,7 @@ export default function SignupContainer() {
           <div className="relative bg-white px-6 py-6 rounded-2xl shadow-xl w-80 text-center space-y-4 animate-fadeIn">
             {/* 🎉 상단 텍스트 */}
             <h3 className="text-xl font-semibold text-gray-800">
-              회원가입이 완료되었습니다!
+              회원가입 완료!
             </h3>
             <p className="text-sm text-gray-600">
               이메일 인증 후 이용해 주세요.
