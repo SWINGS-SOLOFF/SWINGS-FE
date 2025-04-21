@@ -74,10 +74,6 @@ export default function ProfileImageUploader({
         <X size={20} />
       </button>
 
-      <p className="text-sm font-semibold text-gray-700 tracking-wide text-center mb-4">
-        프로필 사진 업로드
-      </p>
-
       <div className="relative w-36 h-36 mx-auto">
         {previewUrl ? (
           <>
@@ -101,7 +97,7 @@ export default function ProfileImageUploader({
       </div>
 
       {/* 이미지 선택 - 가운데 정렬 */}
-      <label className="cursor-pointer mt-4 mx-auto block bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm px-6 py-2 rounded-full shadow-md hover:opacity-90 transition text-center">
+      <label className="cursor-pointer mt-4 mx-auto block font-bold bg-custom-purple  text-white text-sm px-6 py-2 rounded-full shadow-md hover:opacity-90 transition text-center">
         이미지 선택
         <input
           type="file"
@@ -115,7 +111,7 @@ export default function ProfileImageUploader({
       <button
         onClick={handleSave}
         disabled={isSaving}
-        className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm py-2 rounded-full transition disabled:opacity-50"
+        className="mt-6 w-full font-bold bg-custom-pink text-white text-sm py-2 rounded-full transition disabled:opacity-50"
       >
         {isSaving ? "저장 중..." : "저장하기"}
       </button>

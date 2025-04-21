@@ -41,7 +41,7 @@ export default function NavBar() {
             {/* 하트 포인트 버튼 */}
             <button
               onClick={() => navigate("/swings/points")}
-              className="p-1 rounded-full bg-pink-100 hover:bg-pink-200 transition relative top-[2px]"
+              className="p-1 rounded-full outline-none focus:outline-none bg-pink-100 hover:bg-pink-200 transition relative top-[2px]"
               aria-label="포인트"
             >
               <Heart className="w-6 h-6 text-pink-500 fill-pink-500" />
@@ -54,7 +54,7 @@ export default function NavBar() {
               onMouseLeave={() => setShowDropdown(false)}
             >
               <button
-                className="relative text-2xl hover:opacity-80"
+                className="relative text-2xl hover:opacity-80 outline-none focus:outline-none"
                 aria-label="알림"
                 onClick={() => navigate("/swings/notification")}
               >

@@ -6,7 +6,7 @@ const CreatePostButton = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="fixed bottom-24 right-6 bg-pink-600 text-white rounded-full p-3 shadow-lg hover:bg-pink-700 transition-all duration-300 z-[60] flex items-center justify-center"
+      className="fixed bottom-24 right-6 outline-none focus:outline-none  bg-custom-pink text-white rounded-full p-3 shadow-lg transition-all duration-300 z-[60] flex items-center justify-center"
       aria-label="게시물 작성"
     >
       <PenSquare size={20} />
