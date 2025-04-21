@@ -349,7 +349,7 @@ const FeedPost = ({
                 <div className="p-4">
                   <div
                     ref={contentRef}
-                    className={`text-base font-medium text-gray-800 break-words whitespace-pre-wrap font-pretendard ${
+                    className={`text-base text-gray-800 break-words whitespace-pre-wrap  font-pretendard${
                       !isExpanded
                         ? "line-clamp-1 relative cursor-pointer"
                         : "cursor-pointer"

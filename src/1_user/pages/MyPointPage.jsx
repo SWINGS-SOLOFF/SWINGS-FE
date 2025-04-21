@@ -71,7 +71,7 @@ export default function MyPointPage() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500 mb-1">보유 중인 하트</p>
-            <h1 className="text-3xl font-bold text-custom-pink">
+            <h1 className="text-3xl font-bold text-black">
               {balance.toLocaleString()} 하트
             </h1>
             <p className="text-xs text-gray-400 mt-1">
