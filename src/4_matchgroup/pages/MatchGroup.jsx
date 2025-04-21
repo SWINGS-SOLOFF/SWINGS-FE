@@ -16,6 +16,7 @@ import { getAcceptedParticipants } from "../api/matchParticipantApi";
 import { getCurrentUser, getMatchGroupById } from "../api/matchGroupApi";
 import { getProfileImageUrl } from "../../1_user/api/userApi";
 import ParticipantDetailModal from "../components/ParticipantDetailModal";
+import {IoIosArrowBack} from "react-icons/io";
 
 export default function MatchGroup() {
     const { matchGroupId } = useParams();
@@ -83,6 +84,9 @@ export default function MatchGroup() {
     return (
         <div className="relative min-h-[100dvh] flex flex-col bg-[#f9fafb]">
             {/* 사이드바 toggle 버튼 */}
+            <button onClick={() => navigate("/swings/matchgroup")} className="text-gray-700">
+                    <IoIosArrowBack size={25} />
+            </button>
             <button
                 onClick={() => setShowSidebar(!showSidebar)}
                 className="absolute top-4 right-4 bg-gray-200 text-black text-xs px-3 py-1 rounded-lg shadow-sm hover:bg-gray-300 transition"
