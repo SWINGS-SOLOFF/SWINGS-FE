@@ -55,7 +55,6 @@ const PendingUserList = ({
                 ))}
             </ul>
 
-            {/* 상세 모달 */}
             <ParticipantDetailModal
                 isOpen={!!selectedParticipant}
                 onClose={() => setSelectedParticipant(null)}

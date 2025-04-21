@@ -2,7 +2,7 @@ import axios from "axios";
 import { getToken } from "../utils/userUtils"; // 세션에서 토큰 가져오기
 
 const instance = axios.create({
-  baseURL: "http://localhost:8090/swings", // ✨ 공통 prefix
+  baseURL: "http://localhost:8090/swings",
   timeout: 5000, // 요청 타임아웃 설정
 });
 

@@ -8,7 +8,7 @@ export const getAllNotifications = async (receiver) => {
         });
         return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
-        console.error("❌ 알림 목록 불러오기 실패:", error);
+        console.error("알림 목록 불러오기 실패:", error);
         return [];
     }
 };

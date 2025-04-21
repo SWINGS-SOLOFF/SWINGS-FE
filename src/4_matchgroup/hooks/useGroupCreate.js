@@ -2,7 +2,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { createMatchGroup } from "../api/matchGroupApi";
 
-export default function useGroupCreate(onSuccess) {
+export default function useGroupCreate(onSuccess, step) {
     const [groupData, setGroupData] = useState({
         groupName: "",
         description: "",
@@ -47,6 +47,9 @@ export default function useGroupCreate(onSuccess) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const isManualSubmit = e.nativeEvent?.submitter?.name === "submit-final";
+        if (step !== 3 || !isManualSubmit) return;
 
         const totalGender = groupData.femaleLimit + groupData.maleLimit;
         if (totalGender !== groupData.maxParticipants)

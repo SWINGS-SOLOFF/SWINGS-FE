@@ -8,7 +8,7 @@ import {
     LandPlotIcon,
 } from "lucide-react";
 
-import GroupMainBanner from "../components/GroupMainBanner.jsx";
+import GroupMainBanner from "../components/ui/GroupMainBanner.jsx";
 
 export default function MatchGroupMain() {
 

@@ -1,4 +1,5 @@
 import { useNotification } from "../context/NotificationContext";
+import {deleteNotification, markAsRead} from "../api/NotificationApi.js";
 
 const NotificationPage = () => {
     const {

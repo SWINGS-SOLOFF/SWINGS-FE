@@ -51,14 +51,14 @@ export default function MatchGroupCard({ group }) {
 
     const genderCount = acceptedParticipants.reduce(
         (acc, p) => {
-            if (p.gender === "FEMALE") acc.female += 1;
-            else if (p.gender === "MALE") acc.male += 1;
+            if (p.gender === "female") acc.female += 1;
+            else if (p.gender === "male") acc.male += 1;
             return acc;
         },
         { female: 0, male: 0 }
     );
 
-    const isRecruitClosed = group.closed; // ✅ 모집 종료 여부
+    const isRecruitClosed = group.closed;
     const isFull = acceptedParticipants.length >= group.maxParticipants;
     const genderLimitReached =
         (currentUser?.gender === "FEMALE" && genderCount.female >= group.femaleLimit) ||
@@ -143,10 +143,10 @@ export default function MatchGroupCard({ group }) {
                         </button>
                     ) : (
                         <button
-                            className={`w-full py-2 rounded-xl text-sm transition ${
+                            className={`w-full py-2 px-4 rounded-xl font-bold text-white transition ${
                                 disableJoin
                                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-blue-500 text-white hover:bg-blue-600"
+                                    : "bg-custom-purple"
                             }`}
                             onClick={() => setShowJoinModal(true)}
                             disabled={disableJoin}
@@ -174,15 +174,7 @@ export default function MatchGroupCard({ group }) {
                         alert("성비 제한으로 인해 참가할 수 없습니다.");
                         return;
                     }
-
-                    try {
-                        await handleJoin(group.matchGroupId, currentUser?.userId);
-                        alert("참가 신청 완료!");
-                        navigate(`/swings/matchgroup/`);
-                    } catch (error) {
-                        console.error("신청 중 오류:", error);
-                        alert("신청에 실패했습니다.");
-                    }
+                    await handleJoin(group.matchGroupId, currentUser?.userId); // ✅ navigate 제거
                 }}
             />
         </>
