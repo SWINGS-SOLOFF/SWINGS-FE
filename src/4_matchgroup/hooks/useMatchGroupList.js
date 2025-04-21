@@ -9,7 +9,16 @@ export default function useMatchGroupList(category) {
     const [region, setRegion] = useState("전체");
     const [selectedDate, setSelectedDate] = useState("");
 
-    const regionOptions = ["전체", "서울", "경기", "부산", "대구", "대전", "광주"];
+    const regionOptions = [
+        "전체", "서울", "경기", "인천", "부산", "대구", "광주", "대전",
+        "울산", "세종", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주"
+    ];
+
+    // 시/도 추출 함수
+    const extractRegion = (address = "") => {
+        if (typeof address !== "string" || address.trim() === "") return "";
+        return address.trim().split(" ")[0];
+    };
 
     // 그룹 + 유저 데이터 불러오기
     useEffect(() => {
@@ -42,9 +51,11 @@ export default function useMatchGroupList(category) {
                 g.participants?.some((p) => p.userId === currentUser.userId)
             );
         }
+
         if (region !== "전체") {
-            filtered = filtered.filter((g) => g.location?.includes(region));
+            filtered = filtered.filter((g) => extractRegion(g.location) === region);
         }
+
         if (selectedDate) {
             filtered = filtered.filter((g) =>
                 g.schedule?.startsWith(selectedDate)

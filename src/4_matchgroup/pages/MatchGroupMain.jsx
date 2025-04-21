@@ -1,23 +1,18 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
     ClubIcon as GolfIcon,
     Users2Icon,
     CalendarIcon,
     ArrowRightIcon,
-    PlusIcon,
     LandPlotIcon,
 } from "lucide-react";
 
-import MyParticipationModal from "../components/MyParticipationModal";
 import GroupMainBanner from "../components/GroupMainBanner.jsx";
 
 export default function MatchGroupMain() {
-    const navigate = useNavigate();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [showMyModal, setShowMyModal] = useState(false);
 
     return (
         <div className="w-full max-w-5xl mx-auto pb-32 relative">
@@ -72,43 +67,6 @@ export default function MatchGroupMain() {
                     </div>
                 </Modal>
             )}
-
-            {/* 방 만들기 + 참가내역 모달 */}
-            {isCreateOpen && (
-                <Modal onClose={() => setIsCreateOpen(false)} title="그룹 관리">
-                    <div className="flex flex-col gap-4">
-                        <button
-                            onClick={() => navigate("/swings/matchgroup/create")}
-                            className="w-full py-3 px-4 rounded-xl border text-left hover:bg-gray-50 transition text-black"
-                        >
-                            그룹 만들기
-                        </button>
-                        <button
-                            onClick={() => {
-                                setIsCreateOpen(false);
-                                setShowMyModal(true);
-                            }}
-                            className="w-full py-3 px-4 rounded-xl border text-left hover:bg-gray-50 transition text-black"
-                        >
-                            참가 내역 보기
-                        </button>
-                    </div>
-                </Modal>
-            )}
-
-            {/* 플로팅 버튼 */}
-            <button
-                onClick={() => setIsCreateOpen(true)}
-                className="fixed bottom-24 right-6 bg-gray-900 hover:bg-gray-800 text-white p-3 rounded-full shadow-lg z-50"
-            >
-                <PlusIcon className="h-6 w-6" />
-            </button>
-
-            {/* 참가 내역 모달 */}
-            <MyParticipationModal
-                isOpen={showMyModal}
-                onClose={() => setShowMyModal(false)}
-            />
         </div>
     );
 }
@@ -141,27 +99,6 @@ function InfoItem({ icon, title, desc }) {
             <div>
                 <h3 className="font-medium text-gray-900">{title}</h3>
                 <p className="text-sm text-gray-600">{desc}</p>
-            </div>
-        </div>
-    );
-}
-
-function Modal({ onClose, title, children }) {
-    return (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
-            <div className="bg-white rounded-2xl w-full max-w-lg mx-auto p-6 relative shadow-xl">
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl"
-                >
-                    &times;
-                </button>
-                {title && (
-                    <h2 className="text-xl font-bold text-center text-gray-900 mb-6">
-                        {title}
-                    </h2>
-                )}
-                {children}
             </div>
         </div>
     );
