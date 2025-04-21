@@ -1,9 +1,9 @@
 // src/1_user/pages/TossSuccess.jsx
-
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "../api/axiosInstance";
 import { fetchUserData } from "../api/userApi";
+import { CheckCircle } from "lucide-react";
 
 export default function TossSuccess() {
   const [searchParams] = useSearchParams();
@@ -11,11 +11,10 @@ export default function TossSuccess() {
   const [message, setMessage] = useState("결제 확인 중...");
   const [userId, setUserId] = useState(null);
 
-  //  유저 정보 먼저 가져오기
   useEffect(() => {
     fetchUserData()
       .then((data) => {
-        setUserId(data.userId); // userId 저장
+        setUserId(data.userId);
       })
       .catch((err) => {
         console.error("유저 정보 가져오기 실패:", err);
@@ -23,10 +22,6 @@ export default function TossSuccess() {
       });
   }, []);
 
-  //[콘솔]userId 가져오는지 확인
-  console.log("userId:", userId);
-
-  //  userId가 준비되면 결제 확인 요청
   useEffect(() => {
     if (!userId) return;
 
@@ -41,31 +36,32 @@ export default function TossSuccess() {
           orderId,
           amount: parseInt(amount),
           customerId: userId,
-          createdAt: new Date().toISOString(), // ISO 8601 형식으로 보냄
+          createdAt: new Date().toISOString(),
         });
 
-        //[콘솔] 백엔드로 정보 전송 성공
         console.log("✅ 백엔드 확인 완료:", response.data);
-        setMessage("포인트 충전이 완료되었습니다!");
-
-        setTimeout(() => {
-          navigate("/swings/points");
-        }, 1000);
+        setMessage("포인트 충전이 완료되었습니다! 🎉");
       } catch (err) {
-        //[콘솔] 백엔드로 정보 전송 실패
         console.error("❌ 결제 확인 실패:", err.response?.data || err.message);
         setMessage("결제 확인에 실패했습니다.");
       }
+
+      setTimeout(() => {
+        navigate("/swings/shop");
+      }, 3000);
     };
 
     confirmPayment();
   }, [userId]);
 
   return (
-    <div className="p-8 text-center">
-      <br />
-      <h1 className="text-xl font-bold text-green-600">🎉 결제 성공</h1>
-      <p className="mt-4">{message}</p>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-white text-center px-6">
+      <CheckCircle className="text-green-500 w-20 h-20 mb-4 animate-bounce" />
+      <h1 className="text-3xl font-bold text-green-600 mb-2">결제 성공</h1>
+      <p className="text-lg text-gray-700">{message}</p>
+      <p className="mt-2 text-sm text-gray-400">
+        3초 후 상점으로 이동합니다...
+      </p>
     </div>
   );
 }

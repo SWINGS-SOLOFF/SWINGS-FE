@@ -109,7 +109,7 @@ export const getPointHistory = async () => {
 };
 
 //  포인트 충전
-export const chargePoint = async (amount, description = "포인트 충전") => {
+export const chargePoint = async (amount, description = "하트 충전") => {
   const response = await axios.post("/users/me/points/charge", null, {
     params: { amount, description },
   });
@@ -117,7 +117,7 @@ export const chargePoint = async (amount, description = "포인트 충전") => {
 };
 
 //  포인트 사용
-export const usePoint = async (amount, description = "포인트 사용") => {
+export const usePoint = async (amount, description = "하트 사용") => {
   const response = await axios.post("/users/me/points/use", null, {
     params: { amount, description },
   });

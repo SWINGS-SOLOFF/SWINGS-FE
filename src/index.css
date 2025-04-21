@@ -69,10 +69,6 @@ body {
 }
 
 /* ------------------------ 버튼 및 카드 ------------------------ */
-button:hover {
-  border-color: gray;
-}
-
 
 button:focus,
 button:focus-visible {
@@ -117,6 +113,13 @@ button:focus-visible {
   animation-name: sakuraFall;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+}
+
+/*  모든 input, textarea, select에 기본적으로 outline 제거 */
+input:focus,
+textarea:focus,
+select:focus button:focus {
+  @apply outline-none focus:outline-none;
 }
 
 /* ------------------------ 기타 ------------------------ */
