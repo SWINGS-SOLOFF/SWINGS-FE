@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { resetPassword } from "../api/userApi";
-import { X } from "lucide-react";
+import { X, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function FindPasswordModal({ onClose }) {
@@ -65,7 +65,7 @@ export default function FindPasswordModal({ onClose }) {
 
             <input
               type="email"
-              placeholder="가입 시 사용한 이메일 입력"
+              placeholder="이메일 입력"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -95,13 +95,19 @@ export default function FindPasswordModal({ onClose }) {
 
       {showResultModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-xl shadow-md text-center w-full max-w-sm">
-            <h3 className="text-l font-semibold text-gray-800 mb-2">
-              임시 비밀번호가 이메일로 전송되었습니다.
+          <div className="bg-white p-8 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-fadeIn">
+            <CheckCircle className="mx-auto text-green-500 w-12 h-12 mb-3" />
+            <h3 className="text-xl font-semibold text-gray-800 mb-1">
+              임시 비밀번호 전송 완료
             </h3>
+            <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+              입력하신 이메일로
+              <br />
+              임시 비밀번호가 전송되었습니다.
+            </p>
             <button
               onClick={handleConfirm}
-              className="w-full bg-pink-300 text-white py-2 rounded font-semibold"
+              className="w-full bg-custom-purple hover:bg-pink-400 text-white py-2 rounded-lg font-semibold transition"
             >
               확인
             </button>
