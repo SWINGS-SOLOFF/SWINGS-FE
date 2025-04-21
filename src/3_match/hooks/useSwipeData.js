@@ -7,7 +7,7 @@ export function useSwipeData() {
     const [profile, setProfile] = useState(null);               // 추천된 유저 정보
     const [remainingLikes, setRemainingLikes] = useState(3);    // 남은 좋아요 횟수
 
-    // ✅ 페이지 첫 진입 시, 사용자 정보 + 추천 유저 + 남은 좋아요 불러오기
+    //  페이지 첫 진입 시, 사용자 정보 + 추천 유저 + 남은 좋아요 불러오기
     useEffect(() => {
         const load = async () => {
             try {
@@ -24,7 +24,7 @@ export function useSwipeData() {
         load();
     }, []);
 
-    // ✅ 추천 유저 한 명 가져오기
+    // 추천 유저 한 명 가져오기
     const fetchRecommendedUser = async (username) => {
         try {
             const res = await axios.get(`/api/users/${username}/recommend`);
@@ -35,7 +35,7 @@ export function useSwipeData() {
         }
     };
 
-    // ✅ 남은 무료 좋아요 횟수 가져오기
+    //  남은 무료 좋아요 횟수 가져오기
     const fetchRemainingLikes = async (username) => {
         try {
             const res = await axios.get(`/api/likes/count/${username}`);
