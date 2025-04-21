@@ -1,5 +1,5 @@
 module.exports = {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,css}"],
   theme: {
     extend: {
       colors: {
@@ -24,5 +24,18 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        ".scrollbar-hide": {
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
+        },
+        ".scrollbar-hide::-webkit-scrollbar": {
+          display: "none",
+        },
+      });
+    },
+  ],
 };

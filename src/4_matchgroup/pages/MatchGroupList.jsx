@@ -1,12 +1,51 @@
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import {IoIosArrowBack, IoIosArrowDown, IoIosArrowUp} from "react-icons/io";
+import {CalendarIcon, MapPin, Menu, Plus} from "lucide-react";
+import { format, getDaysInMonth, isToday } from "date-fns";
+import { ko } from "date-fns/locale";
+
 import MatchGroupCard from "../components/MatchGroupCard";
 import useMatchGroupList from "../hooks/useMatchGroupList";
+import MatchGroupMenuModal from "../components/MatchGroupMenuModal.jsx";
+import MyParticipationModal from "../components/MyParticipationModal.jsx";
+import MatchGroupCreate from "./MatchGroupCreate.jsx";
+import BaseModal from "../components/ui/BaseModal";
+import MapRegionModal from "../components/MapRegionModal";
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.1 },
+    },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+};
 
 const MatchGroupList = () => {
     const { category } = useParams();
     const navigate = useNavigate();
+
+    const [showMenu, setShowMenu] = useState(false);
+    const [showMyModal, setShowMyModal] = useState(false);
+    const [myModalTab, setMyModalTab] = useState("JOINED");
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showMapModal, setShowMapModal] = useState(false);
+
+    const [monthOffset, setMonthOffset] = useState(0);
+    const [scrollReady, setScrollReady] = useState(false);
+
+    const scrollRef = useRef(null);
+
+    const today = new Date();
+    const baseMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset);
+    const daysInMonth = getDaysInMonth(baseMonth);
+    const startOfMonth = new Date(baseMonth.getFullYear(), baseMonth.getMonth(), 1);
 
     const {
         tab,
@@ -15,82 +54,137 @@ const MatchGroupList = () => {
         setRegion,
         selectedDate,
         setSelectedDate,
-        regionOptions,
         filteredGroups,
     } = useMatchGroupList(category);
 
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.1 },
-        },
+    const groupCountByDate = filteredGroups.reduce((acc, g) => {
+        const date = g.schedule?.split("T")[0];
+        if (date) acc[date] = (acc[date] || 0) + 1;
+        return acc;
+    }, {});
+
+    const handleDateClick = (ymd) => {
+        if (selectedDate === ymd) {
+            setSelectedDate("");
+        } else {
+            setSelectedDate(ymd);
+        }
     };
 
-    const itemVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0 },
+    // 월 이동
+    const changeMonth = (delta) => {
+        setMonthOffset((prev) => prev + delta);
+        setScrollReady(false);
     };
+
+    // 렌더링 후 오늘 날짜로 스크롤 이동
+    useEffect(() => {
+        if (!scrollRef.current) return;
+        const todayEl = scrollRef.current.querySelector(".today");
+        if (todayEl && !scrollReady) {
+            todayEl.scrollIntoView({ inline: "center", behavior: "smooth" });
+            setScrollReady(true);
+        }
+    }, [monthOffset, scrollReady]);
 
     return (
         <div className="relative max-w-6xl mx-auto px-4 py-6">
-            {/* ← 뒤로가기 버튼 */}
-            <div className="absolute top-4 left-4">
-                <button
-                    onClick={() => navigate("/swings/matchgroup")}
-                    className="absolute top-4 left-1 text-gray-700 transition-all"
-                >
-                    <ArrowLeft size={25} />
+            {/* 헤더 */}
+            <div className="flex items-center justify-between px-4 mb-4">
+                <button onClick={() => navigate("/swings/matchgroup")} className="text-gray-700">
+                    <IoIosArrowBack size={25} />
+                </button>
+                <h1 className="text-xl font-bold text-center">
+                    {category === "screen" ? "SCREEN" : "FIELD"}
+                </h1>
+                <button onClick={() => setShowMenu(true)} className="text-gray-700">
+                    <Menu size={25} />
                 </button>
             </div>
-
-            <h1 className="text-2xl font-bold text-center mb-4">
-                {category === "screen" ? "SCREEN" : "FIELD"}
-            </h1>
 
             {/* 탭 */}
-            <div className="bg-gray-100 p-1 rounded-xl flex w-full max-w-md mx-auto mb-6 shadow-inner">
+            <div className="bg-gray-100 p-1 rounded-xl flex w-full max-w-md mx-auto mb-4 shadow-inner">
+                {["all", "my"].map((type) => (
+                    <button
+                        key={type}
+                        className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                            tab === type ? "bg-white text-black shadow-sm" : "text-gray-500 hover:text-black"
+                        }`}
+                        onClick={() => setTab(type)}
+                    >
+                        {type === "all" ? "All" : "My"}
+                    </button>
+                ))}
+            </div>
+
+            {/* 버튼 영역 */}
+            <div className="flex justify-between items-center mb-4 px-2">
                 <button
-                    className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                        tab === "all"
-                            ? "bg-white text-black shadow-sm"
-                            : "text-gray-500 hover:text-black"
-                    }`}
-                    onClick={() => setTab("all")}
+                    onClick={() => setShowMapModal(true)}
                 >
-                    All
+                    <MapPin />
                 </button>
                 <button
-                    className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                        tab === "my"
-                            ? "bg-white text-black shadow-sm"
-                            : "text-gray-500 hover:text-black"
-                    }`}
-                    onClick={() => setTab("my")}
+                    onClick={() => setShowCreateModal(true)}
+                    className="px-1 py-1 text-sm rounded-md text-custom-pink font-bold"
                 >
-                    My
+                    <Plus />
                 </button>
             </div>
 
-            {/* 필터 */}
-            <select
-                className="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition mr-2"
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-            >
-                {regionOptions.map((r) => (
-                    <option key={r} value={r}>{r}</option>
-                ))}
-            </select>
+            {/* 날짜 필터 */}
+            <div className="flex items-center gap-3 mb-3 px-2">
+                <div className="flex flex-col items-center min-w-fit">
+                    <button onClick={() => changeMonth(-1)} className="text-xl mb-1">
+                        <IoIosArrowUp />
+                    </button>
 
-            <select
-                className="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-            >
-                <option value="">일정</option>
-                {/* 날짜 동적 생성은 이후 확장 */}
-            </select>
+                    <span className="font-bold whitespace-nowrap text-center leading-none my-1">
+                        {format(baseMonth, "M월")}
+                    </span>
+
+                    <button onClick={() => changeMonth(1)} className="text-xl mt-1">
+                        <IoIosArrowDown />
+                    </button>
+                </div>
+
+                <div
+                    ref={scrollRef}
+                    className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-hide"
+                >
+                    {Array.from({ length: daysInMonth }, (_, i) => {
+                        const date = new Date(baseMonth.getFullYear(), baseMonth.getMonth(), i + 1);
+                        const ymd = format(date, "yyyy-MM-dd");
+                        const day = format(date, "d");
+                        const weekday = format(date, "EEE", { locale: ko });
+                        const isSelected = selectedDate === ymd;
+                        const isCurrentDay = isToday(date);
+
+                        return (
+                            <button
+                                key={ymd}
+                                onClick={() => handleDateClick(ymd)}
+                                className={`flex flex-col items-center justify-center w-12 text-xs font-medium rounded-lg py-1 ${
+                                    isSelected ? "bg-custom-pink text-white" : "text-gray-700"
+                                } ${isCurrentDay && !isSelected ? "border border-pink-400 today" : ""}`}
+                            >
+                <span
+                    className={`mb-1 ${
+                        weekday === "토" ? "text-blue-500" : weekday === "일" ? "text-red-500" : ""
+                    }`}
+                >
+                  {weekday}
+                </span>
+                                <span className="text-[13px] mb-1">{day}</span>
+                                <span className="w-6 h-6 bg-gray-200 rounded-full text-[12px] flex items-center justify-center">
+                  {groupCountByDate[ymd] || 0}
+                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
 
             {/* 그룹 목록 */}
             {filteredGroups.length === 0 ? (
@@ -108,6 +202,42 @@ const MatchGroupList = () => {
                         </motion.div>
                     ))}
                 </motion.div>
+            )}
+
+            {/* 모달들 */}
+            {showMenu && (
+                <MatchGroupMenuModal
+                    onClose={() => setShowMenu(false)}
+                    onSelectTab={(tab) => {
+                        setMyModalTab(tab);
+                        setShowMyModal(true);
+                    }}
+                />
+            )}
+
+            {showMyModal && (
+                <MyParticipationModal
+                    isOpen={showMyModal}
+                    onClose={() => setShowMyModal(false)}
+                    defaultTab={myModalTab}
+                />
+            )}
+
+            {showCreateModal && (
+                <BaseModal onClose={() => setShowCreateModal(false)} title="그룹 만들기" maxWidth="max-w-md">
+                    <div className="max-h-[60vh] overflow-y-auto scrollbar-hide px-2">
+                        <MatchGroupCreate isModal={true} onSuccess={() => setShowCreateModal(false)} />
+                    </div>
+                </BaseModal>
+            )}
+
+            {showMapModal && (
+                <MapRegionModal
+                    isOpen={showMapModal}
+                    onClose={() => setShowMapModal(false)}
+                    groups={filteredGroups}
+                    setRegion={setRegion}
+                />
             )}
         </div>
     );

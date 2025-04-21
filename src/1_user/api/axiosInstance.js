@@ -1,5 +1,3 @@
-// src/1_user/api/axiosInstance.js
-
 import axios from "axios";
 import { getToken } from "../utils/userUtils"; // 세션에서 토큰 가져오기
 
