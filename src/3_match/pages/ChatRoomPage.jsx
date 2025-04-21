@@ -124,7 +124,7 @@ const ChatRoomPage = () => {
 
     return (
         <div className="flex flex-col h-screen bg-white">
-            {/* ✅ 상단바 */}
+            {/*  상단바 */}
             <div className="fixed top-0 left-0 w-full h-14 bg-white px-4 flex justify-between items-center shadow z-50">
                 <h1 className="text-lg font-bold">채팅방</h1>
                 <button onClick={() => setShowLeaveModal(true)}>
@@ -132,7 +132,7 @@ const ChatRoomPage = () => {
                 </button>
             </div>
 
-            {/* ✅ 메시지 목록 */}
+            {/*  메시지 목록 */}
             <div className="absolute top-14 bottom-24 overflow-y-auto w-full p-4">
                 {messages.map((msg, idx) => {
                     const isMe = msg.sender === currentUser.username;
@@ -175,7 +175,7 @@ const ChatRoomPage = () => {
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* ✅ 입력창 */}
+            {/*  입력창 */}
             <div className="absolute bottom-12 left-0 w-full p-4 bg-white flex items-center mb-2">
                 <input
                     value={input}
@@ -192,7 +192,7 @@ const ChatRoomPage = () => {
                 </button>
             </div>
 
-            {/* ✅ 나가기 모달 */}
+            {/*  나가기 모달 */}
             {showLeaveModal && (
                 <ConfirmModal
                     message="채팅방을 나가시겠어요?"
