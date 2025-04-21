@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { ThumbsUp, ThumbsUpIcon } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import axios from "../../1_user/api/axiosInstance";
+import { IoIosArrowBack } from "react-icons/io"; // ← 추가
 
 // ✅ 3. 내부 API, 컴포넌트
 import {
@@ -65,10 +66,10 @@ export default function LikeListPage() {
       const remaining = res.data;
 
       if (remaining <= 0) {
-        setSelectedUser(targetUsername); // ✅ 딱 여기까지만
-        setShowConfirmModal(true); // ✅ 모달 띄우기
+        setSelectedUser(targetUsername);
+        setShowConfirmModal(true);
       } else {
-        await sendLikeToUser(currentUser.username, targetUsername, false); // 무료면 즉시 전송
+        await sendLikeToUser(currentUser.username, targetUsername, false);
         await createChatRoom(currentUser.username, targetUsername, false);
         toast.success("💓 호감 표시 완료 💓");
         toast.success("💬 채팅방이 생성되었습니다");
@@ -83,19 +84,15 @@ export default function LikeListPage() {
     try {
       const data = new URLSearchParams();
       data.append("amount", 1);
-      data.append("description", "좋아요 유료 사용"); // ✅ 기록용 메세지
+      data.append("description", "좋아요 유료 사용");
 
-      // ✅ 프론트에서 포인트 차감은 여전히 유지
       await axios.post(`/users/me/points/use`, data, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
 
-      // ✅ 좋아요 요청만 보내고, 포인트 차감은 안 함 (백엔드에선 차감 코드 삭제했어야 함!)
       await sendLikeToUser(currentUser.username, selectedUser, true);
-
-      // ✅ 채팅방 생성
       await createChatRoom(currentUser.username, selectedUser, false);
 
       toast.success("💓 유료 좋아요 완료!");
@@ -126,6 +123,17 @@ export default function LikeListPage() {
     <div className="flex flex-col h-full min-h-screen bg-white text-gray-900 px-4 py-6">
       <Toaster />
 
+      {/* ✅ 상단 뒤로가기 + 제목 */}
+      <div className="flex items-center gap-2 mb-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="text-gray-600 hover:text-black"
+        >
+          <IoIosArrowBack size={24} />
+        </button>
+      </div>
+
+      {/* ✅ 유료 좋아요 모달 */}
       {showConfirmModal && (
         <ConfirmModal
           message={`무료 좋아요가 모두 소진되었습니다.\n1하트를 사용하시겠어요?`}
@@ -136,6 +144,7 @@ export default function LikeListPage() {
         />
       )}
 
+      {/* ✅ 충전 모달 */}
       {showChargeModal && (
         <ConfirmModal
           message={`하트가 부족합니다.\n충전하러 가시겠어요?`}
@@ -149,6 +158,7 @@ export default function LikeListPage() {
         />
       )}
 
+      {/* ✅ 탭 전환 */}
       <div className="flex justify-center gap-4 mb-6">
         <button
           className={`px-4 py-2 rounded-xl transition-all font-bold outline-none focus:outline-none duration-200 ${
@@ -172,6 +182,7 @@ export default function LikeListPage() {
         </button>
       </div>
 
+      {/* ✅ 리스트 */}
       <div className="space-y-3 pb-20">
         {activeList.length === 0 ? (
           <p className="text-center text-gray-400 py-10 animate-pulse">
