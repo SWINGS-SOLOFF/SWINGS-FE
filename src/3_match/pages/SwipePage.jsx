@@ -86,14 +86,14 @@ function SwipePage() {
             data.append("amount", 3);
             data.append("description", "슈퍼챗 사용");
 
-            // ✅ 포인트 차감 시도
+            //  포인트 차감 시도
             await axios.post("/users/me/points/use", data, {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
             });
 
-            // ✅ 채팅방 생성 (슈퍼챗으로)
+            //  채팅방 생성 (슈퍼챗으로)
             await axios.post("/api/chat/room", null, {
                 params: {
                     user1: currentUser.username,
@@ -109,7 +109,7 @@ function SwipePage() {
             const msg = error.response?.data?.message || "";
             const status = error.response?.status;
 
-            // ✅ 메시지 기준으로 포인트 부족 판단
+            //  메시지 기준으로 포인트 부족 판단
             if (status === 400 || msg.includes("하트가 부족")) {
                 setShowChargeModal(true);
             } else {
