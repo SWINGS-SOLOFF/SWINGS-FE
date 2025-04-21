@@ -1,4 +1,4 @@
-// ✅ matchApi.js (최종 수정본)
+//  matchApi.js (최종 수정본)
 import axios from "../../1_user/api/axiosInstance";
 
 /**
@@ -19,7 +19,7 @@ export const sendLike = (fromUserId, toUserId, paid = false) => {
     });
 };
 
-// ✅ LikeListPage용 이름으로도 export
+//  LikeListPage용 이름으로도 export
 export const sendLikeToUser = (fromUsername, toUsername, paid = false) => {
     return axios.post(`/api/likes/${fromUsername}/${toUsername}`, null, {
         params: { paid }
@@ -35,7 +35,7 @@ export const sendDislike = (fromUserId, toUserId) => {
 };
 
 /**
- * ✅ 보낸 좋아요 + 받은 좋아요 함께 조회
+ *  보낸 좋아요 + 받은 좋아요 함께 조회
  * GET /swings/api/likes/all/{userId}
  */
 export async function getSentAndReceivedLikes(userId) {
@@ -44,7 +44,7 @@ export async function getSentAndReceivedLikes(userId) {
 }
 
 /**
- * ✅ 채팅방 생성 (슈퍼챗 포함 일반 좋아요도 사용)
+ *  채팅방 생성 (슈퍼챗 포함 일반 좋아요도 사용)
  * POST /swings/api/chat/room?user1={user1}&user2={user2}
  */
 export const createChatRoom = async (user1, user2, isSuperChat = false) => {

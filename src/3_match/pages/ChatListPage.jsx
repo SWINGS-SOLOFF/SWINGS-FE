@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { fetchUserData, getProfileImageUrl } from "../../1_user/api/userApi";
 import { motion } from "framer-motion";
+import { Heart } from "lucide-react";
+
 
 const ChatListPage = () => {
     const [chatRooms, setChatRooms] = useState([]);
@@ -43,7 +45,7 @@ const ChatListPage = () => {
                     <p className="text-center py-10 text-gray-400 animate-pulse">채팅방이 없습니다</p>
                 ) : (
                     chatRooms.map((room, idx) => {
-                        // ✅ 이제 백엔드에서 바로 넘어온 값 사용!
+                        //  백엔드에서 바로 넘어온 값 사용!
                         const targetUsername = room.targetUsername;
                         const targetImg = room.targetImg;
                         const targetName = room.targetName;
@@ -108,10 +110,13 @@ const ChatListPage = () => {
             {/* 좋아요 전체 보기 버튼 */}
             <button
                 onClick={() => navigate(`/swings/chat/likes/${currentUser?.username}`)}
-                className="fixed bottom-24 right-6 px-6 py-5 rounded-full bg-custom-pink text-white text-sm font-bold shadow-xl hover:bg-pink-600 transition-all z-50"
+                className="fixed bottom-24 right-6 outline-none focus:outline-none bg-custom-pink text-white rounded-full p-3 shadow-lg transition-all duration-300 z-[60] flex items-center justify-center"
+                aria-label="좋아요 보낸 유저 목록"
             >
-                ❤️
+                <Heart size={20} />
             </button>
+
+
         </div>
     );
 };

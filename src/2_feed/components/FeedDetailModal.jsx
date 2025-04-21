@@ -400,8 +400,10 @@ const FeedDetailModal = ({
                         className="p-2 text-black hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
                       >
                         <label className="cursor-pointer flex items-center gap-1">
-                          <FaImage className="text-xl text-pink-600" />
-                          <span className="text-sm text-gray-700">업로드</span>
+                          <FaImage className="text-xl text-custom-pink" />
+                          <span className="text-sm text-gray-700 font-bold">
+                            UPLOAD
+                          </span>
                           <input
                             type="file"
                             accept="image/*"
@@ -433,15 +435,17 @@ const FeedDetailModal = ({
                     )}
 
                     {/* 게시글 텍스트 박스 */}
-                    <textarea
-                      value={editedCaption}
-                      onChange={(e) => setEditedCaption(e.target.value)}
-                      placeholder="게시물 내용을 입력하세요..."
-                      className="w-full border border-gray-300 rounded-lg p-4 text-sm text-black resize-none h-36"
-                      maxLength={500}
-                    ></textarea>
-                    <div className="text-right text-xs text-gray-400">
-                      {editedCaption.length}/500
+                    <div className="relative">
+                      <textarea
+                        value={editedCaption}
+                        onChange={(e) => setEditedCaption(e.target.value)}
+                        placeholder="게시물 내용을 입력하세요..."
+                        className="w-full border border-gray-300 rounded-lg p-4 text-sm text-black resize-none h-36 pr-12"
+                        maxLength={500}
+                      ></textarea>
+                      <div className="absolute bottom-2 right-4 text-xs text-gray-400 pointer-events-none">
+                        {editedCaption.length}/500
+                      </div>
                     </div>
 
                     {/* 버튼 영역 */}
@@ -452,13 +456,13 @@ const FeedDetailModal = ({
                           setEditedFile(null);
                           setEditedCaption(feed.caption || "");
                         }}
-                        className="px-4 py-2 text-pink-700 border border-pink-300 rounded-full hover:bg-pink-50 transition-colors text-sm"
+                        className="px-4 py-2 font-bold text-pink-700 border border-pink-300 rounded-full hover:bg-pink-50 transition-colors text-sm"
                       >
                         취소
                       </button>
                       <button
                         onClick={handlePostEditSubmit}
-                        className="px-4 py-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 shadow-sm transition-all duration-300 text-sm"
+                        className="px-4 py-2 font-bold bg-custom-pink text-white rounded-full hover:bg-pink-700 shadow-sm transition-all duration-300 text-sm"
                       >
                         저장
                       </button>
