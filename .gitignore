@@ -36,3 +36,6 @@ dev-dist/*
 
 # Firebase key
 src/main/resources/firebase/firebase-service-account.json
+
+# AWS S3 key
+swings-key.pem

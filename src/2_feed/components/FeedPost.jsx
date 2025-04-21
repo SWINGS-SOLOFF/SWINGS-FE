@@ -7,6 +7,8 @@ import {
   FaEllipsisV,
   FaEdit,
   FaCheck,
+  FaImage,
+  FaTimes,
 } from "react-icons/fa";
 import { normalizeImageUrl } from "../utils/imageUtils";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +38,11 @@ const FeedPost = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedCaption, setEditedCaption] = useState(post.caption || "");
   const [editedFile, setEditedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(
+    post.image || post.imageUrl
+      ? normalizeImageUrl(post.image || post.imageUrl)
+      : null
+  );
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editedComment, setEditedComment] = useState("");
   const [commentHeightMap, setCommentHeightMap] = useState({});
@@ -147,6 +154,23 @@ const FeedPost = ({
     onToggleComments(post.feedId);
   };
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setEditedFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const clearImagePreview = () => {
+    const fileInput = document.getElementById(`image-upload-${post.feedId}`);
+    if (fileInput) {
+      fileInput.value = "";
+    }
+    setImagePreview(null);
+    setEditedFile(null);
+  };
+
   // 이미지가 있는지 확인
   const hasImage = post.image || post.imageUrl;
 
@@ -188,23 +212,21 @@ const FeedPost = ({
               <FaEllipsisV className="text-lg" />
             </button>
 
-            {/* 드롭다운 메뉴 */}
+            {/* 둥근 드롭다운 메뉴 */}
             {showDropdown && (
-              <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                <div className="py-1">
-                  <button
-                    onClick={handleEditClick}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                  >
-                    <FaEdit className="mr-2" /> 게시물 수정
-                  </button>
-                  <button
-                    onClick={handleDeleteClick}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"
-                  >
-                    <FaTrash className="mr-2" /> 게시물 삭제
-                  </button>
-                </div>
+              <div className="absolute right-0 mt-2 bg-white rounded-xl shadow-lg z-10 border border-gray-200 overflow-hidden flex">
+                <button
+                  onClick={handleEditClick}
+                  className="p-2 hover:bg-gray-100 transition text-gray-600"
+                >
+                  <FaEdit size={16} />
+                </button>
+                <button
+                  onClick={handleDeleteClick}
+                  className="p-2 hover:bg-gray-100 transition text-red-600"
+                >
+                  <FaTrash size={16} />
+                </button>
               </div>
             )}
           </div>
@@ -218,7 +240,7 @@ const FeedPost = ({
       />
 
       {isEditing ? (
-        <div className="p-6 bg-gray-50">
+        <div className="p-4 bg-white">
           <form
             onSubmit={async (e) => {
               e.preventDefault();
@@ -240,51 +262,67 @@ const FeedPost = ({
             }}
             className="space-y-4"
           >
-            <div>
-              <label className="inline-block px-4 py-2 bg-black text-white text-sm font-medium rounded-lg cursor-pointer hover:bg-gray-800 transition-all duration-300">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setEditedFile(e.target.files[0])}
-                  className="hidden"
-                />
-                이미지 선택
-              </label>
-              {(editedFile || post.image || post.imageUrl) && (
-                <div className="mt-4 border rounded-lg overflow-hidden">
-                  <img
-                    src={
-                      editedFile
-                        ? URL.createObjectURL(editedFile)
-                        : normalizeImageUrl(post.image || post.imageUrl)
-                    }
-                    alt="미리보기"
-                    className="w-full max-h-64 object-contain bg-gray-100"
+            <div className="outline-none focus:outline-none flex justify-between items-center">
+              <button
+                type="button"
+                className="p-2 text-black hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
+              >
+                <label className="cursor-pointer flex items-center gap-1">
+                  <FaImage className="text-xl text-pink-600" />
+                  <span className="text-sm text-gray-700">업로드</span>
+                  <input
+                    id={`image-upload-${post.feedId}`}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
                   />
-                </div>
-              )}
+                </label>
+              </button>
             </div>
+
+            {/* 이미지 미리보기 */}
+            {imagePreview && (
+              <div className="mt-2 rounded-lg overflow-hidden border border-gray-300 relative group">
+                <img
+                  src={imagePreview}
+                  alt="미리보기"
+                  className="w-full max-h-64 object-cover"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <button
+                    type="button"
+                    onClick={clearImagePreview}
+                    className="bg-white text-black p-2 rounded-full hover:bg-gray-100"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+              </div>
+            )}
 
             <textarea
               value={editedCaption}
               onChange={(e) => setEditedCaption(e.target.value)}
               placeholder="게시물 내용을 입력하세요..."
-              className="w-full border border-gray-300 rounded-lg p-4 text-sm text-black"
-              rows={4}
+              className="w-full border border-gray-300 rounded-lg p-4 text-sm text-black resize-none h-36"
               maxLength={500}
             ></textarea>
+            <div className="absolute bottom-20 right-8 text-xs text-gray-400">
+              {editedCaption.length}/500
+            </div>
 
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="px-4 py-2 text-sm bg-gray-200 rounded"
+                className="px-4 py-2 text-pink-700 border border-pink-300 rounded-full hover:bg-pink-50 transition-colors text-sm"
               >
                 취소
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-sm bg-black text-white rounded hover:bg-gray-800"
+                className="px-4 py-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 shadow-sm transition-all duration-300 text-sm"
               >
                 저장
               </button>
@@ -296,7 +334,7 @@ const FeedPost = ({
           {(post.image || post.imageUrl) && (
             <>
               <div
-                className="w-full md:w-1/2 bg-white max-h-[80vh] overflow-hidden flex justify-center items-center"
+                className="w-full bg-white overflow-hidden cursor-pointer"
                 onClick={() =>
                   onImageClick(normalizeImageUrl(post.image || post.imageUrl))
                 }
@@ -304,14 +342,14 @@ const FeedPost = ({
                 <img
                   src={normalizeImageUrl(post.image || post.imageUrl)}
                   alt="게시물 이미지"
-                  className="object-contain w-full h-full"
+                  className="w-full h-[300px] object-cover"
                 />
               </div>
               {post.caption?.trim() && (
                 <div className="p-4">
                   <div
                     ref={contentRef}
-                    className={`text-base font-medium text-gray-800 break-words whitespace-pre-wrap font-pretendard ${
+                    className={`text-base text-gray-800 break-words whitespace-pre-wrap  font-pretendard${
                       !isExpanded
                         ? "line-clamp-1 relative cursor-pointer"
                         : "cursor-pointer"
@@ -378,7 +416,11 @@ const FeedPost = ({
               />
               <button
                 onClick={() => onShowLikedBy(post.feedId)}
-                className="text-sm font-medium text-red-600 hover:text-red-800 transition cursor-pointer" /* 빨간색으로 변경 */
+                className={`text-sm font-medium transition cursor-pointer ${
+                  post.likes > 0
+                    ? "text-red-600 hover:text-red-800"
+                    : "text-gray-400 hover:text-gray-500"
+                }`}
               >
                 {post.likes || 0}
               </button>
@@ -506,25 +548,25 @@ const FeedPost = ({
                         </button>
 
                         {activeCommentDropdown === comment.commentId && (
-                          <div className="absolute right-0 mt-1 w-28 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                          <div className="absolute right-0 mt-1 bg-white rounded-xl shadow-lg z-10 border border-gray-200 overflow-hidden flex">
                             <button
                               onClick={() => {
                                 setEditingCommentId(comment.commentId);
                                 setEditedComment(comment.content);
                                 setActiveCommentDropdown(null);
                               }}
-                              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              className="p-2 hover:bg-gray-100 transition text-gray-600"
                             >
-                              수정
+                              <FaEdit />
                             </button>
                             <button
                               onClick={() => {
                                 onCommentDelete(comment.commentId, post.feedId);
                                 setActiveCommentDropdown(null);
                               }}
-                              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100"
+                              className="p-2 hover:bg-gray-100 transition text-red-600"
                             >
-                              삭제
+                              <FaTrash />
                             </button>
                           </div>
                         )}
@@ -536,9 +578,7 @@ const FeedPost = ({
             ) : (
               <div className="text-center text-gray-500 py-6 bg-gray-50/50 rounded-lg">
                 <FaComment className="mx-auto mb-3 text-gray-500 text-3xl" />
-                <p className="text-sm">
-                  아직 댓글이 없습니다. 첫 댓글의 주인공이 되어보세요!
-                </p>
+                <p className="text-sm">아직 댓글이 없습니다.</p>
               </div>
             )}
           </div>
@@ -559,8 +599,8 @@ const FeedPost = ({
                   disabled={!newComment.trim()}
                   className={`ml-3 ${
                     !newComment.trim()
-                      ? "bg-gray-400"
-                      : "bg-black hover:bg-gray-800"
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-pink-600 hover:bg-pink-700"
                   } text-white p-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center`}
                 >
                   <FaPaperPlane />

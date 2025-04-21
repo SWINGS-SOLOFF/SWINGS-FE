@@ -6,7 +6,8 @@ const ImageModal = ({ imageUrl, onClose }) => {
   if (!imageUrl || typeof imageUrl !== "string") return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+      {" "}
       <div className="absolute inset-0" onClick={onClose}></div>
       <div
         className="relative max-w-full max-h-full bg-transparent"
