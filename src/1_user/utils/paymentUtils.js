@@ -17,7 +17,7 @@ export const requestTossPayment = ({ clientKey, coin, userId }) => {
   tossPayments.requestPayment("카드", {
     amount: getAmountFromCoin(coin),
     orderId: `order-${Date.now()}`,
-    orderName: `포인트 ${coin}코인 충전`,
+    orderName: `${coin}하트 충전`,
     successUrl: `${window.location.origin}/swings/mypage/points/success`,
     failUrl: `${window.location.origin}/swings/mypage/points/fail`,
     customerName: String(userId),

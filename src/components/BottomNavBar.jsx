@@ -1,18 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
-import {
-  Handshake,
-  HeartHandshake,
-  LayoutGrid,
-  MessageCircle,
-  CircleUser,
-} from "lucide-react";
+import { Handshake, CircleUser } from "lucide-react";
 import { motion } from "framer-motion";
+import { FaHeartCircleCheck } from "react-icons/fa6";
+import { AiOutlineInstagram } from "react-icons/ai";
+import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 
 const navItems = [
   { to: "/swings/matchgroup", label: "조인", icon: Handshake },
-  { to: "/swings/match", label: "소개팅", icon: HeartHandshake },
-  { to: "/swings/feed", label: "피드", icon: LayoutGrid },
-  { to: "/swings/chat", label: "채팅", icon: MessageCircle },
+  { to: "/swings/match", label: "소개팅", icon: FaHeartCircleCheck },
+  { to: "/swings/feed", label: "피드", icon: AiOutlineInstagram },
+  { to: "/swings/chat", label: "채팅", icon: HiOutlineChatBubbleLeftRight },
   { to: "/swings/social", label: "마이페이지", icon: CircleUser },
 ];
 
@@ -38,7 +35,7 @@ export default function BottomNavBar() {
                 animate={{ scale: isActive ? 1.2 : 1 }}
                 transition={{ type: "spring", stiffness: 300, damping: 15 }}
               >
-                <Icon className="w-6 h-6" /> {/* ✅ 더 큰 아이콘 */}
+                <Icon className="w-7 h-7 text-current" />
               </motion.div>
 
               <span className="text-[12px] leading-tight text-center">

@@ -107,8 +107,8 @@ const NewPostForm = ({
               >
                 <label className="cursor-pointer flex items-center gap-1">
                   <FaImage className="text-xl text-custom-pink" />
-                  <span className="text-sm text-gray-700 font-medium">
-                    업로드
+                  <span className="text-sm text-gray-700 font-bold">
+                    UPLOAD
                   </span>
                   <input
                     id="image-upload"
@@ -165,13 +165,13 @@ const NewPostForm = ({
               <button
                 type="button"
                 onClick={() => setShowNewPostForm(false)}
-                className="px-4 py-2 mr-2 text-pink-700 border border-pink-300 rounded-full hover:bg-pink-50 font-medium transition-colors text-sm"
+                className="px-4 py-2 mr-2 text-pink-700 border font-bold border-pink-300 rounded-full hover:bg-pink-50  transition-colors text-sm"
               >
                 취소
               </button>
               <button
                 type="submit"
-                className={`px-4 py-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 font-medium shadow-sm transition-all duration-300 text-sm ${
+                className={`px-4 py-2 bg-custom-pink font-bold text-white rounded-full  shadow-sm transition-all duration-300 text-sm ${
                   !newPostContent.trim() && !imagePreview
                     ? "opacity-50 cursor-not-allowed"
                     : ""
@@ -183,7 +183,7 @@ const NewPostForm = ({
                 {isSubmitting ? (
                   <span className="flex items-center">
                     <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 font-bold text-white"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"

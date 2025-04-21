@@ -268,8 +268,8 @@ const FeedPost = ({
                 className="p-2 text-black hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
               >
                 <label className="cursor-pointer flex items-center gap-1">
-                  <FaImage className="text-xl text-pink-600" />
-                  <span className="text-sm text-gray-700">업로드</span>
+                  <FaImage className="text-xl text-custom-pink" />
+                  <span className="text-sm font-bold text-gray-700">UPLOAD</span>
                   <input
                     id={`image-upload-${post.feedId}`}
                     type="file"
@@ -301,30 +301,33 @@ const FeedPost = ({
               </div>
             )}
 
-            <textarea
-              value={editedCaption}
-              onChange={(e) => setEditedCaption(e.target.value)}
-              placeholder="게시물 내용을 입력하세요..."
-              className="w-full border border-gray-300 rounded-lg p-4 text-sm text-black resize-none h-36"
-              maxLength={500}
-            ></textarea>
-            <div className="absolute bottom-20 right-8 text-xs text-gray-400">
-              {editedCaption.length}/500
+            {/* 캡션 입력 + 글자수 우측 하단 표시 */}
+            <div className="relative">
+              <textarea
+                value={editedCaption}
+                onChange={(e) => setEditedCaption(e.target.value)}
+                placeholder="게시물 내용을 입력하세요..."
+                className="w-full border border-gray-300 rounded-lg p-4 pr-12 text-sm text-black resize-none h-36"
+                maxLength={500}
+              ></textarea>
+              <div className="absolute bottom-2 right-3 text-xs text-gray-400 pointer-events-none">
+                {editedCaption.length}/500
+              </div>
             </div>
 
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="px-4 py-2 text-pink-700 border border-pink-300 rounded-full hover:bg-pink-50 transition-colors text-sm"
+                className="px-4 py-2 text-pink-700 border font-bold border-pink-300 rounded-full hover:bg-pink-50 transition-colors text-sm"
               >
                 취소
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 shadow-sm transition-all duration-300 text-sm"
+                className="px-4 py-2 bg-custom-pink font-bold text-white rounded-full hover:bg-pink-700 shadow-sm transition-all duration-300 text-sm"
               >
-                저장
+                저장하기
               </button>
             </div>
           </form>
@@ -382,7 +385,7 @@ const FeedPost = ({
                   }`}
                   onClick={() => setIsExpanded(!isExpanded)}
                 >
-                  <div className="text-base font-medium text-gray-800 break-words whitespace-pre-wrap font-pretendard">
+                  <div className="text-base font-medium text-gray-800 break-words whitespace-pre-wrap">
                     {post.caption || "게시물 내용이 없습니다."}
                   </div>
 
@@ -600,7 +603,7 @@ const FeedPost = ({
                   className={`ml-3 ${
                     !newComment.trim()
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-pink-600 hover:bg-pink-700"
+                      : "bg-custom-pink hover:bg-pink-700"
                   } text-white p-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center`}
                 >
                   <FaPaperPlane />

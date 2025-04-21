@@ -107,7 +107,7 @@ export default function StartLogin() {
   if (isLoggingIn) return <LoginLoadingScreen />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-white to-blue-100 flex items-center justify-center relative overflow-hidden px-4">
+    <div className="min-h-screen  border-none outline-none bg-gradient-to-br  from-pink-200 via-white to-blue-100 flex items-center justify-center relative overflow-hidden px-4">
       <AnimatePresence>
         <motion.div
           variants={fadeDrop}
@@ -133,7 +133,7 @@ export default function StartLogin() {
             initial="hidden"
             animate="visible"
           >
-            나랑 골프치러 갈래?????
+            나랑 골프치러 갈래?
           </motion.p>
 
           <motion.form
@@ -147,7 +147,7 @@ export default function StartLogin() {
               variants={itemVariants}
               type="text"
               placeholder="아이디"
-              className="w-full border p-2 rounded text-black"
+              className="w-full border p-2 rounded border-none outline-none focus:outline-none text-black"
               value={formData.username}
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
@@ -158,7 +158,7 @@ export default function StartLogin() {
               variants={itemVariants}
               type="password"
               placeholder="비밀번호"
-              className="w-full border p-2 rounded text-black"
+              className="w-full border p-2 rounded border-none outline-none focus:outline-none text-black"
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
@@ -175,8 +175,9 @@ export default function StartLogin() {
                   type="checkbox"
                   checked={saveId}
                   onChange={(e) => setSaveId(e.target.checked)}
-                  className="accent-pink-500 w-4 h-4 rounded focus:ring-1 focus:ring-pink-300 transition"
+                  className="w-4 h-4 rounded border border-gray-300 bg-white checked:bg-custom-pink accent-custom-pink transition"
                 />
+
                 <span className="text-gray-500 font-semibold">아이디 저장</span>
               </label>
               <button
@@ -192,11 +193,11 @@ export default function StartLogin() {
               type="submit"
               custom={5}
               variants={itemVariants}
-              className={`w-full ${
+              className={`border-none outline-none w-full ${
                 formData.username && formData.password
                   ? "bg-custom-purple"
                   : "bg-custom-purple-empty"
-              } text-white font-bold py-2 rounded-lg shadow transition`}
+              } text-white font-bold py-2 rounded-lg shadow transition `}
             >
               로그인
             </motion.button>
@@ -230,7 +231,7 @@ export default function StartLogin() {
             onClick={() => navigate("/swings/signup")}
             custom={8}
             variants={itemVariants}
-            className="w-full bg-custom-pink hover:bg-gray-800 text-white font-semibold py-2 rounded-lg"
+            className="w-full bg-custom-pink border-none outline-none text-white font-semibold py-2 rounded-lg"
           >
             회원가입
           </motion.button>
