@@ -125,14 +125,15 @@ const MatchGroupDetail = () => {
             {!isParticipant ? (
                 <button
                     onClick={() => setShowJoinModal(true)}
-                    className={`mt-4 w-full px-4 py-2 text-white rounded-lg shadow-md transition ${
+                    className={`mt-4 w-full px-4 py-2 font-bold text-white rounded-xl shadow-md transition ${
                         isFull || genderLimitReached
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-blue-500 hover:bg-blue-600"
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-custom-pink hover:bg-pink-400"
                     }`}
                     disabled={isFull || genderLimitReached}
                 >
-                    {isFull ? "모집 완료됨" : genderLimitReached ? "성비 제한으로 신청 불가" : "참가 신청"}
+
+                {isFull ? "모집 완료됨" : genderLimitReached ? "성비 제한으로 신청 불가" : "참가 신청"}
                 </button>
             ) : (
                 <button

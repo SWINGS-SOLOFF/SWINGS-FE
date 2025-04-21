@@ -45,6 +45,7 @@
     "react-toastify": "^9.1.3",
     "rollup": "^4.40.0",
     "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
     "tailwind-merge": "^3.0.2",
     "tailwind-scrollbar-hide": "^2.0.0",
     "tailwindcss-animate": "^1.0.7"
