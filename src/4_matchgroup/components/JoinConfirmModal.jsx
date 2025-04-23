@@ -32,8 +32,8 @@ const JoinConfirmModal = ({ isOpen, group, participants, onClose, onConfirm }) =
                 return;
             }
 
-            await onConfirm(); // 실제 참가 처리
-            setShowSuccess(true); // ✅ 성공 모달 상태 ON
+            await onConfirm();
+            setShowSuccess(true);
         } catch (error) {
             console.error("참가 요청 중 오류:", error);
             alert("참가 신청 중 오류가 발생했습니다.");
