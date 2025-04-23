@@ -42,7 +42,7 @@ const MatchGroupCreate = ({ isModal = false, onSuccess }) => {
                     >
                         <Confetti numberOfPieces={250} recycle={false} />
                         <h2 className="text-xl font-bold text-green-600 mt-6 mb-2">
-                            🎉 그룹이 성공적으로 만들어졌습니다!
+                            🎉 그룹 생성 완료!
                         </h2>
                     </motion.div>
                 )}
