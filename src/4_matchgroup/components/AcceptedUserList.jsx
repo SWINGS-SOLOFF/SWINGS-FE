@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ParticipantDetailModal from "./ParticipantDetailModal.jsx";
+import { getProfileImageUrl } from "../../1_user/api/userApi"; // ✅ 이미지 경로 유틸 import
 
 const AcceptedUserList = ({ participants, currentUserId, onRemove }) => {
     const [selectedParticipant, setSelectedParticipant] = useState(null);
@@ -22,7 +23,7 @@ const AcceptedUserList = ({ participants, currentUserId, onRemove }) => {
                             onClick={() => setSelectedParticipant(p)}
                         >
                             <img
-                                src={p.userImg || "/default-profile.png"}
+                                src={p.userImg ? getProfileImageUrl(p.userImg) : "/default-profile.png"}
                                 alt="프로필"
                                 className="w-10 h-10 rounded-full object-cover border"
                             />
