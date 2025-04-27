@@ -39,3 +39,8 @@ src/main/resources/firebase/firebase-service-account.json
 
 # AWS S3 key
 swings-key.pem
+
+.env*
+*.pem
+*.key
+aws-credentials.json
