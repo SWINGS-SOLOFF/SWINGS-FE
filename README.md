@@ -1,12 +1,41 @@
-# React + Vite
+# SWINGS - 골프 기반 소개팅 플랫폼
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## 프로젝트 정보
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **진행 기간**: 2025년 3월 ~ 4월 (총 2개월)
+- **진행 기관**: 신세계아이앤씨 K-Digital Training
+- **개발 목적**: 소셜 기반 데이팅 서비스의 확장성과 MZ 세대의 골프 관심을 연결한 서비스 기획 및 구현
+- **진행 방식**: 팀 프로젝트 (4인 협업)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 배포 주소 (배포 구현중)
+
+- **웹사이트**: https://www.loveswings.click/swings
+- **프론트엔드** (Vite + React PWA 기반)  
+- **백엔드** (Spring Boot + AWS Elastic Beanstalk)
+
+---
+
+## 팀 소개
+
+| 이름 | 역할 | GitHub |
+|------|------|--------|
+| 이우찬 | 팀장 / 회원 관리 / 보안 / 결제시스템 | [@Gromit-IT](https://github.com/Gromit-IT) |
+| 이건우 | 매칭 기능 / 실시간 채팅 | [@gunwoo-dev](https://github.com/gunwoo-dev) |
+| 황유성 | 그룹 기능 / 실시간 및 푸시 알림 | [@YusungH](https://github.com/YusungH) |
+| 김정대 | 피드 기능 / 소셜 기능 | [@jungdae-dev](https://github.com/jungdae-dev) |
+
+---
+
+## 프로젝트 소개
+
+**SWINGS**는 ‘골프 조인’과 ‘소개팅’의 장점을 결합한 새로운 형태의 소셜 매칭 플랫폼입니다.  
+스크린/필드 라운딩 그룹을 생성하거나 참가할 수 있으며, 실시간 채팅과 푸시 알림을 통해 자연스러운 만남을 유도합니다.  
+PWA를 기반으로 모바일 환경에서도 앱처럼 사용할 수 있어 접근성과 실용성을 높였습니다.
+
+- MZ세대의 골프 이탈과 데이팅 트렌드에 착안
+- 관심사 기반 만남의 자연스러운 연결 추구
+- 참여형 피드 기능과 사용자 프로필 관리까지 지원
