@@ -16,7 +16,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ✅ 모든 플랫폼에서 스크롤은 되지만 스크롤바는 안 보이도록 설정 */
+/* 모든 플랫폼에서 스크롤은 되지만 스크롤바는 안 보이도록 설정 */
 html,
 body {
   height: 100%;
@@ -32,7 +32,7 @@ body::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Edge */
 }
 
-/* ✅ PWA 모드일 때 강제로 적용되는 스크롤바 숨김 클래스 */
+/* PWA 모드일 때 강제로 적용되는 스크롤바 숨김 클래스 */
 .pwa-scroll-hidden {
   overflow-y: auto !important;
   scrollbar-width: none !important;
@@ -42,7 +42,7 @@ body::-webkit-scrollbar {
   display: none !important;
 }
 
-/* ✅ 루트 컨테이너(#root)도 스크롤바 제거 */
+/* 루트 컨테이너(#root)도 스크롤바 제거 */
 #root {
   display: flex;
   flex-direction: column;
@@ -158,7 +158,7 @@ select:focus button:focus {
   text-align: center;
 }
 
-/* ✅ Tailwind에서 사용할 커스텀 유틸리티 클래스 */
+/*  Tailwind에서 사용할 커스텀 유틸리티 클래스 */
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

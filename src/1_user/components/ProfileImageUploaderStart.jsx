@@ -13,7 +13,7 @@ export default function ProfileImageUploaderStart({
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // 🔄 이미지 미리보기 URL 관리
+  // 이미지 미리보기 URL 관리
   useEffect(() => {
     if (imageFile) {
       const objectUrl = URL.createObjectURL(imageFile);
@@ -55,7 +55,7 @@ export default function ProfileImageUploaderStart({
       toast.success("프로필 이미지가 저장되었습니다.");
       onComplete?.(res.filename);
       onClose();
-      window.location.reload(); // ✅ 새로고침
+      window.location.reload(); //  새로고침
     } catch (err) {
       console.error("업로드 실패:", err);
       toast.error("업로드에 실패했습니다.");

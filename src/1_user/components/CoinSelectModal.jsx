@@ -36,7 +36,7 @@ export default function CoinSelectModal({
             결제하시겠습니까?
           </p>
 
-          {/* ✅ 결제 버튼 하나만 */}
+          {/* 결제 버튼 하나만 */}
           <div className="mt-6">
             <button
               onClick={() =>

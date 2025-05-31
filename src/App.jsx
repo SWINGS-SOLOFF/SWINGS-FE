@@ -19,7 +19,7 @@ import ScrollToTop from "./components/ScrollToTop";
 export default function App() {
   return (
     <>
-      <ScrollToTop /> {/* ✅ 페이지 이동 시 스크롤 맨 위로 이동 */}
+      <ScrollToTop /> {/* 페이지 이동 시 스크롤 맨 위로 이동 */}
       <Routes>
         {/* Nginx root 요청*/}
         <Route path="/" element={<Navigate to="/swings" />} />

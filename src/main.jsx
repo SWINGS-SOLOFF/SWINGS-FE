@@ -8,7 +8,7 @@ import { NotificationProvider } from "./5_notification/context/NotificationProvi
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { registerFCM } from "./utils/fcmRegister.js";
 
-// ✅ DOMContentLoaded 이후에 클래스 적용
+//  DOMContentLoaded 이후에 클래스 적용
 document.addEventListener("DOMContentLoaded", () => {
   if (window.matchMedia("(display-mode: standalone)").matches) {
     document.body.classList.add("pwa-scroll-hidden");
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 // 서비스워커 + 토큰 등록
-const username = localStorage.getItem("username"); // ✅ 로그인 성공 시 저장된 사용자 이름
+const username = localStorage.getItem("username"); //  로그인 성공 시 저장된 사용자 이름
 if (username) {
   registerFCM(username);
 }

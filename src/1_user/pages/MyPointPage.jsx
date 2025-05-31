@@ -61,7 +61,7 @@ export default function MyPointPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] px-5 pt-6 pb-24">
-      {/* ✅ 카드형 보유 코인 UI */}
+      {/* 카드형 보유 코인 UI */}
       <motion.section
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -91,14 +91,14 @@ export default function MyPointPage() {
         </div>
       </motion.section>
 
-      {/* ✅ 이벤트 배너 - 말풍선처럼 작게 */}
+      {/* 이벤트 배너 - 말풍선처럼 작게 */}
       <section className="bg-[#fff3cd] text-[#856404] px-4 py-2.5 rounded-xl text-xs font-medium mb-6 shadow-sm flex items-center gap-2">
         🎁 이벤트: 30하트 이상 충전 시 10% 더 드려요!
       </section>
 
       <hr className="my-6 border-gray-200" />
 
-      {/* ✅ 사용 내역 */}
+      {/* 사용 내역 */}
       <section>
         <h2 className="text-base font-bold text-gray-800 mb-4">최근 활동</h2>
 

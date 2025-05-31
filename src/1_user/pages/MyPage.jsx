@@ -22,7 +22,7 @@ import {
 import IntroduceEditor from "../components/IntroduceEditor";
 import ProfileImageUploader from "../components/ProfileImageUploader";
 import PasswordChangeForm from "../components/PasswordChangeForm";
-import DeleteUserModal from "../components/DeleteUserModal"; // ✅ 회원탈퇴 모달 컴포넌트
+import DeleteUserModal from "../components/DeleteUserModal"; // 회원탈퇴 모달 컴포넌트
 import { toast } from "react-toastify";
 import { IoIosArrowBack } from "react-icons/io";
 
@@ -36,7 +36,7 @@ export default function MyPage() {
   const [imageFile, setImageFile] = useState(null);
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // ✅ 회원탈퇴 모달
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // 회원탈퇴 모달
 
   useEffect(() => {
     const loadUser = async () => {
@@ -157,7 +157,7 @@ export default function MyPage() {
           icon={<Trash2 size={18} />}
           text="회원 탈퇴"
           textColor="text-red-500"
-          onClick={() => setShowDeleteModal(true)} // ✅ 모달 열기
+          onClick={() => setShowDeleteModal(true)} //  모달 열기
         />
       </div>
 

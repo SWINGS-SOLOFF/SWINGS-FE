@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaSpinner } from "react-icons/fa"; // 🌟 스피너 아이콘 추가
+import { FaSpinner } from "react-icons/fa"; // 스피너 아이콘 추가
 
 import SignupStep1 from "./SignupStep1";
 import SignupStep2 from "./SignupStep2";
@@ -64,7 +64,7 @@ export default function SignupContainer() {
     setLoading(true);
     setError("");
 
-    console.log("📦 회원가입 전송 데이터:", formData);
+    console.log("회원가입 전송 데이터:", formData);
     try {
       await signupUser(formData);
       setShowSuccessModal(true);
@@ -164,7 +164,7 @@ export default function SignupContainer() {
               이메일 인증 후 이용해 주세요.
             </p>
 
-            {/* ✅ 확인 버튼 */}
+            {/* 확인 버튼 */}
             <button
               onClick={closeModalAndNavigate}
               className="bg-custom-pink hover:bg-pink-600 transition text-white px-5 py-2 rounded-full font-bold shadow-sm"
@@ -175,7 +175,7 @@ export default function SignupContainer() {
         </div>
       )}
 
-      {/* ✅ 로딩 스피너 모달 */}
+      {/* 로딩 스피너 모달 */}
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
           <div className="bg-white px-6 py-6 rounded shadow-lg border text-center space-y-4">

@@ -13,7 +13,7 @@ export default function PasswordChangeForm({ isModal = false, onClose }) {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // ✅ 모달 상태
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // 모달 상태
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function PasswordChangeForm({ isModal = false, onClose }) {
       setNewPassword("");
       setConfirmPassword("");
 
-      // ✅ 모달 열기
+      // 모달 열기
       setShowSuccessModal(true);
     } catch (err) {
       console.error(err);
@@ -54,8 +54,8 @@ export default function PasswordChangeForm({ isModal = false, onClose }) {
   };
 
   const handleLogout = () => {
-    removeToken(); // ✅ 로그아웃 처리
-    navigate("/swings"); // ✅ 이동
+    removeToken(); // 로그아웃 처리
+    navigate("/swings"); // 이동
   };
 
   if (!username) {
@@ -127,7 +127,7 @@ export default function PasswordChangeForm({ isModal = false, onClose }) {
         </button>
       </form>
 
-      {/* ✅ 비밀번호 변경 성공 시 표시되는 모달 */}
+      {/* 비밀번호 변경 성공 시 표시되는 모달 */}
       <Dialog
         open={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}

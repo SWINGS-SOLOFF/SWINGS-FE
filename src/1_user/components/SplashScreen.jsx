@@ -10,10 +10,10 @@ export default function SplashScreen({ onFinish }) {
       transition={{ delay: 2.5, duration: 1.5 }}
       onAnimationComplete={onFinish}
     >
-      {/* 🌸 벚꽃 애니메이션 */}
+      {/* 벚꽃 애니메이션 */}
       <SakuraFall />
 
-      {/* 🎨 배경 + 로고 텍스트 */}
+      {/* 배경 + 로고 텍스트 */}
       <div className="min-h-screen bg-gradient-to-br from-pink-200 via-white to-blue-100 flex items-center justify-center px-4">
         <div className="flex flex-col items-center space-y-2 -mt-12">
           <motion.h1

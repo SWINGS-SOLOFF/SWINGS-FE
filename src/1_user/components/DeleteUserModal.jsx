@@ -14,7 +14,7 @@ export default function DeleteUserModal({ onClose }) {
       removeToken();
       navigate("/swings");
     } catch (err) {
-      alert("❌ 비밀번호가 틀렸거나 오류가 발생했습니다.");
+      alert("비밀번호가 틀렸거나 오류가 발생했습니다.");
     }
   };
 

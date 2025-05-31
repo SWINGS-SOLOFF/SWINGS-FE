@@ -26,10 +26,10 @@ export default function UserDetailModal({ username, onClose, onUpdated }) {
   const handleRoleUpdate = async () => {
     try {
       await updateUserRole(username, role);
-      alert("✅ 역할이 성공적으로 변경되었습니다.");
+      alert("역할이 성공적으로 변경되었습니다.");
       onUpdated();
     } catch (error) {
-      alert("❌ 역할 변경 중 오류 발생");
+      alert("역할 변경 중 오류 발생");
     }
   };
 
@@ -37,10 +37,10 @@ export default function UserDetailModal({ username, onClose, onUpdated }) {
     if (window.confirm("정말 이 유저를 탈퇴시키겠습니까?")) {
       try {
         await deleteUserByAdmin(username);
-        alert("✅ 유저가 탈퇴 처리되었습니다.");
+        alert("유저가 탈퇴 처리되었습니다.");
         onUpdated();
       } catch (error) {
-        alert("❌ 유저 탈퇴 중 오류 발생");
+        alert("유저 탈퇴 중 오류 발생");
       }
     }
   };

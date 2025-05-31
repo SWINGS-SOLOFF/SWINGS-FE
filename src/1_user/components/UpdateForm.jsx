@@ -125,7 +125,7 @@ export default function UpdateForm() {
     loadUser();
   }, []);
 
-  // ✅ 로그아웃 후 강제 이동 (토큰 제거 + 새로고침 포함)
+  // 로그아웃 후 강제 이동 (토큰 제거 + 새로고침 포함)
   useEffect(() => {
     if (logoutPending) {
       removeToken();
@@ -340,7 +340,7 @@ export default function UpdateForm() {
         modal={modal}
         onClose={() => {
           if (modal.success && modal.logout) {
-            setLogoutPending(true); // ✅ logout 플래그를 통해 useEffect에서 로그아웃 처리
+            setLogoutPending(true); // logout 플래그를 통해 useEffect에서 로그아웃 처리
           } else if (modal.success) {
             navigate("/swings/mypage");
           } else {
@@ -403,7 +403,7 @@ function ResultModal({ modal, onClose }) {
               modal.success ? "text-green-600" : "text-red-500"
             }`}
           >
-            {modal.success ? " " : "❌ 실패"}
+            {modal.success ? " " : " 실패"}
           </Dialog.Title>
           <p className="text-gray-700 text-sm whitespace-pre-line font-bold">
             {modal.message}

@@ -132,7 +132,7 @@ export const resetPassword = (data) => {
 //구글 로그인
 export const googleLoginRequest = async (accessToken) => {
   const response = await axios.post("/auth/oauth/google", {
-    accessToken, // ✅ key 이름 수정
+    accessToken, // key 이름 수정
   });
   return response.data;
 };

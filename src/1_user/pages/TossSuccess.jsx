@@ -39,10 +39,10 @@ export default function TossSuccess() {
           createdAt: new Date().toISOString(),
         });
 
-        console.log("✅ 백엔드 확인 완료:", response.data);
-        setMessage("포인트 충전이 완료되었습니다! 🎉");
+        console.log("백엔드 확인 완료:", response.data);
+        setMessage("포인트 충전이 완료되었습니다!");
       } catch (err) {
-        console.error("❌ 결제 확인 실패:", err.response?.data || err.message);
+        console.error("결제 확인 실패:", err.response?.data || err.message);
         setMessage("결제 확인에 실패했습니다.");
       }
 

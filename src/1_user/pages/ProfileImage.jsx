@@ -9,7 +9,7 @@ export default function ProfileImage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ 마운트 시 기존 프로필 이미지 불러오기
+  // 마운트 시 기존 프로필 이미지 불러오기
   useEffect(() => {
     const loadUserImage = async () => {
       try {
@@ -49,7 +49,7 @@ export default function ProfileImage() {
       <ProfileImageUploader
         imageFile={imageFile}
         setImageFile={setImageFile}
-        initialImage={initialImage} // ✅ 기존 이미지 넘겨줌
+        initialImage={initialImage} // 기존 이미지 넘겨줌
       />
 
       <button

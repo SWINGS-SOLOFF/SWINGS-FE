@@ -55,7 +55,7 @@ export default function UserRoutes() {
         }
       />
 
-      {/* 포인트 충전 페이지 (코인 선택 + 모달) ✅ */}
+      {/* 포인트 충전 페이지 (코인 선택 + 모달) */}
       <Route
         path="shop"
         element={

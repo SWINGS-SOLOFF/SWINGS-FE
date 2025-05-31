@@ -17,7 +17,7 @@ export default function TossFail() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-white text-center px-6">
       <XCircle className="text-red-500 w-20 h-20 mb-4 animate-pulse" />
-      <h1 className="text-3xl font-bold text-red-600 mb-2">결제 실패 😢</h1>
+      <h1 className="text-3xl font-bold text-red-600 mb-2">결제 실패</h1>
       <p className="text-lg text-gray-700">
         문제가 발생했습니다. 다시 시도해 주세요.
       </p>
