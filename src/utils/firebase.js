@@ -11,9 +11,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-console.log("✅ Firebase 초기화 완료");
+console.log("Firebase 초기화 완료");
 
 const messaging = getMessaging(app);
-console.log("✅ Firebase 초기화 완료");
+console.log("Firebase 초기화 완료");
 
 export { messaging };

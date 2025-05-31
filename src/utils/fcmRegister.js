@@ -2,10 +2,10 @@ import { getToken } from "firebase/messaging";
 import { messaging } from "./firebase";
 
 export const registerFCM = async (username) => {
-    console.log("📣 registerFCM 실행됨 - 사용자:", username);
+    console.log("registerFCM 실행됨 - 사용자:", username);
 
     if (!("serviceWorker" in navigator)) {
-        console.warn("❌ 이 브라우저는 serviceWorker를 지원하지 않습니다.");
+        console.warn("이 브라우저는 serviceWorker를 지원하지 않습니다.");
         return;
     }
 
@@ -15,7 +15,7 @@ export const registerFCM = async (username) => {
         // 1. 알림 권한 요청
         const permission = await Notification.requestPermission();
         if (permission !== "granted") {
-            console.warn("❌ 알림 권한이 거부되었습니다.");
+            console.warn("알림 권한이 거부되었습니다.");
             return;
         }
 
@@ -29,11 +29,11 @@ export const registerFCM = async (username) => {
         });
 
         if (!token) {
-            console.warn("⚠️ FCM 토큰이 null입니다.");
+            console.warn("FCM 토큰이 null입니다.");
             return;
         }
 
-        console.log("📲 FCM Token 발급 성공:", token);
+        console.log("FCM Token 발급 성공:", token);
 
         // 4. 서버로 토큰 전송
         const response = await fetch("http://localhost:8090/swings/fcm/register-token", {
@@ -45,7 +45,7 @@ export const registerFCM = async (username) => {
 
         const result = await response.text();
     } catch (err) {
-        console.error("❌ FCM 등록 실패:", err.message);
+        console.error("FCM 등록 실패:", err.message);
         console.error(err);
     }
 };

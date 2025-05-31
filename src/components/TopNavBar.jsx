@@ -15,7 +15,7 @@ export default function NavBar() {
 
   return (
     <header className="w-full bg-white px-4 py-4 flex justify-between items-center fixed top-0 z-50">
-      {/* ✅ 로고 */}
+      {/*  로고 */}
       <div className="flex items-center">
         <Link
           to="/swings/feed"
@@ -25,7 +25,7 @@ export default function NavBar() {
         </Link>
       </div>
 
-      {/* ✅ 오른쪽 아이콘 영역 */}
+      {/* 오른쪽 아이콘 영역 */}
       <div className="flex items-center space-x-4 relative">
         {isMyPage ? (
           // 마이페이지일 때: 설정 버튼만 표시
